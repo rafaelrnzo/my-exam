@@ -12,7 +12,7 @@ import {
 import { usePreventScreenCapture } from "expo-screen-capture";
 import { disabledSelect } from "../constant/script";
 
-const HomePage = () => {
+const HomePageUser = () => {
   usePreventScreenCapture();
   const [currentState, setCurrentState] = useState(AppState.currentState);
   const [isSplitScreen, setIsSplitScreen] = useState(false);
@@ -97,7 +97,7 @@ const HomePage = () => {
         style={{ flex: 1 }}
       />
       <Text>Current State: {currentState}</Text>
-      {isSplitScreen && isTextVisible && ( // Menyembunyikan teks jika isTextVisible false
+      {isSplitScreen && isTextVisible && ( 
         <Text style={{ backgroundColor: "red", color: "white", padding: 10 }}>
           Aplikasi sedang dalam mode split screen
         </Text>
@@ -109,4 +109,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default HomePageUser;
