@@ -1,111 +1,55 @@
+import { ScrollView, Text } from "react-native";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
-import { WebView } from "react-native-webview";
-import {
-  View,
-  BackHandler,
-  Alert,
-  AppState,
-  Text,
-  Dimensions,
-  Button,
-} from "react-native";
-import { usePreventScreenCapture } from "expo-screen-capture";
-import { disabledSelect } from "../constant/script";
+import Card from "../../components/Card";
+import BASE_API_URL from "../../constant/ip";
 
-const HomePageUser = () => {
-  usePreventScreenCapture();
-  const [currentState, setCurrentState] = useState(AppState.currentState);
-  const [isSplitScreen, setIsSplitScreen] = useState(false);
-  const [isTextVisible, setIsTextVisible] = useState(true);
+const HomePageUser = ({ navigation }) => {
+  const [links, setlinks] = useState([]);
+  const [name, setname] = useState("");
+  const [token, settoken] = useState("");
+  const [role, setrole] = useState("");
 
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        Alert.alert(
-          "Peringatan",
-          "Anda mencoba untuk meninggalkan aplikasi. Semua record anda akan terulang",
-          [
-            {
-              text: "Batal",
-              onPress: () => console.log("Cancel Pressed"),
-              style: "cancel",
-            },
-            { text: "Keluar", onPress: () => BackHandler.exitApp() },
-          ],
-          { cancelable: false }
-        );
-        return true;
-      }
-    );
+  const getDataLoggedIn = async () => {
+    const name = await AsyncStorage.getItem("name");
+    const token = await AsyncStorage.getItem("token");
+    const role = await AsyncStorage.getItem("role");
+    setname(name);
+    setrole(role);
+    settoken(token);
+  };
 
-    const handleAppStateChange = (nextAppState) => {
-      if (currentState == "background") {
-        Alert.alert(
-          "Peringatan",
-          "Kamu baru saja keluar aplikasi, seluruh aktifitas kamu terekam",
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-          { cancelable: false }
-        );
-      }
-
-      setCurrentState(nextAppState);
-    };
-
-    const appStateListener = AppState.addEventListener(
-      "change",
-      handleAppStateChange
-    );
-
-    return () => {
-      backHandler.remove();
-      appStateListener.remove();
-    };
-  }, [currentState]);
+  const getLinks = async () => {
+    const token = await AsyncStorage.getItem("token");
+    const response = await axios.get(`${BASE_API_URL}links`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setlinks(response.data.data);
+  };
 
   useEffect(() => {
-    console.log(isSplitScreen)
-    const handleDimensionsChange = ({ window }) => {
-      const { width } = window;
-      console.log(width);
-      const minimumWidthForSplitScreen = 500;
-      setIsSplitScreen(width < minimumWidthForSplitScreen);
-    };
-
-    const dimensionsListener = Dimensions.addEventListener(
-      "change",
-      handleDimensionsChange
-    );
-
-    return () => {
-      dimensionsListener.remove();
-    };
-  }, [isSplitScreen]);
-
-  const handleRefresh = () => {
-    setIsTextVisible(false)
-    setIsSplitScreen(false)
-  }
+    getLinks();
+    getDataLoggedIn();
+  }, []);
 
   return (
-    <View style={{ flex: 1 }}>
-      <WebView
-        source={{
-          uri: "https://docs.google.com/forms/d/e/1FAIpQLSfgXFzWuOo9sWAx3v4LfnNZWnTTLx6jwnmGnx4_qiOE75lV1w/viewform",
-        }}
-        injectedJavaScript={disabledSelect}
-        style={{ flex: 1 }}
-      />
-      <Text>Current State: {currentState}</Text>
-      {isSplitScreen && isTextVisible && ( 
-        <Text style={{ backgroundColor: "red", color: "white", padding: 10 }}>
-          Aplikasi sedang dalam mode split screen
-        </Text>
-      )}
-      {isSplitScreen && (
-        <Button title="refresh" onPress={() => handleRefresh()} />
-      )}
-    </View>
+    <ScrollView style={{ flexDirection: "column", flex: 1 }}>
+      <Text>name: {name}</Text>
+      <Text>role: {role}</Text>
+      <Text>{token}</Text>
+      {links.map((item) => (
+        <Card
+          key={item.id}
+          press={() => navigation.navigate("UjianPageUser")}
+          link_name={item.link_name}
+          link_title={item.link_title}
+          link_status={item.link_status}
+        />
+      ))}
+    </ScrollView>
   );
 };
 
