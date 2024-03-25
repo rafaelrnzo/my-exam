@@ -7,6 +7,7 @@ import VerifyPage from "./pages/VerifyPage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef } from "react";
 import BlankScreen from "./components/BlankScreen";
+import UjianPageUser from "./pages/user/UjianPageUser";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -37,6 +38,7 @@ export default function App() {
         <Stack.Screen name="HomePageUser" component={HomePageUser} options={{ headerBackVisible: false }} />
         <Stack.Screen name="HomePageAdmin" component={HomePageAdmin} />
         <Stack.Screen name="VerifyPage" component={VerifyPage} options={{ headerBackVisible: false }} />
+        <Stack.Screen name="UjianPageUser" component={UjianPageUser} options={{ headerBackVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

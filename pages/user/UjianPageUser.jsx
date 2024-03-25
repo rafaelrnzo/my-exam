@@ -9,13 +9,34 @@ import {
   Dimensions,
   Button,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePreventScreenCapture } from "expo-screen-capture";
-import {disabledSelect} from "../../constant/script"
-const UjianPageUser = () => {
+import { disabledSelect } from "../../constant/script";
+import axios from "axios";
+import BASE_API_URL from "../../constant/ip";
+
+const UjianPageUser = ({ navigation, route }) => {
   usePreventScreenCapture();
   const [currentState, setCurrentState] = useState(AppState.currentState);
   const [isSplitScreen, setIsSplitScreen] = useState(false);
   const [isTextVisible, setIsTextVisible] = useState(true);
+  const { link_id } = route.params;
+  const { link_name } = route.params;
+
+  const updateProgress = async (progress) => {
+    const token = await AsyncStorage.getItem('token')
+    const response = await axios.put(`${BASE_API_URL}progress/user`, {
+      link_id: link_id,
+      status_progress: progress,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (response.data.data === 'keluar' || response.data.data === 'split screen' || response.data.data === 'selesai') {
+      navigation.replace('HomePageUser')
+    }
+  };
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -40,10 +61,11 @@ const UjianPageUser = () => {
 
     const handleAppStateChange = (nextAppState) => {
       if (currentState == "background") {
+
         Alert.alert(
           "Peringatan",
           "Kamu baru saja keluar aplikasi, seluruh aktifitas kamu terekam",
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+          [{ text: "OK", onPress: () => updateProgress('keluar') }],
           { cancelable: false }
         );
       }
@@ -63,7 +85,7 @@ const UjianPageUser = () => {
   }, [currentState]);
 
   useEffect(() => {
-    console.log(isSplitScreen)
+    console.log(isSplitScreen);
     const handleDimensionsChange = ({ window }) => {
       const { width } = window;
       console.log(width);
@@ -82,21 +104,24 @@ const UjianPageUser = () => {
   }, [isSplitScreen]);
 
   const handleRefresh = () => {
-    setIsTextVisible(false)
-    setIsSplitScreen(false)
-  }
+    setIsTextVisible(false);
+    setIsSplitScreen(false);
+  };
 
   return (
     <View style={{ flex: 1 }}>
       <WebView
         source={{
-          uri: "https://docs.google.com/forms/d/e/1FAIpQLSfgXFzWuOo9sWAx3v4LfnNZWnTTLx6jwnmGnx4_qiOE75lV1w/viewform",
+          uri: link_name,
         }}
         injectedJavaScript={disabledSelect}
         style={{ flex: 1 }}
       />
+      <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center' }}>
       <Text>Current State: {currentState}</Text>
-      {isSplitScreen && isTextVisible && ( 
+      <Button title="selesai" onPress={() => updateProgress('selesai')} />
+      </View>
+      {isSplitScreen && isTextVisible && (
         <Text style={{ backgroundColor: "red", color: "white", padding: 10 }}>
           Aplikasi sedang dalam mode split screen
         </Text>

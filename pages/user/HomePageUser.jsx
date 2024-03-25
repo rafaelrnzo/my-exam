@@ -37,7 +37,7 @@ const HomePageUser = ({ navigation }) => {
     });
     setlinks(response.data.data);
   };
-  
+
   const logoutUser = async () => {
     const token = await AsyncStorage.getItem("token");
     try {
@@ -56,13 +56,38 @@ const HomePageUser = ({ navigation }) => {
     }
   };
 
+  const createProgress = async (id, link_name) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+       await axios.post(
+        `${BASE_API_URL}progress/post`,
+        {
+          link_id: id,
+          status_progress:'dikerjakan'
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      navigation.navigate("UjianPageUser", {
+        link_id: id,
+        link_name: link_name.toString(),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+   
+  };
+
   useEffect(() => {
     getLinks();
     getDataLoggedIn();
   }, []);
 
   return (
-    <ScrollView style={{ flexDirection: "column", flex: 1 }}>
+    <ScrollView style={{ flexDirection: "column", flex: 1, padding: 10 }}>
       <Text>name: {fields.name}</Text>
       <Text>role: {fields.role}</Text>
       <Text>token: {fields.token}</Text>
@@ -73,7 +98,7 @@ const HomePageUser = ({ navigation }) => {
       {links.map((item) => (
         <Card
           key={item.id}
-          press={() => navigation.navigate("UjianPageUser")}
+          press={() => createProgress(item.id, item.link_name)}
           link_name={item.link_name}
           link_title={item.link_title}
           link_status={item.link_status}

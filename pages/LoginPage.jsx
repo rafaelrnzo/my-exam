@@ -50,7 +50,8 @@ const LoginPage = ({ navigation }) => {
         value={fields.name}
         onChangeText={(text) => setFields({ ...fields, name: text })}
         placeholder="name"
-      />
+        />
+        <Text>Token</Text>
       <TextInput
         value={fields.token}
         onChangeText={(text) => setFields({ ...fields, token: text })}
