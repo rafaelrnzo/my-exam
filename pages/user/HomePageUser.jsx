@@ -1,4 +1,4 @@
-import { ScrollView, Text } from "react-native";
+import { Button, ScrollView, Text } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
@@ -7,17 +7,25 @@ import BASE_API_URL from "../../constant/ip";
 
 const HomePageUser = ({ navigation }) => {
   const [links, setlinks] = useState([]);
-  const [name, setname] = useState("");
-  const [token, settoken] = useState("");
-  const [role, setrole] = useState("");
+  const [fields, setFields] = useState({
+    name: "",
+    password: "",
+    token: "",
+    role: "",
+    kelas_jurusan: "",
+  });
 
   const getDataLoggedIn = async () => {
     const name = await AsyncStorage.getItem("name");
     const token = await AsyncStorage.getItem("token");
     const role = await AsyncStorage.getItem("role");
-    setname(name);
-    setrole(role);
-    settoken(token);
+    const kelas_jurusan = await AsyncStorage.getItem("kelas_jurusan");
+    setFields({
+      name: name,
+      token: token,
+      role: role,
+      kelas_jurusan: kelas_jurusan,
+    });
   };
 
   const getLinks = async () => {
@@ -29,6 +37,24 @@ const HomePageUser = ({ navigation }) => {
     });
     setlinks(response.data.data);
   };
+  
+  const logoutUser = async () => {
+    const token = await AsyncStorage.getItem("token");
+    try {
+      await axios.post(
+        `${BASE_API_URL}logout`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      await AsyncStorage.removeItem("token");
+      navigation.navigate("LoginPage");
+    } catch (error) {
+      await AsyncStorage.removeItem("token");
+      navigation.navigate("LoginPage");
+    }
+  };
 
   useEffect(() => {
     getLinks();
@@ -37,9 +63,13 @@ const HomePageUser = ({ navigation }) => {
 
   return (
     <ScrollView style={{ flexDirection: "column", flex: 1 }}>
-      <Text>name: {name}</Text>
-      <Text>role: {role}</Text>
-      <Text>{token}</Text>
+      <Text>name: {fields.name}</Text>
+      <Text>role: {fields.role}</Text>
+      <Text>token: {fields.token}</Text>
+      <Text>kelas_jurusan: {fields.kelas_jurusan}</Text>
+      <Button title="tes" onPress={() => verifySerialNumber()} />
+      <Button title="logout" onPress={() => logoutUser()} />
+      <Text>ini link ujian</Text>
       {links.map((item) => (
         <Card
           key={item.id}
@@ -47,6 +77,7 @@ const HomePageUser = ({ navigation }) => {
           link_name={item.link_name}
           link_title={item.link_title}
           link_status={item.link_status}
+          kelas_jurusan={item.kelas_jurusan}
         />
       ))}
     </ScrollView>
