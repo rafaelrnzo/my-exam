@@ -34,9 +34,9 @@ export default function App() {
       <Stack.Navigator initialRouteName="BlankScreen">
         <Stack.Screen name="BlankScreen" component={BlankScreen} options={{ headerShown:false }} />
         <Stack.Screen name="LoginPage" component={LoginPage} options={{ headerShown:false }} />
-        <Stack.Screen name="HomePageUser" component={HomePageUser} />
+        <Stack.Screen name="HomePageUser" component={HomePageUser} options={{ headerBackVisible: false }} />
         <Stack.Screen name="HomePageAdmin" component={HomePageAdmin} />
-        <Stack.Screen name="VerifyPage" component={VerifyPage} options={{ headerBackTitleVisible: false }} />
+        <Stack.Screen name="VerifyPage" component={VerifyPage} options={{ headerBackVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
