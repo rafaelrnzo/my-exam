@@ -27,6 +27,7 @@ const VerifyPage = ({ navigation }) => {
     try {
       const role = await AsyncStorage.getItem("role");
       const token = await AsyncStorage.getItem("token");
+      console.log(DeviceInfo.getUniqueId())
       DeviceInfo.getUniqueId().then((uniqueId) => {
         axios.post(
           `${BASE_API_URL}verify`,
@@ -52,11 +53,13 @@ const VerifyPage = ({ navigation }) => {
         }).catch((error) => {
           console.log("Error:", error);
           settextError("Serial number error");
+          // navigation.replace('LoginPage')
         });
       });
     } catch (error) {
       console.log("Error:", error);
       settextError("Serial number error");
+      // navigation.replace('LoginPage')
     }
   };
   

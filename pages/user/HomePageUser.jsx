@@ -6,7 +6,8 @@ import Card from "../../components/Card";
 import BASE_API_URL from "../../constant/ip";
 
 const HomePageUser = ({ navigation }) => {
-  const [links, setlinks] = useState([]);
+  const [links, setLinks] = useState([]);
+  const [status, setStatus] = useState([]);
   const [fields, setFields] = useState({
     name: "",
     password: "",
@@ -29,13 +30,21 @@ const HomePageUser = ({ navigation }) => {
   };
 
   const getLinks = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(`${BASE_API_URL}links`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setlinks(response.data.data);
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${BASE_API_URL}progress`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const responseData = response.data.data;
+      const links = responseData.map(item => item.link);
+      const status = responseData.map(item => item.status_progress);
+      setLinks(links);
+      setStatus(status);
+    } catch (error) {
+      console.log("Error fetching links:", error);
+    }
   };
 
   const logoutUser = async () => {
@@ -51,6 +60,7 @@ const HomePageUser = ({ navigation }) => {
       await AsyncStorage.removeItem("token");
       navigation.navigate("LoginPage");
     } catch (error) {
+      console.log("Error logging out:", error);
       await AsyncStorage.removeItem("token");
       navigation.navigate("LoginPage");
     }
@@ -59,11 +69,11 @@ const HomePageUser = ({ navigation }) => {
   const createProgress = async (id, link_name) => {
     try {
       const token = await AsyncStorage.getItem("token");
-       await axios.post(
+      await axios.post(
         `${BASE_API_URL}progress/post`,
         {
           link_id: id,
-          status_progress:'dikerjakan'
+          status_progress: "dikerjakan",
         },
         {
           headers: {
@@ -76,35 +86,39 @@ const HomePageUser = ({ navigation }) => {
         link_name: link_name.toString(),
       });
     } catch (error) {
-      console.log(error);
+      console.log("Error creating progress:", error);
     }
-   
   };
 
   useEffect(() => {
-    getLinks();
-    getDataLoggedIn();
+    const fetchData = async () => {
+      await getDataLoggedIn();
+      await getLinks();
+    };
+    fetchData();
   }, []);
 
   return (
     <ScrollView style={{ flexDirection: "column", flex: 1, padding: 10 }}>
       <Text>name: {fields.name}</Text>
-      <Text>role: {fields.role}</Text>
-      <Text>token: {fields.token}</Text>
       <Text>kelas_jurusan: {fields.kelas_jurusan}</Text>
-      <Button title="tes" onPress={() => verifySerialNumber()} />
       <Button title="logout" onPress={() => logoutUser()} />
       <Text>ini link ujian</Text>
-      {links.map((item) => (
-        <Card
-          key={item.id}
-          press={() => createProgress(item.id, item.link_name)}
-          link_name={item.link_name}
-          link_title={item.link_title}
-          link_status={item.link_status}
-          kelas_jurusan={item.kelas_jurusan}
-        />
-      ))}
+
+      {links.length > 0 ? (
+        links.map((item, index) => (
+          <Card
+            key={item.id}
+            press={() => createProgress(item.id, item.link_name)}
+            link_title={item.link_title} // Pastikan nama properti ini sesuai dengan respons dari server
+            link_status={item.link_status} // Pastikan nama properti ini sesuai dengan respons dari server
+            status_progress={status[index]} // Menggunakan status yang sesuai dengan indeks
+            kelas_jurusan={item.kelas_jurusan}
+          />
+        ))
+      ) : (
+        <Text>No links available</Text>
+      )}
     </ScrollView>
   );
 };
