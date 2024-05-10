@@ -1,11 +1,11 @@
-import { SafeAreaView, Text, Button } from 'react-native'
+import { SafeAreaView, Text, Button } from "react-native";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import BASE_API_URL from '../../constant/ip';
-import Card from '../../components/Card';
+import BASE_API_URL from "../../constant/ip";
+import Card from "../../components/Card";
 
-const HomePageAdmin = ({navigation}) => {
+const HomePageAdmin = ({ navigation }) => {
   const logout = async () => {
     const token = await AsyncStorage.getItem("token");
     try {
@@ -18,10 +18,20 @@ const HomePageAdmin = ({navigation}) => {
           },
         }
       );
-      await AsyncStorage.multiRemove(["token", "role"]);
+      await AsyncStorage.multiRemove([
+        "token",
+        "role",
+        "name",
+        "kelas_jurusan",
+      ]);
       navigation.replace("LoginPage");
     } catch (error) {
-      await AsyncStorage.multiRemove(["token", "role"]);
+      await AsyncStorage.multiRemove([
+        "token",
+        "role",
+        "name",
+        "kelas_jurusan",
+      ]);
       navigation.replace("LoginPage");
     }
   };
@@ -31,7 +41,7 @@ const HomePageAdmin = ({navigation}) => {
   const getLinks = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${BASE_API_URL}links`, {
+      const response = await axios.get(`${BASE_API_URL}admin-sekolah/links`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -43,28 +53,40 @@ const HomePageAdmin = ({navigation}) => {
   };
 
   useEffect(() => {
-    getLinks()
+    getLinks();
   }, []);
 
   return (
-    <SafeAreaView style={{ padding:4 }}>
+    <SafeAreaView style={{ padding: 4 }}>
       <Text>HomePageAdmin</Text>
       {links.length > 0 ? (
         links.map((item) => (
           <Card
             key={item.id}
-            link_title={item.link_title} // Pastikan nama properti ini sesuai dengan respons dari server
-            link_status={item.link_status} // Pastikan nama properti ini sesuai dengan respons dari server
+            press={() =>
+              navigation.push("UpdateLinkAdmin", {
+                link_title: item.link_title,
+                link_status: item.link_status,
+                kelas_jurusan: item.kelas_jurusan,
+                link_name: item.link_name,
+                id: item.id
+              })
+            }
+            link_title={item.link_title}
+            link_status={item.link_status}
             kelas_jurusan={item.kelas_jurusan}
           />
         ))
       ) : (
         <Text>No links available</Text>
       )}
-      <Button title='Create link' onPress={() => navigation.push('CreateLinkAdmin')} />
-      <Button title='logout' onPress={logout} />
+      <Button
+        title="Create link"
+        onPress={() => navigation.push("CreateLinkAdmin")}
+      />
+      <Button title="logout" onPress={logout} />
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default HomePageAdmin
+export default HomePageAdmin;

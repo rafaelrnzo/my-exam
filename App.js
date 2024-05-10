@@ -10,7 +10,14 @@ import BlankScreen from "./components/BlankScreen";
 import UjianPageUser from "./pages/user/UjianPageUser";
 import LoginAsAdmin from "./pages/LoginAsAdmin";
 import MainAdmin from "./pages/admin/MainAdmin";
-import CreateLinkAdmin from "./pages/admin/action/CreateLinkAdmin";
+import CreateLinkAdmin from "./pages/admin/action-link/CreateLinkAdmin";
+import UpdateLinkAdmin from "./pages/admin/action-link/UpdateLinkAdmin";
+import CreateUser from "./pages/admin/action-user/CreateUser";
+import UpdateUser from "./pages/admin/action-user/UpdateUser";
+import SubsPage from "./pages/admin/SubsPage";
+import PaymentScreen from "./pages/admin/PaymentScreen";
+import ListUser from "./pages/admin/ListUser";
+import MonitoringPage from "./pages/admin/MonitoringPage";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -23,7 +30,7 @@ export default function App() {
       if (token && role == 'siswa') {
         navigationRef.current?.reset({
           index: 0,
-          routes: [{ name: 'VerifyPage' }]
+          routes: [{ name: 'HomePageUser' }]
         });
       } else {
         navigationRef.current?.navigate('MainAdmin');
@@ -42,7 +49,14 @@ export default function App() {
         <Stack.Screen name="HomePageUser" component={HomePageUser} options={{ headerBackVisible: false }} />
         <Stack.Screen name="MainAdmin" component={MainAdmin} options={{ headerShown:false }} />
         <Stack.Screen name="CreateLinkAdmin" component={CreateLinkAdmin} />
+        <Stack.Screen name="UpdateUser" component={UpdateUser} />
+        <Stack.Screen name="CreateUser" component={CreateUser} />
+        <Stack.Screen name="SubsPage" component={SubsPage} options={{ headerBackVisible: false }} />
+        <Stack.Screen name="PaymentScreen" component={PaymentScreen} options={{ headerBackVisible: false }} />
+        <Stack.Screen name="UpdateLinkAdmin" component={UpdateLinkAdmin} />
         <Stack.Screen name="HomePageAdmin" component={HomePageAdmin} />
+        <Stack.Screen name="ListUser" component={ListUser} />
+        <Stack.Screen name="MonitoringPage" component={MonitoringPage} />
         <Stack.Screen name="VerifyPage" component={VerifyPage} options={{ headerBackVisible: false }} />
         <Stack.Screen name="UjianPageUser" component={UjianPageUser} options={{ headerBackVisible: false }} />
       </Stack.Navigator>

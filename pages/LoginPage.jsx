@@ -30,7 +30,7 @@ const LoginPage = ({ navigation }) => {
         token: "",
         password: "",
       });
-      navigation.replace("VerifyPage");
+      navigation.replace("HomePageUser");
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }

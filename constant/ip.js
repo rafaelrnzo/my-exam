@@ -1,3 +1,3 @@
-const BASE_API_URL = 'https://d0b4-103-247-219-33.ngrok-free.app/api/'
+const BASE_API_URL = 'http://192.168.1.4:8000/api/'
 
 export default BASE_API_URL

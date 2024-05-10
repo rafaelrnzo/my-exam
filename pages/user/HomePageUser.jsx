@@ -7,6 +7,7 @@ import BASE_API_URL from "../../constant/ip";
 
 const HomePageUser = ({ navigation }) => {
   const [links, setLinks] = useState([]);
+  const [belumDikerjakan, setbelumDikerjakan] = useState([]);
   const [status, setStatus] = useState([]);
   const [fields, setFields] = useState({
     name: "",
@@ -38,10 +39,26 @@ const HomePageUser = ({ navigation }) => {
         },
       });
       const responseData = response.data.data;
-      const links = responseData.map(item => item.link);
-      const status = responseData.map(item => item.status_progress);
+      const links = responseData.map((item) => item.link);
+      const status = responseData.map((item) => item.status_progress);
+      console.log("ini sudah",links);
       setLinks(links);
       setStatus(status);
+    } catch (error) {
+      console.log("Error fetching links:", error);
+    }
+  };
+
+  const getLinksBelum = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(`${BASE_API_URL}links`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("ini belum", response.data.data);
+      setbelumDikerjakan(response.data.data);
     } catch (error) {
       console.log("Error fetching links:", error);
     }
@@ -57,11 +74,11 @@ const HomePageUser = ({ navigation }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      await AsyncStorage.removeItem("token");
+      await AsyncStorage.multiRemove(["token","role","name","kelas_jurusan"]);
       navigation.navigate("LoginPage");
     } catch (error) {
       console.log("Error logging out:", error);
-      await AsyncStorage.removeItem("token");
+      await AsyncStorage.multiRemove(["token","role","name","kelas_jurusan"]);
       navigation.navigate("LoginPage");
     }
   };
@@ -91,11 +108,9 @@ const HomePageUser = ({ navigation }) => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      await getDataLoggedIn();
-      await getLinks();
-    };
-    fetchData();
+    getDataLoggedIn();
+    getLinks();
+    getLinksBelum();
   }, []);
 
   return (
@@ -103,16 +118,30 @@ const HomePageUser = ({ navigation }) => {
       <Text>name: {fields.name}</Text>
       <Text>kelas_jurusan: {fields.kelas_jurusan}</Text>
       <Button title="logout" onPress={() => logoutUser()} />
-      <Text>ini link ujian</Text>
+      <Text>Belum Dikerjakan</Text>
 
+      {belumDikerjakan.length > 0 ? (
+        belumDikerjakan.map((item) => (
+          <Card
+            key={item.id}
+            press={() => createProgress(item.id, item.link_name)}
+            link_title={item.link_title} 
+            link_status={item.link_status} 
+            kelas_jurusan={item.kelas_jurusan}
+          />
+        ))
+      ) : (
+        <Text>No links available</Text>
+      )}
+      <Text>Sudah Dikerjakan</Text>
       {links.length > 0 ? (
         links.map((item, index) => (
           <Card
             key={item.id}
             press={() => createProgress(item.id, item.link_name)}
-            link_title={item.link_title} // Pastikan nama properti ini sesuai dengan respons dari server
-            link_status={item.link_status} // Pastikan nama properti ini sesuai dengan respons dari server
-            status_progress={status[index]} // Menggunakan status yang sesuai dengan indeks
+            link_title={item.link_title} 
+            link_status={item.link_status} 
+            status_progress={status[index]} 
             kelas_jurusan={item.kelas_jurusan}
           />
         ))
