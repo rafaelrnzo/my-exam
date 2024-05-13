@@ -18,7 +18,7 @@ const SubsPage = () => {
       });
       setSubsData(response.data.data);
     } catch (error) {
-      console.log('tes',subsData);
+      console.log(error);
     }
   };
 

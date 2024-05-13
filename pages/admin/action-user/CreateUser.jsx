@@ -2,6 +2,7 @@ import { View, Text, TextInput, ToastAndroid, Button } from 'react-native'
 import React, { useState } from "react";
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import BASE_API_URL from '../../../constant/ip';
 
 const CreateUser = ({navigation}) => {
   const [fields, setFields] = useState({
