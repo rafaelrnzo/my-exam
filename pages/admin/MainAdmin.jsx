@@ -9,7 +9,6 @@ import ListUser from "./ListUser";
 import axios from "axios";
 import BASE_API_URL from "../../constant/ip";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import PaymentScreen from "./PaymentScreen";
 import SubsPage from "./SubsPage";
 
 const MainAdmin = () => {

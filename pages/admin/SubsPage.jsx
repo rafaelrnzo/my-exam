@@ -18,7 +18,7 @@ const SubsPage = () => {
       });
       setSubsData(response.data.data);
     } catch (error) {
-      console.log(subsData);
+      console.log('tes',subsData);
     }
   };
 
@@ -39,7 +39,7 @@ const SubsPage = () => {
       const { data } = response;
       console.log(data);
       if (data.status === "success" && data.snap_token) {
-        navigation.navigate('PaymentScreen', {snap_token: data.snap_token})
+        navigation.navigate('PaymentScreen', {snap_token: data.snap_token, pay_token: data.pay_token})
       } else {
         console.log("Failed to process payment. Please try again later.");
       }
