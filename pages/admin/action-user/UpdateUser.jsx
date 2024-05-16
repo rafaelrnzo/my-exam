@@ -91,12 +91,14 @@ const UpdateUser = ({navigation, route}) => {
         renderButton={(selectedRole, isOpened) => {
           return (
             <View style={styles.dropdownButtonStyle}>
-              <Text style={styles.dropdownButtonTxtStyle}>{selectedRole}</Text>
-              <Icon
-                name={isOpened ? "chevron-up" : "chevron-down"}
-                style={styles.dropdownButtonArrowStyle}
-              />
-            </View>
+            <Text style={styles.dropdownButtonTxtStyle}>
+              {selectedRole || fields.role}
+            </Text>
+            <Icon
+              name={isOpened ? "chevron-up" : "chevron-down"}
+              style={styles.dropdownButtonArrowStyle}
+            />
+          </View>
           );
         }}
         renderItem={(item, index, isSelected) => {

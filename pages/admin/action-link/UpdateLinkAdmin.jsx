@@ -113,20 +113,14 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
         }
         renderButton={(selectedStatus, isOpened) => (
           <View style={styles.dropdownButtonStyle}>
-            {fields.link_status && (
-              <Icon
-                name={fields.link_status.icon}
-                style={styles.dropdownButtonIconStyle}
-              />
-            )}
-            <Text style={styles.dropdownButtonTxtStyle}>
-              {selectedStatus}
-            </Text>
-            <Icon
-              name={isOpened ? "chevron-up" : "chevron-down"}
-              style={styles.dropdownButtonArrowStyle}
-            />
-          </View>
+          <Text style={styles.dropdownButtonTxtStyle}>
+            {selectedStatus || fields.link_status}
+          </Text>
+          <Icon
+            name={isOpened ? "chevron-up" : "chevron-down"}
+            style={styles.dropdownButtonArrowStyle}
+          />
+        </View>
         )}
         renderItem={(item, index, isSelected) => (
           <View
