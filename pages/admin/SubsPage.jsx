@@ -3,10 +3,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BASE_API_URL from "../../constant/ip";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 
 const SubsPage = () => {
   const [subsData, setSubsData] = useState([]);
+  const navigation = useNavigation();
 
   const getSubsData = async () => {
     try {
@@ -39,7 +40,10 @@ const SubsPage = () => {
       const { data } = response;
       console.log(data);
       if (data.status === "success" && data.snap_token) {
-        navigation.navigate('PaymentScreen', {snap_token: data.snap_token, pay_token: data.pay_token})
+        navigation.navigate("PaymentScreen", {
+          snap_token: data.snap_token,
+          pay_token: data.pay_token,
+        });
       } else {
         console.log("Failed to process payment. Please try again later.");
       }
@@ -52,7 +56,34 @@ const SubsPage = () => {
     getSubsData();
   }, []);
 
-  const navigation = useNavigation();
+  const logoutUser = async () => {
+    const token = await AsyncStorage.getItem("token");
+    try {
+      await axios.post(
+        `${BASE_API_URL}logout`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      await AsyncStorage.multiRemove([
+        "token",
+        "role",
+        "name",
+        "kelas_jurusan",
+      ]);
+      navigation.navigate("LoginPage");
+    } catch (error) {
+      console.log("Error logging out:", error);
+      await AsyncStorage.multiRemove([
+        "token",
+        "role",
+        "name",
+        "kelas_jurusan",
+      ]);
+      navigation.navigate("LoginPage");
+    }
+  };
 
   return (
     <View>
@@ -65,9 +96,13 @@ const SubsPage = () => {
           <Text>{item.name}</Text>
           <Text>desc: dasdsa{item.description}</Text>
           <Text>{item.price}</Text>
-          <Button onPress={() => handleSubmit(item.name, item.price, item.id)} title="buy" />
+          <Button
+            onPress={() => handleSubmit(item.name, item.price, item.id)}
+            title="buy"
+          />
         </TouchableOpacity>
       ))}
+      <Button title="logout" onPress={() => logoutUser()} />
     </View>
   );
 };

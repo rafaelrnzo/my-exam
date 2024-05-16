@@ -50,8 +50,8 @@ const LoginPage = ({ navigation }) => {
         value={fields.name}
         onChangeText={(text) => setFields({ ...fields, name: text })}
         placeholder="name"
-        />
-        <Text>Token</Text>
+      />
+      <Text>Token</Text>
       <TextInput
         value={fields.token}
         onChangeText={(text) => setFields({ ...fields, token: text })}
@@ -63,8 +63,17 @@ const LoginPage = ({ navigation }) => {
         onChangeText={(text) => setFields({ ...fields, password: text })}
         placeholder="password"
       />
-      <Button title="Admin" onPress={() => navigation.replace('LoginAsAdmin')} />
-      <Button title="Login" onPress={login} />
+      <Button
+        title="Admin"
+        onPress={() => navigation.replace("LoginAsAdmin")}
+      />
+      <View style={{ flexDirection: "row" }}>
+        <Button title="Login" onPress={login} />
+        <Button
+          title="register"
+          onPress={() => navigation.navigate("RegisterPage")}
+        />
+      </View>
     </View>
   );
 };

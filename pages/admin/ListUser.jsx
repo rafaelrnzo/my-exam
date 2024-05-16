@@ -12,17 +12,12 @@ import BASE_API_URL from "../../constant/ip";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as DocumentPicker from "expo-document-picker";
 
-const ListUser = ({ navigation }) => {
+const ListUser = ({ navigation, route }) => {
   const [users, setUsers] = useState([]);
   const [links, setlinks] = useState([]);
   const [file, setFile] = useState(null);
-  const [fields, setFields] = useState({
-    name: "",
-    password: "",
-    token: "",
-    role: "",
-    kelas_jurusan: "",
-  });
+
+  const {kelas_jurusan_id} = route.params
 
   const pickFile = async () => {
     try {
@@ -41,7 +36,6 @@ const ListUser = ({ navigation }) => {
     }
   };
 
- 
 
   const handleImport = async () => {
     try {
@@ -68,16 +62,16 @@ const ListUser = ({ navigation }) => {
 
   const getUsers = async (url = '') => {
     try {
-      const token = await AsyncStorage.getItem('token');
       console.log(url);
-      console.log(BASE_API_URL);
-      const response = await axios.get(url == '' ? `${BASE_API_URL}admin-sekolah` : url, {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.get(url == '' ? `${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}` : url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       setUsers(response.data.data.data);
       setlinks(response.data.data.links);
+      console.log(token);
     } catch (error) {
       console.log(error);
     }
@@ -88,7 +82,7 @@ const ListUser = ({ navigation }) => {
   }, []);
 
   return (
-    <SafeAreaView style={{ padding: 20 }}>
+    <SafeAreaView>
       <View
         style={{
           flexDirection: "row",
@@ -102,16 +96,6 @@ const ListUser = ({ navigation }) => {
         <Button title="import" onPress={handleImport} />
         <Button title="create" onPress={() => navigation.push("CreateUser")} />
       </View>
-      {links.length !== 0 ? (
-        <View
-          style={{ flexDirection: "row", justifyContent: "center", gap: 4 }}
-        >
-          {links.map((item, index) => (
-            <Button key={index} onPress={() =>getUsers(item.url)} title={item.label} />
-          ))}
-        </View>
-      ) : null}
-
       <ScrollView>
         {users?.map((item) => (
           <TouchableOpacity
@@ -121,18 +105,27 @@ const ListUser = ({ navigation }) => {
               navigation.push("UpdateUser", {
                 id: item.id,
                 name: item.name,
-                kelas_jurusan: item.kelas_jurusan,
+                kelas_jurusan_id: item.kelas_jurusan_id,
                 token: item.token,
                 role: item.role,
               })
             }
           >
             <Text>name: {item.name}</Text>
-            <Text>kelas_jurusan: {item.kelas_jurusan ?? "admin"}</Text>
+            <Text>kelas_jurusan: {item.kelas_jurusan.name ?? "admin"}</Text>
             <Text>token: {item.token}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
+      {links.length !== 0 ? (
+        <View
+          style={{ flexDirection: "row", justifyContent: "center", gap: 4, paddingTop:10 }}
+        >
+          {links.map((item, index) => (
+            <Button key={index} onPress={() =>getUsers(item.url)} title={item.label} />
+          ))}
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 };

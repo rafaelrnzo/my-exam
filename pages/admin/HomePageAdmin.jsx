@@ -47,6 +47,7 @@ const HomePageAdmin = ({ navigation }) => {
         },
       });
       setLinks(response.data.data);
+      console.log(links);
     } catch (error) {
       console.log("Error fetching links:", error);
     }
@@ -67,14 +68,14 @@ const HomePageAdmin = ({ navigation }) => {
               navigation.push("UpdateLinkAdmin", {
                 link_title: item.link_title,
                 link_status: item.link_status,
-                kelas_jurusan: item.kelas_jurusan,
+                kelas_jurusan: item.kelas_jurusan.name,
                 link_name: item.link_name,
                 id: item.id
               })
             }
             link_title={item.link_title}
             link_status={item.link_status}
-            kelas_jurusan={item.kelas_jurusan}
+            kelas_jurusan={item.kelas_jurusan.name}
           />
         ))
       ) : (

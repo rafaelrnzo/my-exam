@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomePageAdmin from "./HomePageAdmin";
-import MonitoringPage from "./MonitoringPage";
 import { AntDesign } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native";
-import ListUser from "./ListUser";
 import axios from "axios";
 import BASE_API_URL from "../../constant/ip";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SubsPage from "./SubsPage";
+import ListKelas from "./ListKelas";
 
 const MainAdmin = () => {
   const Tab = createBottomTabNavigator();
@@ -24,7 +22,7 @@ const MainAdmin = () => {
         },
       });
       setsubsData(response.data.data);
-      console.log('ini subs data',subsData);
+      console.log('ini subs dat',subsData);
     } catch (error) {
       console.log('ini subs data',subsData);
     }
@@ -40,8 +38,8 @@ const MainAdmin = () => {
       ) : (
         <Tab.Navigator>
           <Tab.Screen
-            name="ListUser"
-            component={ListUser}
+            name="ListKelas"
+            component={ListKelas}
             options={{
               headerShown: false,
               tabBarLabel: "Home",
@@ -58,17 +56,6 @@ const MainAdmin = () => {
               tabBarLabel: "Link",
               tabBarIcon: ({}) => (
                 <AntDesign name="home" size={24} color="black" />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="MonitoringPage"
-            component={MonitoringPage}
-            options={{
-              headerShown: false,
-              tabBarLabel: "Monitoring",
-              tabBarIcon: ({}) => (
-                <MaterialIcons name="category" size={24} color="black" />
               ),
             }}
           />

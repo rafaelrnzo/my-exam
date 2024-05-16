@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -23,6 +23,8 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
     link_status: link_status,
   });
 
+  const [kelasJurusan, setKelasJurusan] = useState([]);
+
   const updateLink = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -37,6 +39,25 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
       console.log(fields);
     }
   };
+
+  const getKelasJurusan = async () => {
+    const token = await AsyncStorage.getItem("token");
+    try {
+      const response = await axios.get(`${BASE_API_URL}get-kelas`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const responseData = response.data.data;
+      setKelasJurusan(responseData.map((item) => item.name));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getKelasJurusan();
+  }, []);
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
@@ -53,10 +74,35 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
         onChangeText={(text) => setFields({ ...fields, link_title: text })}
       />
       <Text>Kelas Jurusan</Text>
-      <TextInput
-        placeholder="kelas"
-        value={fields.kelas_jurusan}
-        onChangeText={(text) => setFields({ ...fields, kelas_jurusan: text })}
+      <SelectDropdown
+        data={kelasJurusan}
+        defaultValue={fields.kelas_jurusan}
+        onSelect={(selectedKelas, index) =>
+          setFields({ ...fields, kelas_jurusan: selectedKelas })
+        }
+        renderButton={(selectedKelas, isOpened) => (
+          <View style={styles.dropdownButtonStyle}>
+            <Text style={styles.dropdownButtonTxtStyle}>
+              {selectedKelas || fields.kelas_jurusan}
+            </Text>
+            <Icon
+              name={isOpened ? "chevron-up" : "chevron-down"}
+              style={styles.dropdownButtonArrowStyle}
+            />
+          </View>
+        )}
+        renderItem={(item, index, isSelected) => (
+          <View
+            style={{
+              ...styles.dropdownItemStyle,
+              ...(isSelected && { backgroundColor: "#D2D9DF" }),
+            }}
+          >
+            <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+          </View>
+        )}
+        showsVerticalScrollIndicator={false}
+        dropdownStyle={styles.dropdownMenuStyle}
       />
       <Text>Link Status</Text>
       <SelectDropdown
@@ -65,37 +111,33 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
         onSelect={(selectedStatus, index) =>
           setFields({ ...fields, link_status: selectedStatus })
         }
-        renderButton={(selectedStatus, isOpened) => {
-          return (
-            <View style={styles.dropdownButtonStyle}>
-              {fields.link_status && (
-                <Icon
-                  name={fields.link_status.icon}
-                  style={styles.dropdownButtonIconStyle}
-                />
-              )}
-              <Text style={styles.dropdownButtonTxtStyle}>
-                {fields.link_status}
-              </Text>
+        renderButton={(selectedStatus, isOpened) => (
+          <View style={styles.dropdownButtonStyle}>
+            {fields.link_status && (
               <Icon
-                name={isOpened ? "chevron-up" : "chevron-down"}
-                style={styles.dropdownButtonArrowStyle}
+                name={fields.link_status.icon}
+                style={styles.dropdownButtonIconStyle}
               />
-            </View>
-          );
-        }}
-        renderItem={(item, index, isSelected) => {
-          return (
-            <View
-              style={{
-                ...styles.dropdownItemStyle,
-                ...(isSelected && { backgroundColor: "#D2D9DF" }),
-              }}
-            >
-              <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-            </View>
-          );
-        }}
+            )}
+            <Text style={styles.dropdownButtonTxtStyle}>
+              {selectedStatus}
+            </Text>
+            <Icon
+              name={isOpened ? "chevron-up" : "chevron-down"}
+              style={styles.dropdownButtonArrowStyle}
+            />
+          </View>
+        )}
+        renderItem={(item, index, isSelected) => (
+          <View
+            style={{
+              ...styles.dropdownItemStyle,
+              ...(isSelected && { backgroundColor: "#D2D9DF" }),
+            }}
+          >
+            <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+          </View>
+        )}
         showsVerticalScrollIndicator={false}
         dropdownStyle={styles.dropdownMenuStyle}
       />
@@ -146,10 +188,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "500",
     color: "#151E26",
-  },
-  dropdownItemIconStyle: {
-    fontSize: 28,
-    marginRight: 8,
   },
 });
 
