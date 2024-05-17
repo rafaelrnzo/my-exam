@@ -11,11 +11,11 @@ const LoginPage = ({ navigation }) => {
     password: "",
   });
 
-  const saveTokenRole = async (token, role, name, kelas_jurusan) => {
+  const saveTokenRole = async (token, role, name) => {
     await AsyncStorage.setItem("token", token);
     await AsyncStorage.setItem("role", role);
     await AsyncStorage.setItem("name", name);
-    await AsyncStorage.setItem("kelas_jurusan", kelas_jurusan);
+    //await AsyncStorage.setItem("kelas_jurusan", kelas_jurusan);
   };
 
   const login = async () => {
@@ -23,8 +23,8 @@ const LoginPage = ({ navigation }) => {
       const response = await axios.post(`${BASE_API_URL}login-siswa`, fields);
       const token = response.data.token;
       const role = response.data.message;
-      const kelas_jurusan = response.data.user.kelas_jurusan;
-      saveTokenRole(token, role, fields.name, kelas_jurusan);
+      // const kelas_jurusan = response.data.user.kelas_jurusan;
+      saveTokenRole(token, role, fields.name);
       setFields({
         name: "",
         token: "",
