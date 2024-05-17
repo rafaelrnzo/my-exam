@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginPage from "./pages/LoginPage";
 import HomePageUser from "./pages/user/HomePageUser";
 import HomePageAdmin from "./pages/admin/HomePageAdmin";
-import VerifyPage from "./pages/VerifyPage";
+// import VerifyPage from "./pages/VerifyPage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef } from "react";
 import BlankScreen from "./components/BlankScreen";
@@ -110,11 +110,11 @@ export default function App() {
             headerTitle: route.params.kelas_jurusan,
           })}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="VerifyPage"
           component={VerifyPage}
           options={{ headerBackVisible: false }}
-        />
+        /> */}
         <Stack.Screen
           name="UjianPageUser"
           component={UjianPageUser}

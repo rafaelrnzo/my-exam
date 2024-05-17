@@ -4,6 +4,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BASE_API_URL from "../../../constant/ip";
 import SelectDropdown from "react-native-select-dropdown";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const CreateUser = ({ navigation }) => {
   const [fields, setFields] = useState({
@@ -39,6 +40,7 @@ const CreateUser = ({ navigation }) => {
       });
       navigation.pop();
     } catch (error) {
+      console.log(fields);
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };

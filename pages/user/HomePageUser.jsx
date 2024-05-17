@@ -14,19 +14,16 @@ const HomePageUser = ({ navigation }) => {
     password: "",
     token: "",
     role: "",
-    kelas_jurusan: "",
   });
 
   const getDataLoggedIn = async () => {
     const name = await AsyncStorage.getItem("name");
     const token = await AsyncStorage.getItem("token");
     const role = await AsyncStorage.getItem("role");
-    const kelas_jurusan = await AsyncStorage.getItem("kelas_jurusan");
     setFields({
       name: name,
       token: token,
       role: role,
-      kelas_jurusan: kelas_jurusan,
     });
   };
 
@@ -41,7 +38,7 @@ const HomePageUser = ({ navigation }) => {
       const responseData = response.data.data;
       const links = responseData.map((item) => item.link);
       const status = responseData.map((item) => item.status_progress);
-      console.log("ini sudah",links);
+      console.log("ini sudah",response.data);
       setLinks(links);
       setStatus(status);
     } catch (error) {
@@ -74,11 +71,11 @@ const HomePageUser = ({ navigation }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      await AsyncStorage.multiRemove(["token","role","name","kelas_jurusan"]);
+      await AsyncStorage.multiRemove(["token","role","name"]);
       navigation.navigate("LoginPage");
     } catch (error) {
       console.log("Error logging out:", error);
-      await AsyncStorage.multiRemove(["token","role","name","kelas_jurusan"]);
+      await AsyncStorage.multiRemove(["token","role","name"]);
       navigation.navigate("LoginPage");
     }
   };
@@ -116,7 +113,6 @@ const HomePageUser = ({ navigation }) => {
   return (
     <ScrollView style={{ flexDirection: "column", flex: 1, padding: 10 }}>
       <Text>name: {fields.name}</Text>
-      <Text>kelas_jurusan: {fields.kelas_jurusan}</Text>
       <Button title="logout" onPress={() => logoutUser()} />
       <Text>Belum Dikerjakan</Text>
 
@@ -127,7 +123,7 @@ const HomePageUser = ({ navigation }) => {
             press={() => createProgress(item.id, item.link_name)}
             link_title={item.link_title} 
             link_status={item.link_status} 
-            kelas_jurusan={item.kelas_jurusan}
+            // kelas_jurusan={item.kelas_jurusan}
           />
         ))
       ) : (
@@ -138,11 +134,11 @@ const HomePageUser = ({ navigation }) => {
         links.map((item, index) => (
           <Card
             key={item.id}
-            press={() => createProgress(item.id, item.link_name)}
+            press={() => console.log('t')}
             link_title={item.link_title} 
             link_status={item.link_status} 
             status_progress={status[index]} 
-            kelas_jurusan={item.kelas_jurusan}
+            // kelas_jurusan={item.kelas_jurusan}
           />
         ))
       ) : (

@@ -5,7 +5,6 @@ import {
   TextInput,
   Button,
   StyleSheet,
-  ToastAndroid,
 } from "react-native";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";

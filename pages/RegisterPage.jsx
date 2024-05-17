@@ -26,7 +26,7 @@ const RegisterPage = ({ navigation }) => {
       await axios.post(`${BASE_API_URL}register`, fields);
       navigation.replace("LoginPage");
     } catch (error) {
-      console.log(error);
+      console.log(error, fields);
     }
   };
   return (
@@ -46,7 +46,7 @@ const RegisterPage = ({ navigation }) => {
       <Text>Role</Text>
       <SelectDropdown
         data={["admin sekolah", "siswa"]}
-        defaultValue={"admin sekolah"}
+        defaultValue={fields.role}
         onSelect={(selectedRole, index) =>
           setFields({ ...fields, role: selectedRole })
         }
@@ -88,7 +88,7 @@ const RegisterPage = ({ navigation }) => {
         onChangeText={(text) => setFields({ ...fields, kelas_jurusan: text })}
         placeholder="kelas jurusan"
       />
-      <Button title="register" onPress={() => register()} />
+      <Button title="register" onPress={register} />
     </View>
   );
 };

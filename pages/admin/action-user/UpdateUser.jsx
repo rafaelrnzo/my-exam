@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SelectDropdown from "react-native-select-dropdown";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import BASE_API_URL from '../../../constant/ip';
 
 const UpdateUser = ({navigation, route}) => {
   const {id,name,token,role,kelas_jurusan} = route.params
@@ -55,6 +57,7 @@ const UpdateUser = ({navigation, route}) => {
 
   useEffect(() => {
     getKelasJurusan();
+    console.log(kelasJurusan);
   }, []);
 
   return (
@@ -73,13 +76,11 @@ const UpdateUser = ({navigation, route}) => {
     />
     <Text>token</Text>
     <View style={{ flexDirection:'row', alignItems:'center', gap:5 }}>
-      <Text>usr-</Text>
     <TextInput
       placeholder="token"
       value={fields.token}
       onChangeText={(text) => setFields({ ...fields, token: text })}
       />
-      <Text>-smkn10</Text>
     </View>
     <Text>role</Text>
     <SelectDropdown
