@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BASE_API_URL from "../constant/ip";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const LoginAsAdmin = ({ navigation }) => {
   const [fields, setFields] = useState({
@@ -35,14 +36,7 @@ const LoginAsAdmin = ({ navigation }) => {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        flexDirection: "column",
-        justifyContent: "center",
-        padding: 4,
-      }}
-    >
+    <SafeAreaView className="h-full bg-slate-50">
       <Text>Name</Text>
       <TextInput
         value={fields.name}
@@ -57,7 +51,7 @@ const LoginAsAdmin = ({ navigation }) => {
       />
       <Button title="USER" onPress={() => navigation.replace("LoginPage")} />
       <Button title="Login" onPress={login} />
-    </View>
+    </SafeAreaView>
   );
 };
 
