@@ -14,16 +14,19 @@ const HomePageUser = ({ navigation }) => {
     password: "",
     token: "",
     role: "",
+    //kelas_jurusan: "",
   });
 
   const getDataLoggedIn = async () => {
     const name = await AsyncStorage.getItem("name");
     const token = await AsyncStorage.getItem("token");
     const role = await AsyncStorage.getItem("role");
+    //const kelas_jurusan = await AsyncStorage.getItem("kelas_jurusan");
     setFields({
       name: name,
       token: token,
       role: role,
+      //kelas_jurusan: kelas_jurusan,
     });
   };
 
@@ -113,6 +116,7 @@ const HomePageUser = ({ navigation }) => {
   return (
     <ScrollView style={{ flexDirection: "column", flex: 1, padding: 10 }}>
       <Text>name: {fields.name}</Text>
+      {/* <Text>kelas_jurusan: {fields.kelas_jurusan}</Text> */}
       <Button title="logout" onPress={() => logoutUser()} />
       <Text>Belum Dikerjakan</Text>
 
