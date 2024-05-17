@@ -22,6 +22,7 @@ import ListKelas from "./pages/admin/ListKelas";
 import RegisterPage from "./pages/RegisterPage";
 import CreateKelas from "./pages/admin/action-kelas/CreateKelas";
 import UpdateKelas from "./pages/admin/action-kelas/UpdateKelas";
+import PortalPage from "./pages/PortalPage";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -45,7 +46,7 @@ export default function App() {
       } else {
         navigationRef.current?.reset({
           index: 0,
-          routes: [{ name: "LoginPage" }],
+          routes: [{ name: "PortalPage" }],
         });
       }
     };
@@ -55,7 +56,7 @@ export default function App() {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator initialRouteName="BlankScreen">
+      <Stack.Navigator initialRouteName="PortalPage">
         <Stack.Screen
           name="BlankScreen"
           component={BlankScreen}
@@ -64,6 +65,11 @@ export default function App() {
         <Stack.Screen
           name="LoginPage"
           component={LoginPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PortalPage"
+          component={PortalPage}
           options={{ headerShown: false }}
         />
         <Stack.Screen
