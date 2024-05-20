@@ -38,6 +38,24 @@ const UjianPageUser = ({ navigation, route }) => {
     }
   };
 
+  const getStatusProgress = async() => {
+    try {
+      const token = await AsyncStorage.getItem('token')
+      const response = await axios.get(`${BASE_API_URL}progress/${link_id}`, {
+        headers:{Authorization:`Bearer ${token}`}
+      })
+      if (response.data.data === 'selesai') {
+        navigation.replace('HomePageUser')
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    getStatusProgress()
+  }, [])
+
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",

@@ -18,6 +18,9 @@ const CreateLinkAdmin = ({ navigation }) => {
     link_name: "",
     link_title: "",
     kelas_jurusan: "",
+    waktu_pengerjaan: 0,
+    waktu_pengerjaan_mulai: "",
+    waktu_pengerjaan_selesai: "",
   });
 
   const [kelasJurusan, setkelasJurusan] = useState([]);
@@ -35,6 +38,9 @@ const CreateLinkAdmin = ({ navigation }) => {
         link_name: "",
         link_title: "",
         kelas_jurusan: "",
+        waktu_pengerjaan: 0,
+        waktu_pengerjaan_mulai: "",
+        waktu_pengerjaan_selesai: "",
       });
       navigation.replace("MainAdmin");
     } catch (error) {
@@ -50,7 +56,7 @@ const CreateLinkAdmin = ({ navigation }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const responseData = response.data.data
+      const responseData = response.data.data;
       setkelasJurusan(responseData.map((item) => item.name));
       console.log(kelasJurusan);
     } catch (error) {
@@ -59,9 +65,8 @@ const CreateLinkAdmin = ({ navigation }) => {
   };
 
   useEffect(() => {
-    getKelasJurusan()
-  }, [])
-  
+    getKelasJurusan();
+  }, []);
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
@@ -76,6 +81,24 @@ const CreateLinkAdmin = ({ navigation }) => {
         placeholder="title"
         value={fields.link_title}
         onChangeText={(text) => setFields({ ...fields, link_title: text })}
+      />
+      <Text>Waktu pengerjaan</Text>
+      <TextInput
+        placeholder="waktu_pengerjaan"
+        value={fields.waktu_pengerjaan}
+        onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan: text })}
+      />
+      <Text>Waktu pengerjaan mulai</Text>
+      <TextInput
+        placeholder="waktu_pengerjaan_mulai"
+        value={fields.waktu_pengerjaan_mulai}
+        onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan_mulai: text })}
+      />
+      <Text>waktu pengerjaan selesai</Text>
+      <TextInput
+        placeholder="waktu_pengerjaan_selesai"
+        value={fields.waktu_pengerjaan_selesai}
+        onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan_selesai: text })}
       />
       <Text>Kelas Jurusan</Text>
       <SelectDropdown

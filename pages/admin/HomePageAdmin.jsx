@@ -22,17 +22,15 @@ const HomePageAdmin = ({ navigation }) => {
         "token",
         "role",
         "name",
-        "kelas_jurusan",
       ]);
-      navigation.replace("LoginPage");
+      navigation.replace("LoginAsAdmin");
     } catch (error) {
       await AsyncStorage.multiRemove([
         "token",
         "role",
         "name",
-        "kelas_jurusan",
       ]);
-      navigation.replace("LoginPage");
+      navigation.replace("LoginAsAdmin");
     }
   };
 
