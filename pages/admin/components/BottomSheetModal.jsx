@@ -2,22 +2,29 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
+import { textTitle } from '../../../assets/style/basic';
 
-const BottomSheetModal = ({ isVisible, onClose, text }) => {
+const BottomSheetModal = ({ isVisible, onClose, text, onDelete, onEdit }) => {
   return (
     <Modal
       isVisible={isVisible}
+      className="flex justify-end m-0"
       onBackdropPress={onClose}
       swipeDirection="down"
       onSwipeComplete={onClose}
-      style={styles.modal}
       backdropColor="black"
       backdropOpacity={0.2}  // Set the opacity here
     >
-      <View style={styles.modalContent}>
-        <Text style={styles.title}>{text}</Text>
-        <TouchableOpacity style={styles.button} onPress={onClose}>
-          <Text style={styles.buttonText}>Close</Text>
+      <View className=" bg-slate-50 py-6 rounded-t-xl px-4 ">
+        {/* <Text style={styles.title}>{text}</Text> */}
+        <TouchableOpacity className=" p-3 px-5 border-b-[0.5px] items-center flex border-slate-400" onPress={onDelete}>
+          <Text className={`${textTitle} font-medium text-red-500`}>Delete</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className=" p-3 px-5 border-b-[0.5px] items-center flex border-slate-400" onPress={onEdit}>
+          <Text className={`${textTitle} font-medium`}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className=" p-3 px-5 border-b-[0.5px] items-center flex border-slate-400" onPress={onClose}>
+          <Text className={`${textTitle} font-medium`}>Close</Text>
         </TouchableOpacity>
       </View>
     </Modal>
