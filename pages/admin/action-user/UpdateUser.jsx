@@ -39,6 +39,10 @@ const UpdateUser = ({ navigation, route }) => {
     }
   }, [kelasJurusan]);
 
+  if (error) {
+    return <Text>Error loading data</Text>;
+  }
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -81,7 +85,7 @@ const UpdateUser = ({ navigation, route }) => {
       />
       <Text>kelas_jurusan</Text>
       <SelectDropdown
-        data={kelasJurusan || []}
+        data={kelasJurusan.data || []}
         defaultValue={fields.kelas_jurusan}
         onSelect={(selectedKelas) => setFields({ ...fields, kelas_jurusan: selectedKelas })}
         renderButtonText={(selectedKelas) => selectedKelas}

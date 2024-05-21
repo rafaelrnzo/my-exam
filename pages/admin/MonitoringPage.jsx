@@ -1,37 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { View, Text, SafeAreaView, Button, StyleSheet } from "react-native";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import BASE_API_URL from "../../constant/ip";
+import { useApi } from "../../utils/useApi";
 
 const MonitoringPage = ({ navigation, route }) => {
-  const [users, setUsers] = useState([]);
-  const [links, setLinks] = useState([]);
-  const [paginations, setPaginations] = useState([]);
-  const [status, setStatus] = useState([]);
   const { kelas_jurusan } = route.params;
-
-  useEffect(() => {
-    fetchUserProgress();
-  }, []);
+  const {data, error, isLoading} = useApi()
 
   const fetchUserProgress = async (urlParams = "") => {
     try {
-      const token = await AsyncStorage.getItem("token");
       const url = `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan=${kelas_jurusan}`;
-      console.log(urlParams);
-      const response = await axios.get(urlParams == "" ? url : urlParams, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const { data } = response.data.data;
-      setUsers(data.map((item) => item.user));
-      setLinks(data.map((item) => item.link));
-      setStatus(data.map((item) => item.status_progress));
-      setPaginations(response.data.data.links);
+      useApi(urlParams == "" ? url : urlParams)
     } catch (error) {
       console.error("Failed to fetch user progress:", error);
     }
   };
+
+  const users = data.data.map((item) => item.user)
+  const links = data.data.map((item) => item.link)
+  const status = data.data.map((item) => item.status_progress)
+  const paginations = data.links
 
   return (
     <SafeAreaView style={styles.safeArea}>

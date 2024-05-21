@@ -7,6 +7,7 @@ const UpdateKelas = ({ navigation, route }) => {
   const { name_kelas, id } = route.params;
   const [fields, setFields] = useState({ name: name_kelas });
   const { putData, isLoading } = useApi();
+  
   const update = async () => {
     try {
       await putData(`${BASE_API_URL}update-kelas/${id}`, fields);

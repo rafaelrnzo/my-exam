@@ -29,8 +29,8 @@ const HomePageAdmin = ({ navigation }) => {
   return (
     <SafeAreaView style={{ padding: 4 }}>
       <Text>HomePageAdmin</Text>
-      {links.length > 0 ? (
-        links.map((item) => (
+      {links.data.length > 0 ? (
+        links.data.map((item) => (
           <Card
             key={item.id}
             press={() =>

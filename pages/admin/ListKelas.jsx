@@ -6,8 +6,9 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import BASE_API_URL from "../../constant/ip";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -16,47 +17,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheetModal from "./components/BottomSheetModal";
+import { useApi } from "../../utils/useApi";
 
 const ListKelas = ({ navigation }) => {
-  const [kelasJurusan, setKelasJurusan] = useState([]);
-  const [isModalVisible, setModalVisible] = React.useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const { data: kelasJurusan, isLoading } = useApi(`${BASE_API_URL}admin-sekolah/kelas-jurusan`);
+  const {deleteData}= useApi()
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
-  const fetchKelasJurusan = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(
-        `${BASE_API_URL}admin-sekolah/kelas-jurusan`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      console.log(response.data.data);
-      setKelasJurusan(response.data.data);
-    } catch (error) {
-      console.error("Failed to fetch kelas jurusan:", error);
-    }
-  };
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    )
+  }
 
   const deleteKelas = async (id) => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.delete(`${BASE_API_URL}delete-kelas/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      deleteData(`${BASE_API_URL}delete-kelas/${id}`)
       navigation.replace("MainAdmin");
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };
-
-  useEffect(() => {
-    fetchKelasJurusan();
-  }, []);
   return (
     <SafeAreaView className="pt-6 bg-slate-50 h-full w-full">
       <View className="flex justify-center items-center py-4 border-b-[0.5px] border-slate-400 bg-white">
