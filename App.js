@@ -23,6 +23,8 @@ import RegisterPage from "./pages/RegisterPage";
 import CreateKelas from "./pages/admin/action-kelas/CreateKelas";
 import UpdateKelas from "./pages/admin/action-kelas/UpdateKelas";
 import PortalPage from "./pages/PortalPage";
+import { SWRConfig } from "swr";
+import { fetcher } from "./utils/useApi";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -55,6 +57,7 @@ export default function App() {
   }, []);
 
   return (
+    <SWRConfig value={{ fetcher, dedupingInterval:2000 }}>
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator initialRouteName="PortalPage">
         <Stack.Screen
@@ -135,5 +138,6 @@ export default function App() {
         <Stack.Screen name="UpdateKelas" component={UpdateKelas} />
       </Stack.Navigator>
     </NavigationContainer>
+    </SWRConfig>
   );
 }

@@ -8,12 +8,14 @@ import {
   Text,
   Dimensions,
   Button,
+  ToastAndroid,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePreventScreenCapture } from "expo-screen-capture";
 import { disabledSelect } from "../../constant/script";
 import axios from "axios";
 import BASE_API_URL from "../../constant/ip";
+import { useApi } from "../../utils/useApi";
 
 const UjianPageUser = ({ navigation, route }) => {
   usePreventScreenCapture();
@@ -22,33 +24,28 @@ const UjianPageUser = ({ navigation, route }) => {
   const [isTextVisible, setIsTextVisible] = useState(true);
   const { link_id } = route.params;
   const { link_name } = route.params;
+  const {data,error, isLoading} = useApi(`${BASE_API_URL}progress/${link_id}`)
+  const { putData } = useApi();
 
   const updateProgress = async (progress) => {
-    const token = await AsyncStorage.getItem('token')
-    const response = await axios.put(`${BASE_API_URL}progress/user`, {
-      link_id: link_id,
-      status_progress: progress,
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`
+    try {
+      await putData(`${BASE_API_URL}progress/user`,{link_id:link_id,status_progress:progress})
+      if (data.data === 'keluar' || data.data === 'split screen' || data.data === 'selesai') {
+        navigation.replace('HomePageUser')
       }
-    });
-    if (response.data.data === 'keluar' || response.data.data === 'split screen' || response.data.data === 'selesai') {
-      navigation.replace('HomePageUser')
+    } catch (error) {
+      ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };
 
   const getStatusProgress = async() => {
     try {
-      const token = await AsyncStorage.getItem('token')
-      const response = await axios.get(`${BASE_API_URL}progress/${link_id}`, {
-        headers:{Authorization:`Bearer ${token}`}
-      })
-      if (response.data.data === 'selesai') {
+      useApi(`${BASE_API_URL}progress/${link_id}`)
+      if (data.data === 'selesai' || data.data === 'keluar' || data.data === 'split screen') {
         navigation.replace('HomePageUser')
       }
     } catch (error) {
-      console.log(error);
+      ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   }
 

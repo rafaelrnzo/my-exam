@@ -1,60 +1,31 @@
-import { SafeAreaView, Text, Button } from "react-native";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaView, Text, Button, ActivityIndicator } from "react-native";
+import React from "react";
 import BASE_API_URL from "../../constant/ip";
 import Card from "../../components/Card";
+import { useLogout } from "../../utils/useLogout";
+import { useApi } from "../../utils/useApi";
 
 const HomePageAdmin = ({ navigation }) => {
-  const logout = async () => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      await axios.post(
-        `${BASE_API_URL}logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      await AsyncStorage.multiRemove([
-        "token",
-        "role",
-        "name",
-      ]);
-      navigation.replace("LoginAsAdmin");
-    } catch (error) {
-      await AsyncStorage.multiRemove([
-        "token",
-        "role",
-        "name",
-      ]);
-      navigation.replace("LoginAsAdmin");
-    }
-  };
-
-  const [links, setLinks] = useState([]);
-
-  const getLinks = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${BASE_API_URL}admin-sekolah/links`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setLinks(response.data.data);
-      console.log(links);
-    } catch (error) {
-      console.log("Error fetching links:", error);
-    }
-  };
-
-  useEffect(() => {
-    getLinks();
-  }, []);
-
+  const { logout } = useLogout();
+  const {
+    data: links,
+    error,
+    isLoading,
+  } = useApi(`${BASE_API_URL}admin-sekolah/links`);
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>error</Text>
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={{ padding: 4 }}>
       <Text>HomePageAdmin</Text>
@@ -68,7 +39,7 @@ const HomePageAdmin = ({ navigation }) => {
                 link_status: item.link_status,
                 kelas_jurusan: item.kelas_jurusan.name,
                 link_name: item.link_name,
-                id: item.id
+                id: item.id,
               })
             }
             link_title={item.link_title}
@@ -83,7 +54,7 @@ const HomePageAdmin = ({ navigation }) => {
         title="Create link"
         onPress={() => navigation.push("CreateLinkAdmin")}
       />
-      <Button title="logout" onPress={logout} />
+      <Button title="logout" onPress={() => logout()} />
     </SafeAreaView>
   );
 };

@@ -1,14 +1,12 @@
-import { Button, ScrollView, Text } from "react-native";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
-import Card from "../../components/Card";
-import BASE_API_URL from "../../constant/ip";
+import React, { useEffect, useState } from 'react';
+import { ScrollView, Text, Button, View, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useApi } from '../../utils/useApi';
+import Card from '../../components/Card';
+import BASE_API_URL from '../../constant/ip';
+import { useLogout } from '../../utils/useLogout';
 
 const HomePageUser = ({ navigation }) => {
-  const [links, setLinks] = useState([]);
-  const [belumDikerjakan, setbelumDikerjakan] = useState([]);
-  const [status, setStatus] = useState([]);
   const [fields, setFields] = useState({
     name: "",
     password: "",
@@ -17,93 +15,30 @@ const HomePageUser = ({ navigation }) => {
     kelas_jurusan: "",
   });
 
-  const getDataLoggedIn = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${BASE_API_URL}get-data-login`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const { data: userData, error: userError } = useApi(`${BASE_API_URL}get-data-login`);
+  const { data: progressData, error: progressError } = useApi(`${BASE_API_URL}progress`);
+  const { data: linksData, error: linksError } = useApi(`${BASE_API_URL}links`);
+  const { postData } = useApi();
+  const {logout} = useLogout()
+
+  useEffect(() => {
+    if (userData) {
+      const token = AsyncStorage.getItem("token");
       setFields({
-        name: response.data.name,
+        name: userData.name,
         token: token,
-        role: response.data.role,
-        kelas_jurusan: response.data.kelas_jurusan,
+        role: userData.role,
+        kelas_jurusan: userData.kelas_jurusan,
       });
-    } catch (error) {
-      console.log(error);
     }
-  };
-
-  const getLinks = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${BASE_API_URL}progress`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const responseData = response.data.data;
-      const links = responseData.map((item) => item.link);
-      const status = responseData.map((item) => item.status_progress);
-      console.log("ini sudah", response.data);
-      setLinks(links);
-      setStatus(status);
-    } catch (error) {
-      console.log("Error fetching links:", error);
-    }
-  };
-
-  const getLinksBelum = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${BASE_API_URL}links`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log("ini belum", response.data.data);
-      setbelumDikerjakan(response.data.data);
-    } catch (error) {
-      console.log("Error fetching links:", error);
-    }
-  };
-
-  const logoutUser = async () => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      await axios.post(
-        `${BASE_API_URL}logout`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      await AsyncStorage.multiRemove(["token", "role", "name"]);
-      navigation.navigate("LoginPage");
-    } catch (error) {
-      console.log("Error logging out:", error);
-      await AsyncStorage.multiRemove(["token", "role", "name"]);
-      navigation.navigate("LoginPage");
-    }
-  };
+  }, [userData]);
 
   const createProgress = async (id, link_name) => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(
-        `${BASE_API_URL}progress/post`,
-        {
-          link_id: id,
-          status_progress: "dikerjakan",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await postData(`${BASE_API_URL}progress/post`, {
+        link_id: id,
+        status_progress: "dikerjakan",
+      });
       navigation.navigate("UjianPageUser", {
         link_id: id,
         link_name: link_name.toString(),
@@ -113,17 +48,27 @@ const HomePageUser = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    getDataLoggedIn();
-    getLinks();
-    getLinksBelum();
-  }, []);
+  if (userError || progressError || linksError) {
+    return <Text>Error loading data</Text>;
+  }
+
+  if (!userData || !progressData || !linksData) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    )
+  }
+
+  const links = progressData.data.map((item) => item.link);
+  const status = progressData.data.map((item) => item.status_progress);
+  const belumDikerjakan = linksData.data;
 
   return (
     <ScrollView style={{ flexDirection: "column", flex: 1, padding: 10 }}>
       <Text>name: {fields.name}</Text>
       <Text>Ujian untuk kelas: {fields.kelas_jurusan}</Text>
-      <Button title="logout" onPress={() => logoutUser()} />
+      <Button title="logout" onPress={() => logout()} />
       <Text>Belum Dikerjakan</Text>
 
       {belumDikerjakan.length > 0 ? (
