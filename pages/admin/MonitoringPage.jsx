@@ -1,31 +1,43 @@
-import React from "react";
-import { View, Text, SafeAreaView, Button, StyleSheet } from "react-native";
+import React,{useState} from "react";
+import { View, Text, SafeAreaView, Button, StyleSheet, ActivityIndicator } from "react-native";
 import BASE_API_URL from "../../constant/ip";
 import { useApi } from "../../utils/useApi";
 
 const MonitoringPage = ({ navigation, route }) => {
-  const { kelas_jurusan } = route.params;
-  const {data, error, isLoading} = useApi()
+  const { kelas_jurusan_id } = route.params;
+  const [url, setUrl] = useState(`${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`);
 
-  const fetchUserProgress = async (urlParams = "") => {
-    try {
-      const url = `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan=${kelas_jurusan}`;
-      useApi(urlParams == "" ? url : urlParams)
-    } catch (error) {
-      console.error("Failed to fetch user progress:", error);
-    }
+  const {data, error, isLoading} = useApi(url)
+
+  const users = data?.data.data.map((item) => item.user) || []
+  const links = data?.data.data.map((item) => item.link) || []
+  const status = data?.data.data.map((item) => item.status_progress) || []
+  const paginations = data?.data.links || []
+
+  const handleLinkPress = (newUrl) => {
+    setUrl(newUrl);
   };
 
-  const users = data.data.map((item) => item.user)
-  const links = data.data.map((item) => item.link)
-  const status = data.data.map((item) => item.status_progress)
-  const paginations = data.links
+  if (error) {
+    return <Text>Error loading data</Text>;
+  }
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    )
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View>
         {users.length == 0 ? (
+          <>
           <Text>tidak ada user ujian</Text>
+          <Button title="tes" onPress={() => console.log(kelas_jurusan_id)} />
+          </>
         ) : (
           users.map((user, index) => (
             <View style={styles.userRow} key={user.id}>
@@ -42,7 +54,7 @@ const MonitoringPage = ({ navigation, route }) => {
           {paginations.map((item, index) => (
             <Button
               key={index}
-              onPress={() => fetchUserProgress(item.url)}
+              onPress={() => handleLinkPress(item.url)}
               title={item.label}
             />
           ))}

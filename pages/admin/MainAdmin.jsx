@@ -7,9 +7,12 @@ import BASE_API_URL from "../../constant/ip";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SubsPage from "./SubsPage";
 import ListKelas from "./ListKelas";
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faClipboard as faClipboardSolid , faLink as faLinkSolid } from '@fortawesome/free-solid-svg-icons';
-import { faClipboard,  faLink} from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faClipboard as faClipboardSolid,
+  faLink as faLinkSolid,
+} from "@fortawesome/free-solid-svg-icons";
+import { faClipboard, faLink } from "@fortawesome/free-regular-svg-icons";
 
 const MainAdmin = () => {
   const Tab = createBottomTabNavigator();
@@ -24,21 +27,25 @@ const MainAdmin = () => {
         },
       });
       setsubsData(response.data.data);
-      console.log('ini subs dat', subsData);
+      if (subsData.length != 0) {
+        await AsyncStorage.setItem("status_pay", "paid");
+      }
+      console.log("ini subs dat", response.data.data);
     } catch (error) {
-      console.log('ini subs data', subsData);
+      console.log("ini subs data", subsData);
     }
   };
 
   useEffect(() => {
-    getSubsData();
+    const status_pay = AsyncStorage.getItem('status_pay')
+    if (status_pay == '' || status_pay == null) {
+      getSubsData();
+    }
   }, []);
 
   return (
     <SafeAreaView className="h-full w-full">
-      {subsData.length === 0 ? (
-        <SubsPage />
-      ) : (
+      {AsyncStorage.getItem("status_pay") ? (
         <Tab.Navigator
           screenOptions={{
             tabBarStyle: {
@@ -53,10 +60,16 @@ const MainAdmin = () => {
             options={{
               headerShown: false,
               tabBarLabel: ({ focused }) => (
-                <Text style={{ color: focused ? 'blue' : 'black' }}>Classroom</Text>
+                <Text style={{ color: focused ? "blue" : "black" }}>
+                  Classroom
+                </Text>
               ),
               tabBarIcon: ({ focused }) => (
-                <FontAwesomeIcon icon={ focused ? faClipboardSolid : faClipboard } color={focused ? 'blue' : 'black'} size={24} />
+                <FontAwesomeIcon
+                  icon={focused ? faClipboardSolid : faClipboard}
+                  color={focused ? "blue" : "black"}
+                  size={24}
+                />
               ),
             }}
           />
@@ -66,14 +79,20 @@ const MainAdmin = () => {
             options={{
               headerShown: false,
               tabBarLabel: ({ focused }) => (
-                <Text style={{ color: focused ? 'blue' : 'black' }}>Link</Text>
+                <Text style={{ color: focused ? "blue" : "black" }}>Link</Text>
               ),
               tabBarIcon: ({ focused }) => (
-                <FontAwesomeIcon icon={ focused ? faLinkSolid : faLinkSolid } color={focused ? 'blue' : 'black'} size={24} />
+                <FontAwesomeIcon
+                  icon={focused ? faLinkSolid : faLinkSolid}
+                  color={focused ? "blue" : "black"}
+                  size={24}
+                />
               ),
             }}
           />
         </Tab.Navigator>
+      ) : (
+        <SubsPage />
       )}
     </SafeAreaView>
   );

@@ -19,7 +19,7 @@ import { useApi } from "../../utils/useApi";
 const ListKelas = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
-  const { data: kelasJurusan, error, isLoading } = useApi(`${BASE_API_URL}admin-sekolah/kelas-jurusan`);
+  const { data, error, isLoading } = useApi(`${BASE_API_URL}admin-sekolah/kelas-jurusan`);
   const {deleteData}= useApi()
 
   const toggleModal = (item) => {
@@ -46,6 +46,7 @@ const ListKelas = ({ navigation }) => {
       </View>
     )
   }
+  const kelasJurusan = data.data
   return (
     <SafeAreaView className="pt-6 bg-slate-50 h-full w-full">
       <View className="flex justify-center items-center py-4 border-b-[0.5px] border-slate-400 bg-white">

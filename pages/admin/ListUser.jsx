@@ -7,17 +7,16 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import BASE_API_URL from "../../constant/ip";
 import * as DocumentPicker from "expo-document-picker";
 import { useApi } from "../../utils/useApi";
 
 const ListUser = ({ navigation, route }) => {
   const [file, setFile] = useState(null);
-
   const {kelas_jurusan_id} = route.params
-  const {postData} = useApi()
-  const {data, error, isLoading} = useApi()
+  const [url, setUrl] = useState(`${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}`);
+  const { data, error, isLoading, postData } = useApi(url);
 
   const pickFile = async () => {
     try {
@@ -51,20 +50,12 @@ const ListUser = ({ navigation, route }) => {
     }
   };
 
-  const getUsers = async (url = '') => {
-    try {
-      useApi(url == '' ? `${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}` : url)
-    } catch (error) {
-      console.log(error);
-    }
+  const users = data?.data.data || []
+  const links = data?.data.links || []
+
+  const handleLinkPress = (newUrl) => {
+    setUrl(newUrl);
   };
-
-  const users = data.data
-  const links = data.links
-
-  useEffect(() => {
-    getUsers();
-  }, []);
 
   if (error) {
     return <Text>Error loading data</Text>;
@@ -94,7 +85,7 @@ const ListUser = ({ navigation, route }) => {
         <Button title="create" onPress={() => navigation.push("CreateUser")} />
       </View>
       <ScrollView>
-        {users?.map((item) => (
+        {users.map((item) => (
           <TouchableOpacity
             key={item.id}
             style={{ padding: 10, borderColor: "black", borderWidth: 1 }}
@@ -119,7 +110,7 @@ const ListUser = ({ navigation, route }) => {
           style={{ flexDirection: "row", justifyContent: "center", gap: 4, paddingTop:10 }}
         >
           {links.map((item, index) => (
-            <Button key={index} onPress={() =>getUsers(item.url)} title={item.label} />
+            <Button key={index} onPress={() =>handleLinkPress(item.url)} title={item.label} />
           ))}
         </View>
       ) : null}
