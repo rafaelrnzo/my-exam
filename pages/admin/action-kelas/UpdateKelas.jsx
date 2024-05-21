@@ -1,8 +1,8 @@
-import { View, Text, TextInput, Button, ToastAndroid, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, ToastAndroid, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import BASE_API_URL from "../../../constant/ip";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { buttonStyle, textBasic, textInputStyle, textTitle } from "../../../assets/style/basic";
+import { buttonStyle, textBasic, textInputStyle } from "../../../assets/style/basic";
 
 const UpdateKelas = ({ navigation, route }) => {
   const { name_kelas, id } = route.params;
