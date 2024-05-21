@@ -65,14 +65,14 @@ export default function App() {
           component={BlankScreen}
           options={{ headerShown: false }}
         />
+          <Stack.Screen
+            name="PortalPage"
+            component={PortalPage}
+            options={{ headerShown: false }}
+          />
         <Stack.Screen
           name="LoginPage"
           component={LoginPage}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="PortalPage"
-          component={PortalPage}
           options={{ headerShown: false }}
         />
         <Stack.Screen

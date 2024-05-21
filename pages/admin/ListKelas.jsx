@@ -5,15 +5,25 @@ import {
   Button,
   ScrollView,
   SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import BASE_API_URL from "../../constant/ip";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { textTitle } from "../../assets/style/basic";
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheetModal from "./components/BottomSheetModal";
 
 const ListKelas = ({ navigation }) => {
   const [kelasJurusan, setKelasJurusan] = useState([]);
+  const [isModalVisible, setModalVisible] = React.useState(false);
 
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
   const fetchKelasJurusan = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -48,29 +58,25 @@ const ListKelas = ({ navigation }) => {
     fetchKelasJurusan();
   }, []);
   return (
-    <SafeAreaView style={{ padding: 10, paddingTop: 30 }}>
-      <View style={{ flexDirection: "row" }}>
-        <Text>list kelas</Text>
-        <Button
+    <SafeAreaView className="pt-6 bg-slate-50 h-full w-full">
+      <View className="flex justify-center items-center py-4 border-b-[0.5px] border-slate-400 bg-white">
+        <Text className={`${textTitle}`}>Classroom</Text>
+        {/* <Button
           title="+kelas"
           onPress={() => navigation.navigate("CreateKelas")}
-        />
+        /> */}
       </View>
-      <ScrollView>
+      <ScrollView className="p-4 flex gap-3">
         {kelasJurusan.map((item, index) => (
           <View
             key={index}
-            style={{
-              padding: 10,
-              borderColor: "black",
-              borderWidth: 1,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
+            className="p-3 border border-slate-300 rounded-lg"
+
           >
+            <Button title="Show Modal" onPress={toggleModal} />
+            <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal} text={item.name}/>
             <View style={{ flexDirection: "column" }}>
-              <Text>{item.name}</Text>
+              <Text className={`${textTitle}`}>{item.name}</Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <View style={{ flexDirection: "column" }}>
@@ -109,6 +115,13 @@ const ListKelas = ({ navigation }) => {
           </View>
         ))}
       </ScrollView>
+      <TouchableOpacity
+        className="absolute bottom-4 right-4 w-14 h-14 bg-blue-500 rounded-full justify-center items-center shadow-lg"
+        onPress={() => navigation.navigate("CreateKelas")}
+
+      >
+        <FontAwesomeIcon icon={faPlus} color="white" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
