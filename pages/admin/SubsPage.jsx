@@ -1,44 +1,26 @@
-import { View, Text, TouchableOpacity, Button } from "react-native";
+import { View, Text, TouchableOpacity, Button, ActivityIndicator } from "react-native";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BASE_API_URL from "../../constant/ip";
 import { useNavigation } from "@react-navigation/native";
+import { useLogout } from "../../utils/useLogout";
+import { useApi } from "../../utils/useApi";
 
 const SubsPage = () => {
-  const [subsData, setSubsData] = useState([]);
   const navigation = useNavigation();
-
-  const getSubsData = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${BASE_API_URL}item`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setSubsData(response.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const { data: subsData, error, isLoading } = useApi(`${BASE_API_URL}item`);
+  const { logout } = useLogout();
+  const { postData } = useApi();
 
   const handleSubmit = async (item_name, price, item_id) => {
-    const token = await AsyncStorage.getItem("token");
     try {
-      const response = await axios.post(
-        `${BASE_API_URL}pay`,
-        {
-          item_name: item_name,
-          price: price,
-          item_id: item_id,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await postData(`${BASE_API_URL}pay`, {
+        item_name: item_name,
+        price: price,
+        item_id: item_id,
+      });
       const { data } = response;
-      console.log(data);
       if (data.status === "success" && data.snap_token) {
         navigation.navigate("PaymentScreen", {
           snap_token: data.snap_token,
@@ -52,43 +34,22 @@ const SubsPage = () => {
     }
   };
 
-  useEffect(() => {
-    getSubsData();
-  }, []);
+  if (error) {
+    return <Text>Error loading data</Text>;
+  }
 
-  const logoutUser = async () => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      await axios.post(
-        `${BASE_API_URL}logout`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      await AsyncStorage.multiRemove([
-        "token",
-        "role",
-        "name",
-        "kelas_jurusan",
-      ]);
-      navigation.navigate("LoginPage");
-    } catch (error) {
-      console.log("Error logging out:", error);
-      await AsyncStorage.multiRemove([
-        "token",
-        "role",
-        "name",
-        "kelas_jurusan",
-      ]);
-      navigation.navigate("LoginPage");
-    }
-  };
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    )
+  }
 
   return (
     <View>
       <Text>SubsPage</Text>
-      {subsData.map((item) => (
+      {subsData.data.map((item) => (
         <TouchableOpacity
           key={item.id}
           style={{ padding: 10, borderColor: "black", borderWidth: 1 }}
@@ -102,7 +63,7 @@ const SubsPage = () => {
           />
         </TouchableOpacity>
       ))}
-      <Button title="logout" onPress={() => logoutUser()} />
+      <Button title="logout" onPress={() => logout()} />
     </View>
   );
 };

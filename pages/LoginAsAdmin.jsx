@@ -1,41 +1,12 @@
-import { View, Text, Button, TextInput, ToastAndroid, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import React from "react";
 import BASE_API_URL from "../constant/ip";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { buttonStyle, textBasic, textHero, textInputStyle, textSubtitle, textTitle } from "../assets/style/basic";
+import { useLogin } from "../utils/useLogin";
 
 const LoginAsAdmin = ({ navigation }) => {
-  const [fields, setFields] = useState({
-    name: "",
-    token: "",
-    password: "",
-  });
-
-  const saveTokenRole = async (token, role, name) => {
-    await AsyncStorage.setItem("token", token);
-    await AsyncStorage.setItem("role", role);
-    await AsyncStorage.setItem("name", name);
-  };
-
-  const login = async () => {
-    try {
-      const response = await axios.post(`${BASE_API_URL}login`, fields);
-      const token = response.data.token;
-      const role = response.data.message;
-      saveTokenRole(token, role, fields.name);
-      setFields({
-        name: "",
-        token: "",
-        password: "",
-      });
-      navigation.replace("MainAdmin");
-    } catch (error) {
-      ToastAndroid.show(error.message, ToastAndroid.LONG);
-    }
-  };
-
+  const { fields, setFields, login } = useLogin();
   return (
     <SafeAreaView className="h-full w-full bg-slate-50 px-4 flex justify-start">
       <View className="pt-8 flex gap-4">
@@ -69,7 +40,7 @@ const LoginAsAdmin = ({ navigation }) => {
         </View>
 
         <View className="pt-4">
-          <TouchableOpacity onPress={login} className={`${buttonStyle}`}>
+          <TouchableOpacity onPress={() => login(`${BASE_API_URL}login`, 'MainAdmin')} className={`${buttonStyle}`}>
             <Text className={`${textTitle} text-slate-50 text-lg`}>Login Admin</Text>
           </TouchableOpacity>
         </View>

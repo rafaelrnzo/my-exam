@@ -1,40 +1,28 @@
 import { View, Text, TextInput, ToastAndroid, Button, StyleSheet } from "react-native";
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState } from "react";
 import BASE_API_URL from "../../../constant/ip";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useApi } from "../../../utils/useApi";
 
 const CreateUser = ({ navigation }) => {
   const [fields, setFields] = useState({
     name: "",
     password: "",
-    token1: "",
-    token2: "",
+    token: "",
     role: "",
     kelas_jurusan: "",
   });
-  const [kelasJurusan, setkelasJurusan] = useState([]);
+  const {postData} = useApi()
+  const {data:kelasJurusan, error, isLoading} = useApi(`${BASE_API_URL}get-kelas`)
 
   const createUser = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.post(
-        `${BASE_API_URL}admin-sekolah/post`,
-        fields,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(response.data);
+      await postData(`${BASE_API_URL}admin-sekolah/post`, fields)
       setFields({
         name: "",
         password: "",
-        token1: "",
-        token2: "",
+        token: "",
         role: "",
         kelas_jurusan: "",
       });
@@ -45,25 +33,17 @@ const CreateUser = ({ navigation }) => {
     }
   };
 
-  const getKelasJurusan = async () => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      const response = await axios.get(`${BASE_API_URL}get-kelas`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const responseData = response.data.data;
-      setkelasJurusan(responseData.map((item) => item.name));
-      console.log(kelasJurusan);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  if (error) {
+    return <Text>Error loading data</Text>;
+  }
 
-  useEffect(() => {
-    getKelasJurusan();
-  }, []);
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    )
+  }
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
@@ -80,20 +60,12 @@ const CreateUser = ({ navigation }) => {
         onChangeText={(text) => setFields({ ...fields, password: text })}
       />
       <Text>token</Text>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
         <TextInput
           maxLength={3}
-          placeholder="max 3 characters"
-          value={fields.token1}
-          onChangeText={(text) => setFields({ ...fields, token1: text })}
+          placeholder="token"
+          value={fields.token}
+          onChangeText={(text) => setFields({ ...fields, token: text })}
         />
-        <TextInput
-          maxLength={3}
-          placeholder="max 3 characters"
-          value={fields.token2}
-          onChangeText={(text) => setFields({ ...fields, token2: text })}
-        />
-      </View>
       <Text>role</Text>
       <SelectDropdown
         data={["admin sekolah", "siswa"]}
@@ -129,8 +101,8 @@ const CreateUser = ({ navigation }) => {
       />
       <Text>kelas_jurusan</Text>
       <SelectDropdown
-        data={kelasJurusan}
-        defaultValue={kelasJurusan[0]}
+        data={kelasJurusan.data}
+        defaultValue={kelasJurusan.data[0]}
         onSelect={(selectedKelas, index) =>
           setFields({ ...fields, kelas_jurusan: selectedKelas })
         }

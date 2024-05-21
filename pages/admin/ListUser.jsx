@@ -5,19 +5,19 @@ import {
   Button,
   ScrollView,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import BASE_API_URL from "../../constant/ip";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as DocumentPicker from "expo-document-picker";
+import { useApi } from "../../utils/useApi";
 
 const ListUser = ({ navigation, route }) => {
-  const [users, setUsers] = useState([]);
-  const [links, setlinks] = useState([]);
   const [file, setFile] = useState(null);
 
   const {kelas_jurusan_id} = route.params
+  const {postData} = useApi()
+  const {data, error, isLoading} = useApi()
 
   const pickFile = async () => {
     try {
@@ -45,16 +45,7 @@ const ListUser = ({ navigation, route }) => {
         type: "file/xlsx",
         name: file.assets[0].name,
       });
-      console.log(file.assets[0].uri);
-      const token = await AsyncStorage.getItem("token");
-      await axios.post(`${BASE_API_URL}admin-sekolah/siswa-import`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      getUsers();
-      console.log("Data siswa berhasil diimpor!");
+      await postData(`${BASE_API_URL}admin-sekolah/siswa-import`, formData)
     } catch (error) {
       console.error("Error importing siswa:", error);
     }
@@ -62,24 +53,30 @@ const ListUser = ({ navigation, route }) => {
 
   const getUsers = async (url = '') => {
     try {
-      console.log(url);
-      const token = await AsyncStorage.getItem('token');
-      const response = await axios.get(url == '' ? `${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}` : url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setUsers(response.data.data.data);
-      setlinks(response.data.data.links);
-      console.log(token);
+      useApi(url == '' ? `${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}` : url)
     } catch (error) {
       console.log(error);
     }
   };
 
+  const users = data.data
+  const links = data.links
+
   useEffect(() => {
     getUsers();
   }, []);
+
+  if (error) {
+    return <Text>Error loading data</Text>;
+  }
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    )
+  }
 
   return (
     <SafeAreaView>

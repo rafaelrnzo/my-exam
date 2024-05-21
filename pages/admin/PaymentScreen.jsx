@@ -1,15 +1,12 @@
-import { Button, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
-import WebView from "react-native-webview";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import BASE_API_URL from "../../constant/ip";
+import React, { useEffect } from 'react';
+import { View } from 'react-native';
+import { WebView } from 'react-native-webview';
+import { useApi } from '../../utils/useApi';
 
 const PaymentScreen = ({ navigation, route }) => {
-  const {snap_token, pay_token} = route.params
+  const { snap_token, pay_token } = route.params;
   const clientKey = 'SB-Mid-client-6nVp9w_Xc4Ghak7I';
-  const [statusPay, setStatusPay] = useState('');
-  const [prevStatusPay, setPrevStatusPay] = useState('');
+  const { data: statusPay, error, isLoading, mutate } = useApi(`${BASE_API_URL}get-pay/${pay_token}`);
 
   const injectScript = `
     document.addEventListener("DOMContentLoaded", function() {
@@ -20,37 +17,24 @@ const PaymentScreen = ({ navigation, route }) => {
     });
   `;
 
-  const getStatusPay = async() => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      const response = await axios.get(`${BASE_API_URL}get-pay/${pay_token}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setStatusPay(response.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   useEffect(() => {
-    if (statusPay !== prevStatusPay) {
-      getStatusPay();
-      setPrevStatusPay(statusPay);
-    }
-  }, [statusPay]);
+    const interval = setInterval(() => {
+      mutate(); // Revalidate the data every 5 seconds
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [mutate]);
 
   useEffect(() => {
     if (statusPay && statusPay !== 'pending') {
       navigation.replace('MainAdmin');
     }
   }, [statusPay]);
-  
+
   return (
-    <View style={{ flex:1 }}>
+    <View style={{ flex: 1 }}>
       <WebView
-      style={{ flex:1 }}
+        style={{ flex: 1 }}
         javaScriptEnabled={true}
         javaScriptCanOpenWindowsAutomatically={true}
         domStorageEnabled={true}
@@ -60,7 +44,7 @@ const PaymentScreen = ({ navigation, route }) => {
         cacheMode="LOAD_NO_CACHE"
         injectedJavaScript={injectScript}
         source={{ uri: `https://app.sandbox.midtrans.com/snap/v2/vtweb/${snap_token}` }}
-        />
+      />
     </View>
   );
 };

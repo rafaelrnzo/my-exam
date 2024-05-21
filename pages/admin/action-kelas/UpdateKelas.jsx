@@ -1,28 +1,30 @@
-import { View, Text, TextInput, Button, ToastAndroid, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, ToastAndroid, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import BASE_API_URL from "../../../constant/ip";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { buttonStyle, textBasic, textInputStyle, textTitle } from "../../../assets/style/basic";
+import { buttonStyle, textBasic, textInputStyle } from "../../../assets/style/basic";
 
 const UpdateKelas = ({ navigation, route }) => {
-  const { name_kelas, id } = route.params
+  const { name_kelas, id } = route.params;
   const [fields, setFields] = useState({ name: name_kelas });
+  const { putData, isLoading } = useApi();
+  
   const update = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      await axios.put(`${BASE_API_URL}update-kelas/${id}`, fields, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await putData(`${BASE_API_URL}update-kelas/${id}`, fields);
       setFields({ name: "" });
       navigation.replace("MainAdmin");
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={{ paddingTop: 0 }} className="h-full w-full bg-slate-50 flex justify-start">
       <View className="flex gap-y-2  px-4">
@@ -43,4 +45,4 @@ const UpdateKelas = ({ navigation, route }) => {
   )
 }
 
-export default UpdateKelas
+export default UpdateKelas;
