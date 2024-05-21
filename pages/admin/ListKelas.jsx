@@ -14,27 +14,39 @@ import BASE_API_URL from "../../constant/ip";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { textTitle } from "../../assets/style/basic";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faEllipsisVertical, faDesktop } from '@fortawesome/free-solid-svg-icons'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheetModal from "./components/BottomSheetModal";
 import { useApi } from "../../utils/useApi";
 
 const ListKelas = ({ navigation }) => {
+  const [kelasJurusan, setKelasJurusan] = useState([]);
+  const [isModalVisible, setModalVisible] = React.useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const { data: kelasJurusan, isLoading } = useApi(`${BASE_API_URL}admin-sekolah/kelas-jurusan`);
   const {deleteData}= useApi()
 
-  const toggleModal = () => {
+  const toggleModal = (item) => {
+    setSelectedItem(item);
     setModalVisible(!isModalVisible);
   };
 
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    )
-  }
+  const fetchKelasJurusan = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(
+        `${BASE_API_URL}admin-sekolah/kelas-jurusan`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log(response.data.data);
+      setKelasJurusan(response.data.data);
+    } catch (error) {
+      console.error("Failed to fetch kelas jurusan:", error);
+    }
+  };
 
   const deleteKelas = async (id) => {
     try {
@@ -55,53 +67,54 @@ const ListKelas = ({ navigation }) => {
       </View>
       <ScrollView className="p-4 flex gap-3">
         {kelasJurusan.map((item, index) => (
-          <View
+          <TouchableOpacity
             key={index}
-            className="p-3 border border-slate-300 rounded-lg"
-
+            className="p-3 border border-slate-300 rounded-lg w-auto flex "
+            onPress={() =>
+              navigation.push("ListUser", {
+                kelas_jurusan_id: item.id,
+                kelas_jurusan: item.name,
+              })
+            }
           >
-            <Button title="Show Modal" onPress={toggleModal} />
-            <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal} text={item.name}/>
-            <View style={{ flexDirection: "column" }}>
+            <View className="flex-row flex justify-between">
               <Text className={`${textTitle}`}>{item.name}</Text>
+              <TouchableOpacity onPress={() => toggleModal(item)} >
+                <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
+              </TouchableOpacity>
+              {/* <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal} text={item.name} /> */}
             </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <View style={{ flexDirection: "column" }}>
-                <Button
-                  title="view"
-                  onPress={() =>
-                    navigation.push("ListUser", {
-                      kelas_jurusan_id: item.id,
-                      kelas_jurusan: item.name,
-                    })
-                  }
-                />
-                <Button
-                  title="monitoring"
-                  onPress={() =>
-                    navigation.push("MonitoringPage", {
-                      kelas_jurusan_id: item.id,
-                      kelas_jurusan: item.name,
-                    })
-                  }
-                />
+            <View className="pt-5">
+              <View className="flex justify-between flex-row items-center">
+                <Text>as</Text>
+                <TouchableOpacity onPress={() =>
+                  navigation.push("MonitoringPage", {
+                    kelas_jurusan_id: item.id,
+                    kelas_jurusan: item.name,
+                  })
+                }>
+                  <View className="flex flex-row  bg-blue-500 items-center p-2 px-3 rounded-md">
+                    <FontAwesomeIcon icon={faDesktop} color="white" />
+                    <Text className="text-base font-medium  text-white pl-2">Monitoring</Text>
+                  </View>
+                </TouchableOpacity>
               </View>
-              <View style={{ flexDirection: "column" }}>
-                <Button
-                  title="Edit"
-                  onPress={() =>
-                    navigation.push("UpdateKelas", {
-                      name_kelas: item.name,
-                      id: item.id,
-                    })
-                  }
-                />
-                <Button title="delete" onPress={() => deleteKelas(item.id)} />
-              </View>
+
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
+      {selectedItem && (
+        <BottomSheetModal
+          isVisible={isModalVisible}
+          onClose={() => setModalVisible(false)}
+          onDelete={() => deleteKelas(selectedItem.id)}
+          onEdit={() => navigation.push("UpdateKelas", {
+            name_kelas: selectedItem.name,
+            id: selectedItem.id,
+          })}
+        />
+      )}
       <TouchableOpacity
         className="absolute bottom-4 right-4 w-14 h-14 bg-blue-500 rounded-full justify-center items-center shadow-lg"
         onPress={() => navigation.navigate("CreateKelas")}
