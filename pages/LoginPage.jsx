@@ -1,5 +1,5 @@
-import { View, Text, Button, TextInput, ToastAndroid, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import React from "react";
 import BASE_API_URL from "../constant/ip";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { buttonStyle, textBasic, textHero, textInputStyle, textSubtitle, textTitle } from "../assets/style/basic";
