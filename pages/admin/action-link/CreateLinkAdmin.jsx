@@ -27,9 +27,10 @@ const CreateLinkAdmin = ({ navigation }) => {
     link_name: "",
     link_title: "",
     kelas_jurusan: "",
+    link_status:"active",
     waktu_pengerjaan: 0,
-    waktu_pengerjaan_mulai: "",
-    waktu_pengerjaan_selesai: "",
+    waktu_pengerjaan_mulai: new Date(),
+    waktu_pengerjaan_selesai: new Date(),
   });
 
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -68,25 +69,36 @@ const CreateLinkAdmin = ({ navigation }) => {
   const createLink = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const response = await axios.post(`${BASE_API_URL}links/post`, fields, {
+  
+      const formattedFields = {
+        ...fields,
+        waktu_pengerjaan_mulai: fields.waktu_pengerjaan_mulai.toISOString().slice(0, 19).replace('T', ' '),
+        waktu_pengerjaan_selesai: fields.waktu_pengerjaan_selesai.toISOString().slice(0, 19).replace('T', ' '),
+      };
+  
+      const response = await axios.post(`${BASE_API_URL}links/post`, formattedFields, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       console.log(response.data);
+  
       setFields({
         link_name: "",
         link_title: "",
         kelas_jurusan: "",
+        link_status: "",
         waktu_pengerjaan: 0,
-        waktu_pengerjaan_mulai: "",
-        waktu_pengerjaan_selesai: "",
+        waktu_pengerjaan_mulai: new Date(),
+        waktu_pengerjaan_selesai: new Date(),
       });
       navigation.replace("MainAdmin");
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
+      console.log(error.response.data);
     }
   };
+  
 
   const getKelasJurusan = async () => {
     const token = await AsyncStorage.getItem("token");
@@ -129,6 +141,32 @@ const CreateLinkAdmin = ({ navigation }) => {
             className={`${textInputStyle}`}
           />
         </View>
+        <View className="flex gap-y-2">
+        <Text className={`${textBasic}`}>Link Status</Text>
+        <SelectDropdown
+              data={['active','inactive']}
+              defaultValue={fields.link_status}
+              onSelect={(selectedStatus) => setFields({ ...fields, link_status: selectedStatus })}
+              renderButton={(selectedStatus, isOpened) => (
+                <View style={styles.dropdownButtonStyle}>
+                  <Text style={styles.dropdownButtonTxtStyle}>{selectedStatus}</Text>
+                  <Icon name={isOpened ? 'chevron-up' : 'chevron-down'} style={styles.dropdownButtonArrowStyle} />
+                </View>
+              )}
+              renderItem={(item, index, isSelected) => (
+                <View
+                  style={{
+                    ...styles.dropdownItemStyle,
+                    ...(isSelected && { backgroundColor: '#D2D9DF' }),
+                  }}
+                >
+                  <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+                </View>
+              )}
+              showsVerticalScrollIndicator={false}
+              dropdownStyle={styles.dropdownMenuStyle}
+            />
+        </View>
         <View className="flex-row flex-wrap">
           <View className="pr-2 flex-auto">
             <Text className={`${textBasic} mb-2`}>Kelas Jurusan</Text>
@@ -161,7 +199,7 @@ const CreateLinkAdmin = ({ navigation }) => {
             <TextInput
               placeholder="Waktu"
               value={fields.waktu_pengerjaan.toString()}
-              onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan: parseInt(text) })}
+              onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan: text })}
               className={`${textInputStyle}`}
             />
           </View>
