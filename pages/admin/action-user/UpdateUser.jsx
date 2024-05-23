@@ -15,6 +15,7 @@ const UpdateUser = ({ navigation, route }) => {
     kelas_jurusan: kelas_jurusan,
   });
   const { data: kelasJurusan, error, isLoading } = useApi(`${BASE_API_URL}get-kelas`);
+  const responseData = kelasJurusan.data.map((item) => item.name)
   const { putData } = useApi();
 
   const updateUser = async () => {
@@ -34,10 +35,8 @@ const UpdateUser = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    if (kelasJurusan) {
-      setFields({ ...fields, kelas_jurusan: kelasJurusan.map(item => item.name) });
-    }
-  }, [kelasJurusan]);
+    console.log(fields.kelas_jurusan);
+  }, []);
 
   if (error) {
     return <Text>Error loading data</Text>;
@@ -85,13 +84,34 @@ const UpdateUser = ({ navigation, route }) => {
       />
       <Text>kelas_jurusan</Text>
       <SelectDropdown
-        data={kelasJurusan.data || []}
+        data={responseData}
         defaultValue={fields.kelas_jurusan}
-        onSelect={(selectedKelas) => setFields({ ...fields, kelas_jurusan: selectedKelas })}
-        renderButtonText={(selectedKelas) => selectedKelas}
-        renderDropdownIcon={(isOpened) => (
-          <Icon name={isOpened ? "chevron-up" : "chevron-down"} />
+        onSelect={(selectedKelas, index) =>
+          setFields({ ...fields, kelas_jurusan: selectedKelas })
+        }
+        renderButton={(selectedKelas, isOpened) => (
+          <View style={styles.dropdownButtonStyle}>
+            <Text style={styles.dropdownButtonTxtStyle}>
+              {selectedKelas || fields.kelas_jurusan}
+            </Text>
+            <Icon
+              name={isOpened ? "chevron-up" : "chevron-down"}
+              style={styles.dropdownButtonArrowStyle}
+            />
+          </View>
         )}
+        renderItem={(item, index, isSelected) => (
+          <View
+            style={{
+              ...styles.dropdownItemStyle,
+              ...(isSelected && { backgroundColor: "#D2D9DF" }),
+            }}
+          >
+            <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+          </View>
+        )}
+        showsVerticalScrollIndicator={false}
+        dropdownStyle={styles.dropdownMenuStyle}
       />
       <Button title="update" onPress={updateUser} />
     </View>

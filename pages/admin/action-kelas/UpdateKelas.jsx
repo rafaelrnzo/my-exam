@@ -1,13 +1,14 @@
-import { View, Text, TextInput, ToastAndroid, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, ToastAndroid, TouchableOpacity, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import BASE_API_URL from "../../../constant/ip";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { buttonStyle, textBasic, textInputStyle } from "../../../assets/style/basic";
+import { useApi } from "../../../utils/useApi";
 
 const UpdateKelas = ({ navigation, route }) => {
   const { name_kelas, id } = route.params;
   const [fields, setFields] = useState({ name: name_kelas });
-  const { putData, isLoading } = useApi();
+  const { putData } = useApi();
   
   const update = async () => {
     try {
@@ -18,13 +19,6 @@ const UpdateKelas = ({ navigation, route }) => {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
   return (
     <SafeAreaView style={{ paddingTop: 0 }} className="h-full w-full bg-slate-50 flex justify-start">
       <View className="flex gap-y-2  px-4">

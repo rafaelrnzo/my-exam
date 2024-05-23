@@ -1,20 +1,9 @@
-// useApi.js
 import useSWR from 'swr';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-export const fetcher = async (url) => {
-  const token = await AsyncStorage.getItem('token');
-  const response = await axios.get(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return response.data;
-};
-
-export const useApi = (url) => {
-  const { data, error, mutate } = useSWR(url);
+export const useApi = (initialUrl) => {
+  const { data, error, mutate } = useSWR(initialUrl);
 
   const postData = async (url, newData) => {
     const token = await AsyncStorage.getItem('token');
@@ -70,4 +59,14 @@ export const useApi = (url) => {
     putData,
     deleteData
   };
+};
+
+export const fetcher = async (url) => {
+  const token = await AsyncStorage.getItem('token');
+  const response = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
 };

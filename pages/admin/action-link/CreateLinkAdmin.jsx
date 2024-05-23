@@ -5,6 +5,8 @@ import {
   Button,
   ToastAndroid,
   StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -12,6 +14,13 @@ import BASE_API_URL from "../../../constant/ip";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import {
+  buttonStyle,
+  textBasic,
+  textInputStyle,
+  textTitle,
+} from "../../../assets/style/basic";
 
 const CreateLinkAdmin = ({ navigation }) => {
   const [fields, setFields] = useState({
@@ -22,6 +31,37 @@ const CreateLinkAdmin = ({ navigation }) => {
     waktu_pengerjaan_mulai: "",
     waktu_pengerjaan_selesai: "",
   });
+
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
+  const onStartDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || fields.waktu_pengerjaan_mulai;
+    setShowStartDatePicker(false);
+    setFields({ ...fields, waktu_pengerjaan_mulai: currentDate });
+    setShowStartTimePicker(true);
+  };
+
+  const onStartTimeChange = (event, selectedTime) => {
+    const currentTime = selectedTime || fields.waktu_pengerjaan_mulai;
+    setShowStartTimePicker(false);
+    setFields({ ...fields, waktu_pengerjaan_mulai: currentTime });
+  };
+
+  const onEndDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || fields.waktu_pengerjaan_selesai;
+    setShowEndDatePicker(false);
+    setFields({ ...fields, waktu_pengerjaan_selesai: currentDate });
+    setShowEndTimePicker(true);
+  };
+
+  const onEndTimeChange = (event, selectedTime) => {
+    const currentTime = selectedTime || fields.waktu_pengerjaan_selesai;
+    setShowEndTimePicker(false);
+    setFields({ ...fields, waktu_pengerjaan_selesai: currentTime });
+  };
 
   const [kelasJurusan, setkelasJurusan] = useState([]);
 
@@ -69,72 +109,111 @@ const CreateLinkAdmin = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
-      <Text>Link URL</Text>
-      <TextInput
-        placeholder="link"
-        value={fields.link_name}
-        onChangeText={(text) => setFields({ ...fields, link_name: text })}
-      />
-      <Text>Link Title</Text>
-      <TextInput
-        placeholder="title"
-        value={fields.link_title}
-        onChangeText={(text) => setFields({ ...fields, link_title: text })}
-      />
-      <Text>Waktu pengerjaan</Text>
-      <TextInput
-        placeholder="waktu_pengerjaan"
-        value={fields.waktu_pengerjaan}
-        onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan: text })}
-      />
-      <Text>Waktu pengerjaan mulai</Text>
-      <TextInput
-        placeholder="waktu_pengerjaan_mulai"
-        value={fields.waktu_pengerjaan_mulai}
-        onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan_mulai: text })}
-      />
-      <Text>waktu pengerjaan selesai</Text>
-      <TextInput
-        placeholder="waktu_pengerjaan_selesai"
-        value={fields.waktu_pengerjaan_selesai}
-        onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan_selesai: text })}
-      />
-      <Text>Kelas Jurusan</Text>
-      <SelectDropdown
-        data={kelasJurusan}
-        defaultValue={kelasJurusan[0]}
-        onSelect={(selectedKelas, index) =>
-          setFields({ ...fields, kelas_jurusan: selectedKelas })
-        }
-        renderButton={(selectedKelas, isOpened) => {
-          return (
-            <View style={styles.dropdownButtonStyle}>
-              <Text style={styles.dropdownButtonTxtStyle}>{selectedKelas}</Text>
-              <Icon
-                name={isOpened ? "chevron-up" : "chevron-down"}
-                style={styles.dropdownButtonArrowStyle}
-              />
-            </View>
-          );
-        }}
-        renderItem={(item, index, isSelected) => {
-          return (
-            <View
-              style={{
-                ...styles.dropdownItemStyle,
-                ...(isSelected && { backgroundColor: "#D2D9DF" }),
-              }}
-            >
-              <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-            </View>
-          );
-        }}
-        showsVerticalScrollIndicator={false}
-        dropdownStyle={styles.dropdownMenuStyle}
-      />
-      <Button title="create" onPress={createLink} />
-    </View>
+    <SafeAreaView style={{ paddingTop: 10 }} className="h-full w-full bg-slate-50 flex justify-start">
+      <View className="flex gap-2 pt-4 px-4">
+        <View className="flex gap-y-2">
+          <Text className={`${textBasic}`}>Link URL</Text>
+          <TextInput
+            placeholder="Link URL"
+            value={fields.link_name}
+            onChangeText={(text) => setFields({ ...fields, link_name: text })}
+            className={`${textInputStyle}`}
+          />
+        </View>
+        <View className="flex gap-y-2">
+          <Text className={`${textBasic}`}>Link Title</Text>
+          <TextInput
+            placeholder="Link Title"
+            value={fields.link_title}
+            onChangeText={(text) => setFields({ ...fields, link_title: text })}
+            className={`${textInputStyle}`}
+          />
+        </View>
+        <View className="flex-row flex-wrap">
+          <View className="pr-2 flex-auto">
+            <Text className={`${textBasic} mb-2`}>Kelas Jurusan</Text>
+            <SelectDropdown
+              data={kelasJurusan}
+              defaultValue={kelasJurusan[0]}
+              onSelect={(selectedKelas) => setFields({ ...fields, kelas_jurusan: selectedKelas })}
+              renderButton={(selectedKelas, isOpened) => (
+                <View style={styles.dropdownButtonStyle}>
+                  <Text style={styles.dropdownButtonTxtStyle}>{selectedKelas}</Text>
+                  <Icon name={isOpened ? 'chevron-up' : 'chevron-down'} style={styles.dropdownButtonArrowStyle} />
+                </View>
+              )}
+              renderItem={(item, index, isSelected) => (
+                <View
+                  style={{
+                    ...styles.dropdownItemStyle,
+                    ...(isSelected && { backgroundColor: '#D2D9DF' }),
+                  }}
+                >
+                  <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+                </View>
+              )}
+              showsVerticalScrollIndicator={false}
+              dropdownStyle={styles.dropdownMenuStyle}
+            />
+          </View>
+          <View className="gap-y-2 flex-auto">
+            <Text className={`${textBasic}`}>Waktu Pengerjaan</Text>
+            <TextInput
+              placeholder="Waktu"
+              value={fields.waktu_pengerjaan.toString()}
+              onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan: parseInt(text) })}
+              className={`${textInputStyle}`}
+            />
+          </View>
+        </View>
+        <View>
+          <Text>Waktu pengerjaan mulai</Text>
+          <Button onPress={() => setShowStartDatePicker(true)} title="Select Start Date and Time" />
+          {showStartDatePicker && (
+            <DateTimePicker
+              value={fields.waktu_pengerjaan_mulai}
+              mode="date"
+              display="default"
+              onChange={onStartDateChange}
+            />
+          )}
+          {showStartTimePicker && (
+            <DateTimePicker
+              value={fields.waktu_pengerjaan_mulai}
+              mode="time"
+              display="default"
+              onChange={onStartTimeChange}
+            />
+          )}
+          <Text>{fields.waktu_pengerjaan_mulai.toLocaleString()}</Text>
+
+          <Text>Waktu pengerjaan selesai</Text>
+          <Button onPress={() => setShowEndDatePicker(true)} title="Select End Date and Time" />
+          {showEndDatePicker && (
+            <DateTimePicker
+              value={fields.waktu_pengerjaan_selesai}
+              mode="date"
+              display="default"
+              onChange={onEndDateChange}
+            />
+          )}
+          {showEndTimePicker && (
+            <DateTimePicker
+              value={fields.waktu_pengerjaan_selesai}
+              mode="time"
+              display="default"
+              onChange={onEndTimeChange}
+            />
+          )}
+          <Text>{fields.waktu_pengerjaan_selesai.toLocaleString()}</Text>
+        </View>
+        <View className="pt-4">
+          <TouchableOpacity className={`${buttonStyle}`} onPress={createLink}>
+            <Text className="font-semibold text-white text-lg">Create</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 

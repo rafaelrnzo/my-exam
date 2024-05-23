@@ -1,4 +1,4 @@
-import { SafeAreaView, Text, Button, ActivityIndicator } from "react-native";
+import { SafeAreaView, Text, Button, ActivityIndicator, View } from "react-native";
 import React from "react";
 import BASE_API_URL from "../../constant/ip";
 import Card from "../../components/Card";
