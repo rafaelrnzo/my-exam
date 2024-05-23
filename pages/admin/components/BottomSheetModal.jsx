@@ -2,7 +2,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
-import { textTitle } from '../../../assets/style/basic';
+import { textBasic, textTitle } from '../../../assets/style/basic';
+import { faClipboard, faLink } from "@fortawesome/free-regular-svg-icons";
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 const BottomSheetModal = ({ isVisible, onClose, text, onDelete, onEdit }) => {
   return (
@@ -15,17 +18,33 @@ const BottomSheetModal = ({ isVisible, onClose, text, onDelete, onEdit }) => {
       backdropColor="black"
       backdropOpacity={0.2}  // Set the opacity here
     >
-      <View className=" bg-slate-50 py-6 rounded-t-xl px-4 ">
-        {/* <Text style={styles.title}>{text}</Text> */}
-        <TouchableOpacity className=" p-3 px-5 border-b-[0.5px] items-center flex border-slate-400" onPress={onDelete}>
-          <Text className={`${textTitle} font-medium text-red-500`}>Delete</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className=" p-3 px-5 border-b-[0.5px] items-center flex border-slate-400" onPress={onEdit}>
-          <Text className={`${textTitle} font-medium`}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className=" p-3 px-5 border-b-[0.5px] items-center flex border-slate-400" onPress={onClose}>
-          <Text className={`${textTitle} font-medium`}>Close</Text>
-        </TouchableOpacity>
+      <View className=" bg-slate-50 py-4 rounded-t-xl px-4 flex  ">
+        <View className="bg-slate-200 h-[4px] w-1/4 rounded-full self-center"></View>
+        <View >
+          <TouchableOpacity className=" p-3 px-5 items-start flex" onPress={onDelete}>
+            <View className="flex flex-row items-center gap-x-3">
+              <FontAwesomeIcon
+                icon={faTrash}
+                color={"#0f172a"}
+                size={18}
+              />
+              <Text className={`${textBasic} text-lg font-medium `}>Delete</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity className=" p-3 px-5 items-start flex" onPress={onEdit}>
+            <View className="flex flex-row items-center gap-x-3 ">
+              <FontAwesomeIcon
+                icon={faPen}
+                color={"#0f172a"}
+                size={18}
+              />
+              <Text className={`${textBasic} text-lg font-medium text`}>Edit</Text>
+            </View>
+          </TouchableOpacity>
+          {/* <TouchableOpacity className=" p-3 px-5 items-start flex" onPress={onClose}>
+            <Text className={`${textBasic} text-lg font-medium`}>Close</Text>
+          </TouchableOpacity> */}
+        </View>
       </View>
     </Modal>
   );

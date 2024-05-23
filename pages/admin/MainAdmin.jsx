@@ -49,8 +49,8 @@ const MainAdmin = () => {
         <Tab.Navigator
           screenOptions={{
             tabBarStyle: {
-              paddingVertical: 10,
-              height: 65,
+              paddingVertical: 8,
+              height: 55,
             },
           }}
         >
@@ -68,7 +68,7 @@ const MainAdmin = () => {
                 <FontAwesomeIcon
                   icon={focused ? faClipboardSolid : faClipboard}
                   color={focused ? "blue" : "black"}
-                  size={24}
+                  size={20}
                 />
               ),
             }}
@@ -85,7 +85,7 @@ const MainAdmin = () => {
                 <FontAwesomeIcon
                   icon={focused ? faLinkSolid : faLinkSolid}
                   color={focused ? "blue" : "black"}
-                  size={24}
+                  size={20}
                 />
               ),
             }}

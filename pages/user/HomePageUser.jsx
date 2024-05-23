@@ -5,6 +5,8 @@ import { useApi } from '../../utils/useApi';
 import Card from '../../components/Card';
 import BASE_API_URL from '../../constant/ip';
 import { useLogout } from '../../utils/useLogout';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { textTitle } from '../../assets/style/basic';
 
 const HomePageUser = ({ navigation }) => {
   const [fields, setFields] = useState({
@@ -19,7 +21,7 @@ const HomePageUser = ({ navigation }) => {
   const { data: progressData, error: progressError } = useApi(`${BASE_API_URL}progress`);
   const { data: linksData, error: linksError } = useApi(`${BASE_API_URL}links`);
   const { postData } = useApi();
-  const {logout} = useLogout()
+  const { logout } = useLogout()
 
   useEffect(() => {
     if (userData) {
@@ -65,39 +67,45 @@ const HomePageUser = ({ navigation }) => {
   const belumDikerjakan = linksData.data;
 
   return (
-    <ScrollView style={{ flexDirection: "column", flex: 1, padding: 10 }}>
-      <Text>name: {fields.name}</Text>
-      <Text>Ujian untuk kelas: {fields.kelas_jurusan}</Text>
-      <Button title="logout" onPress={() => logout()} />
-      <Text>Belum Dikerjakan</Text>
+    <SafeAreaView className="h-full w-full bg-white ">
+      <View className="flex justify-center items-center py-3 border-b-[0.5px] border-slate-400 bg-white">
+        <Text className={`${textTitle}`}>ExamTen</Text>
+    
+      </View>
+      <ScrollView className="p-4 bg-slate-50">
+        <Text>name: {fields.name}</Text>
+        <Text>Ujian untuk kelas: {fields.kelas_jurusan}</Text>
+        <Button title="logout" onPress={() => logout()} />
+        <Text>Belum Dikerjakan</Text>
 
-      {belumDikerjakan.length > 0 ? (
-        belumDikerjakan.map((item) => (
-          <Card
-            key={item.id}
-            press={() => createProgress(item.id, item.link_name)}
-            link_title={item.link_title}
-            link_status={item.link_status}
-          />
-        ))
-      ) : (
-        <Text>No links available</Text>
-      )}
-      <Text>Sudah Dikerjakan</Text>
-      {links.length > 0 ? (
-        links.map((item, index) => (
-          <Card
-            key={item.id}
-            press={() => console.log("t")}
-            link_title={item.link_title}
-            link_status={item.link_status}
-            status_progress={status[index]}
-          />
-        ))
-      ) : (
-        <Text>No links available</Text>
-      )}
-    </ScrollView>
+        {belumDikerjakan.length > 0 ? (
+          belumDikerjakan.map((item) => (
+            <Card
+              key={item.id}
+              press={() => createProgress(item.id, item.link_name)}
+              link_title={item.link_title}
+              link_status={item.link_status}
+            />
+          ))
+        ) : (
+          <Text>No links available</Text>
+        )}
+        <Text>Sudah Dikerjakan</Text>
+        {links.length > 0 ? (
+          links.map((item, index) => (
+            <Card
+              key={item.id}
+              press={() => console.log("t")}
+              link_title={item.link_title}
+              link_status={item.link_status}
+              status_progress={status[index]}
+            />
+          ))
+        ) : (
+          <Text>No links available</Text>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
