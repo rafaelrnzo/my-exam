@@ -93,7 +93,7 @@ const ListUser = ({ navigation, route }) => {
               navigation.push("UpdateUser", {
                 id: item.id,
                 name: item.name,
-                kelas_jurusan_id: item.kelas_jurusan_id,
+                kelas_jurusan: item.kelas_jurusan.name,
                 token: item.token,
                 role: item.role,
               })

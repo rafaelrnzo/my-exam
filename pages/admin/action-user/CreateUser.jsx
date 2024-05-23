@@ -1,4 +1,4 @@
-import { View, Text, TextInput, ToastAndroid, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, ToastAndroid, Button, StyleSheet, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import BASE_API_URL from "../../../constant/ip";
 import SelectDropdown from "react-native-select-dropdown";
@@ -15,7 +15,8 @@ const CreateUser = ({ navigation }) => {
   });
   const {postData} = useApi()
   const {data:kelasJurusan, error, isLoading} = useApi(`${BASE_API_URL}get-kelas`)
-
+  const responseData = kelasJurusan.data.map((item) => item.name)
+  
   const createUser = async () => {
     try {
       await postData(`${BASE_API_URL}admin-sekolah/post`, fields)
@@ -101,8 +102,8 @@ const CreateUser = ({ navigation }) => {
       />
       <Text>kelas_jurusan</Text>
       <SelectDropdown
-        data={kelasJurusan.data}
-        defaultValue={kelasJurusan.data[0]}
+        data={responseData}
+        defaultValue={responseData[0]}
         onSelect={(selectedKelas, index) =>
           setFields({ ...fields, kelas_jurusan: selectedKelas })
         }
