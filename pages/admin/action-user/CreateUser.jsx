@@ -135,18 +135,6 @@ const CreateUser = ({ navigation }) => {
               />
             </View>
           )}
-
-          <View className="gap-y-2 flex-auto">
-            <Text className={`${textBasic}`}>Waktu Pengerjaan</Text>
-            <TextInput
-              placeholder="Waktu"
-              value={fields.waktu_pengerjaan.toString()}
-              onChangeText={(text) =>
-                setFields({ ...fields, waktu_pengerjaan: text })
-              }
-              className={`${textInputStyle}`}
-            />
-          </View>
         </View>
       <Button title="create" onPress={createUser} />
     </View>

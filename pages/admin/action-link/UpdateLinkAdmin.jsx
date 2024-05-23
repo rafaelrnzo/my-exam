@@ -32,7 +32,6 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
     waktu_pengerjaan_selesai,
   } = route.params;
 
-  // Parse initial date strings to Date objects
   const initialStartDate = new Date(waktu_pengerjaan_mulai.replace(' ', 'T'));
   const initialEndDate = new Date(waktu_pengerjaan_selesai.replace(' ', 'T'));
 
@@ -136,16 +135,16 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
             placeholder="Link URL"
             value={fields.link_name}
             onChangeText={(text) => setFields({ ...fields, link_name: text })}
-            className="textInputStyle"
+            className={`${textInputStyle}`}
           />
         </View>
         <View className="flex gap-y-2">
-          <Text className="textBasic">Link Title</Text>
+          <Text className={`${textBasic}`}>Link Title</Text>
           <TextInput
             placeholder="Link Title"
             value={fields.link_title}
             onChangeText={(text) => setFields({ ...fields, link_title: text })}
-            className="textInputStyle"
+            className={`${textInputStyle}`}
           />
         </View>
         <View className="flex gap-y-2">

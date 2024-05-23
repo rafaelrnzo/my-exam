@@ -81,13 +81,34 @@ const UpdateUser = ({ navigation, route }) => {
       <SelectDropdown
         data={["admin sekolah", "siswa"]}
         defaultValue={fields.role}
-        onSelect={(selectedRole) =>
+        onSelect={(selectedRole, index) =>
           setFields({ ...fields, role: selectedRole })
         }
-        renderButtonText={(selectedRole) => selectedRole}
-        renderDropdownIcon={(isOpened) => (
-          <Icon name={isOpened ? "chevron-up" : "chevron-down"} />
-        )}
+        renderButton={(selectedRole, isOpened) => {
+          return (
+            <View style={styles.dropdownButtonStyle}>
+              <Text style={styles.dropdownButtonTxtStyle}>{selectedRole}</Text>
+              <Icon
+                name={isOpened ? "chevron-up" : "chevron-down"}
+                style={styles.dropdownButtonArrowStyle}
+              />
+            </View>
+          );
+        }}
+        renderItem={(item, index, isSelected) => {
+          return (
+            <View
+              style={{
+                ...styles.dropdownItemStyle,
+                ...(isSelected && { backgroundColor: "#D2D9DF" }),
+              }}
+            >
+              <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+            </View>
+          );
+        }}
+        showsVerticalScrollIndicator={false}
+        dropdownStyle={styles.dropdownMenuStyle}
       />
       <View className="flex-row flex-wrap">
         {isLoading ? (
@@ -131,18 +152,6 @@ const UpdateUser = ({ navigation, route }) => {
             />
           </View>
         )}
-
-        <View className="gap-y-2 flex-auto">
-          <Text className={`${textBasic}`}>Waktu Pengerjaan</Text>
-          <TextInput
-            placeholder="Waktu"
-            value={fields.waktu_pengerjaan.toString()}
-            onChangeText={(text) =>
-              setFields({ ...fields, waktu_pengerjaan: text })
-            }
-            className={`${textInputStyle}`}
-          />
-        </View>
       </View>
       <Button title="update" onPress={updateUser} />
     </View>
