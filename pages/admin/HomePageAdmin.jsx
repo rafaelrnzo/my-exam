@@ -40,6 +40,9 @@ const HomePageAdmin = ({ navigation }) => {
                 link_status: item.link_status,
                 kelas_jurusan: item.kelas_jurusan.name,
                 link_name: item.link_name,
+                waktu_pengerjaan: item.waktu_pengerjaan,
+                waktu_pengerjaan_mulai: item.waktu_pengerjaan_mulai,
+                waktu_pengerjaan_selesai: item.waktu_pengerjaan_selesai,
                 id: item.id,
               })
             }

@@ -5,138 +5,254 @@ import {
   TextInput,
   Button,
   StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import axios from "axios";
 import BASE_API_URL from "../../../constant/ip";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import {
+  buttonStyle,
+  textBasic,
+  textInputStyle,
+} from "../../../assets/style/basic";
+import { useApi } from "../../../utils/useApi";
 
 const UpdateLinkAdmin = ({ navigation, route }) => {
-  const { link_title, link_status, kelas_jurusan, link_name, id } =
-    route.params;
+  const {
+    link_title,
+    link_status,
+    kelas_jurusan,
+    link_name,
+    id,
+    waktu_pengerjaan,
+    waktu_pengerjaan_mulai,
+    waktu_pengerjaan_selesai,
+  } = route.params;
+
+  // Parse initial date strings to Date objects
+  const initialStartDate = new Date(waktu_pengerjaan_mulai.replace(' ', 'T'));
+  const initialEndDate = new Date(waktu_pengerjaan_selesai.replace(' ', 'T'));
+
   const [fields, setFields] = useState({
-    link_name: link_name,
-    link_title: link_title,
-    kelas_jurusan: kelas_jurusan,
-    link_status: link_status,
+    link_name,
+    link_title,
+    kelas_jurusan,
+    link_status,
+    waktu_pengerjaan: waktu_pengerjaan.toString(),
+    waktu_pengerjaan_mulai: initialStartDate,
+    waktu_pengerjaan_selesai: initialEndDate,
   });
 
-  const [kelasJurusan, setKelasJurusan] = useState([]);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
+  const onStartDateChange = (event, selectedDate) => {
+    setShowStartDatePicker(false);
+    if (selectedDate) {
+      setFields((prevFields) => ({
+        ...prevFields,
+        waktu_pengerjaan_mulai: selectedDate,
+      }));
+      setShowStartTimePicker(true);
+    }
+  };
+
+  const onStartTimeChange = (event, selectedTime) => {
+    setShowStartTimePicker(false);
+    if (selectedTime) {
+      const newStartDate = new Date(fields.waktu_pengerjaan_mulai);
+      newStartDate.setHours(selectedTime.getHours());
+      newStartDate.setMinutes(selectedTime.getMinutes());
+      setFields((prevFields) => ({
+        ...prevFields,
+        waktu_pengerjaan_mulai: newStartDate,
+      }));
+    }
+  };
+
+  const onEndDateChange = (event, selectedDate) => {
+    setShowEndDatePicker(false);
+    if (selectedDate) {
+      setFields((prevFields) => ({
+        ...prevFields,
+        waktu_pengerjaan_selesai: selectedDate,
+      }));
+      setShowEndTimePicker(true);
+    }
+  };
+
+  const onEndTimeChange = (event, selectedTime) => {
+    setShowEndTimePicker(false);
+    if (selectedTime) {
+      const newEndDate = new Date(fields.waktu_pengerjaan_selesai);
+      newEndDate.setHours(selectedTime.getHours());
+      newEndDate.setMinutes(selectedTime.getMinutes());
+      setFields((prevFields) => ({
+        ...prevFields,
+        waktu_pengerjaan_selesai: newEndDate,
+      }));
+    }
+  };
+
+  const { data: kelasJurusanData, error, isLoading } = useApi(`${BASE_API_URL}get-kelas`);
+  const responseData = kelasJurusanData?.data?.map((item) => item.name);
+  const { putData } = useApi();
 
   const updateLink = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.put(`${BASE_API_URL}links/${id}`, fields, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const formattedFields = {
+        ...fields,
+        waktu_pengerjaan_mulai: fields.waktu_pengerjaan_mulai.toISOString().slice(0, 19).replace("T", " "),
+        waktu_pengerjaan_selesai: fields.waktu_pengerjaan_selesai.toISOString().slice(0, 19).replace("T", " "),
+      };
+      await putData(`${BASE_API_URL}links/${id}`, formattedFields);
+      setFields({
+        link_name: "",
+        link_title: "",
+        kelas_jurusan: "",
+        link_status: "",
+        waktu_pengerjaan: "0",
+        waktu_pengerjaan_mulai: "",
+        waktu_pengerjaan_selesai: "",
       });
-      console.log(response.data);
-      navigation.pop();
+      navigation.replace("MainAdmin");
     } catch (error) {
-      console.log(fields);
+      ToastAndroid.show(error.message, ToastAndroid.LONG);
+      console.log(error.response.data);
     }
   };
-
-  const getKelasJurusan = async () => {
-    const token = await AsyncStorage.getItem("token");
-    try {
-      const response = await axios.get(`${BASE_API_URL}get-kelas`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const responseData = response.data.data;
-      setKelasJurusan(responseData.map((item) => item.name));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getKelasJurusan();
-  }, []);
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
-      <Text>Link URL</Text>
-      <TextInput
-        placeholder="link"
-        value={fields.link_name}
-        onChangeText={(text) => setFields({ ...fields, link_name: text })}
-      />
-      <Text>Link Title</Text>
-      <TextInput
-        placeholder="title"
-        value={fields.link_title}
-        onChangeText={(text) => setFields({ ...fields, link_title: text })}
-      />
-      <Text>Kelas Jurusan</Text>
-      <SelectDropdown
-        data={kelasJurusan}
-        defaultValue={fields.kelas_jurusan}
-        onSelect={(selectedKelas, index) =>
-          setFields({ ...fields, kelas_jurusan: selectedKelas })
-        }
-        renderButton={(selectedKelas, isOpened) => (
-          <View style={styles.dropdownButtonStyle}>
-            <Text style={styles.dropdownButtonTxtStyle}>
-              {selectedKelas || fields.kelas_jurusan}
-            </Text>
-            <Icon
-              name={isOpened ? "chevron-up" : "chevron-down"}
-              style={styles.dropdownButtonArrowStyle}
-            />
-          </View>
-        )}
-        renderItem={(item, index, isSelected) => (
-          <View
-            style={{
-              ...styles.dropdownItemStyle,
-              ...(isSelected && { backgroundColor: "#D2D9DF" }),
-            }}
-          >
-            <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-          </View>
-        )}
-        showsVerticalScrollIndicator={false}
-        dropdownStyle={styles.dropdownMenuStyle}
-      />
-      <Text>Link Status</Text>
-      <SelectDropdown
-        data={["active", "inactive"]}
-        defaultValue={fields.link_status}
-        onSelect={(selectedStatus, index) =>
-          setFields({ ...fields, link_status: selectedStatus })
-        }
-        renderButton={(selectedStatus, isOpened) => (
-          <View style={styles.dropdownButtonStyle}>
-          <Text style={styles.dropdownButtonTxtStyle}>
-            {selectedStatus || fields.link_status}
-          </Text>
-          <Icon
-            name={isOpened ? "chevron-up" : "chevron-down"}
-            style={styles.dropdownButtonArrowStyle}
+    <SafeAreaView style={{ paddingTop: 10 }} className="h-full w-full bg-slate-50 flex justify-start">
+      <View className="flex gap-2 pt-4 px-4">
+        <View className="flex gap-y-2">
+          <Text className="textBasic">Link URL</Text>
+          <TextInput
+            placeholder="Link URL"
+            value={fields.link_name}
+            onChangeText={(text) => setFields({ ...fields, link_name: text })}
+            className="textInputStyle"
           />
         </View>
-        )}
-        renderItem={(item, index, isSelected) => (
-          <View
-            style={{
-              ...styles.dropdownItemStyle,
-              ...(isSelected && { backgroundColor: "#D2D9DF" }),
-            }}
-          >
-            <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+        <View className="flex gap-y-2">
+          <Text className="textBasic">Link Title</Text>
+          <TextInput
+            placeholder="Link Title"
+            value={fields.link_title}
+            onChangeText={(text) => setFields({ ...fields, link_title: text })}
+            className="textInputStyle"
+          />
+        </View>
+        <View className="flex gap-y-2">
+          <Text className="textBasic">Link Status</Text>
+          <SelectDropdown
+            data={["active", "inactive"]}
+            defaultValue={fields.link_status}
+            onSelect={(selectedStatus) => setFields({ ...fields, link_status: selectedStatus })}
+            renderButton={(selectedStatus, isOpened) => (
+              <View style={styles.dropdownButtonStyle}>
+                <Text style={styles.dropdownButtonTxtStyle}>{selectedStatus}</Text>
+                <Icon name={isOpened ? "chevron-up" : "chevron-down"} style={styles.dropdownButtonArrowStyle} />
+              </View>
+            )}
+            renderItem={(item, index, isSelected) => (
+              <View style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: "#D2D9DF" }) }}>
+                <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+              </View>
+            )}
+            showsVerticalScrollIndicator={false}
+            dropdownStyle={styles.dropdownMenuStyle}
+          />
+        </View>
+        <View className="flex-row flex-wrap">
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <View className="pr-2 flex-auto">
+              <Text className="textBasic mb-2">Kelas Jurusan</Text>
+              <SelectDropdown
+                data={responseData}
+                defaultValue={fields.kelas_jurusan}
+                onSelect={(selectedKelas) => setFields({ ...fields, kelas_jurusan: selectedKelas })}
+                renderButton={(selectedKelas, isOpened) => (
+                  <View style={styles.dropdownButtonStyle}>
+                    <Text style={styles.dropdownButtonTxtStyle}>{selectedKelas}</Text>
+                    <Icon name={isOpened ? "chevron-up" : "chevron-down"} style={styles.dropdownButtonArrowStyle} />
+                  </View>
+                )}
+                renderItem={(item, index, isSelected) => (
+                  <View style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: "#D2D9DF" }) }}>
+                    <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+                  </View>
+                )}
+                showsVerticalScrollIndicator={false}
+                dropdownStyle={styles.dropdownMenuStyle}
+              />
+            </View>
+          )}
+          <View className="gap-y-2 flex-auto">
+            <Text className={`${textBasic}`}>Waktu Pengerjaan</Text>
+            <TextInput
+              placeholder="Waktu"
+              value={fields.waktu_pengerjaan.toString()}
+              onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan: text })}
+              className={`${textInputStyle}`}
+            />
           </View>
-        )}
-        showsVerticalScrollIndicator={false}
-        dropdownStyle={styles.dropdownMenuStyle}
-      />
+        </View>
+        <View>
+          <Text>Waktu pengerjaan mulai</Text>
+          <Button onPress={() => setShowStartDatePicker(true)} title="Select Start Date and Time" />
+          {showStartDatePicker && (
+            <DateTimePicker
+              value={fields.waktu_pengerjaan_mulai}
+              mode="date"
+              display="default"
+              onChange={onStartDateChange}
+            />
+          )}
+          {showStartTimePicker && (
+            <DateTimePicker
+              value={fields.waktu_pengerjaan_mulai}
+              mode="time"
+              display="default"
+              onChange={onStartTimeChange}
+            />
+          )}
+          <Text>{fields.waktu_pengerjaan_mulai.toLocaleString()}</Text>
 
-      <Button title="update" onPress={updateLink} />
-    </View>
+          <Text>Waktu pengerjaan selesai</Text>
+          <Button onPress={() => setShowEndDatePicker(true)} title="Select End Date and Time" />
+          {showEndDatePicker && (
+            <DateTimePicker
+              value={fields.waktu_pengerjaan_selesai}
+              mode="date"
+              display="default"
+              onChange={onEndDateChange}
+            />
+          )}
+          {showEndTimePicker && (
+            <DateTimePicker
+              value={fields.waktu_pengerjaan_selesai}
+              mode="time"
+              display="default"
+              onChange={onEndTimeChange}
+            />
+          )}
+          <Text>{fields.waktu_pengerjaan_selesai.toLocaleString()}</Text>
+        </View>
+        <View className="pt-4">
+          <TouchableOpacity className={`${buttonStyle}`} onPress={updateLink}>
+            <Text className="font-semibold text-white text-lg">Update</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
