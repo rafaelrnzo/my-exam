@@ -31,6 +31,8 @@ const HomePageAdmin = ({ navigation }) => {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Error: {error.message}</Text>
+        <Text>error</Text>
+        <Button title="logout" onPress={logout} />
       </View>
     );
   }
@@ -76,6 +78,30 @@ const HomePageAdmin = ({ navigation }) => {
             />
           )}
         />
+    <SafeAreaView style={{ padding: 4 }}>
+      <Text>HomePageAdmin</Text>
+      {links.data.length > 0 ? (
+        links.data.map((item) => (
+          <Card
+            key={item.id}
+            press={() =>
+              navigation.push("UpdateLinkAdmin", {
+                link_title: item.link_title,
+                link_status: item.link_status,
+                kelas_jurusan: item.kelas_jurusan.name,
+                link_name: item.link_name,
+                waktu_pengerjaan: item.waktu_pengerjaan,
+                waktu_pengerjaan_mulai: item.waktu_pengerjaan_mulai,
+                waktu_pengerjaan_selesai: item.waktu_pengerjaan_selesai,
+                id: item.id,
+              })
+            }
+            link_title={item.link_title}
+            link_status={item.link_status}
+            kelas_jurusan={item.kelas_jurusan.name}
+          />
+        ))
+
       ) : (
         <Text>No links available</Text>
       )}

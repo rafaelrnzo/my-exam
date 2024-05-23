@@ -51,10 +51,6 @@ const ListKelas = ({ navigation }) => {
     <SafeAreaView className="pt-6 bg-slate-50 h-full w-full">
       <View className="flex justify-center items-center py-4 border-b-[0.5px] border-slate-400 bg-white">
         <Text className={`${textTitle}`}>Classroom</Text>
-        {/* <Button
-          title="+kelas"
-          onPress={() => navigation.navigate("CreateKelas")}
-        /> */}
       </View>
       <ScrollView className="p-4 flex gap-3">
         {kelasJurusan.map((item, index) => (
@@ -77,7 +73,7 @@ const ListKelas = ({ navigation }) => {
             </View>
             <View className="pt-5">
               <View className="flex justify-between flex-row items-center">
-                <Text>as</Text>
+                <Text></Text>
                 <TouchableOpacity onPress={() =>
                   navigation.push("MonitoringPage", {
                     kelas_jurusan_id: item.id,

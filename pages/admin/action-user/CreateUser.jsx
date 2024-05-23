@@ -4,6 +4,7 @@ import BASE_API_URL from "../../../constant/ip";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useApi } from "../../../utils/useApi";
+import { textBasic } from "../../../assets/style/basic";
 
 const CreateUser = ({ navigation }) => {
   const [fields, setFields] = useState({
@@ -15,7 +16,7 @@ const CreateUser = ({ navigation }) => {
   });
   const {postData} = useApi()
   const {data:kelasJurusan, error, isLoading} = useApi(`${BASE_API_URL}get-kelas`)
-  const responseData = kelasJurusan.data.map((item) => item.name)
+  const responseData = kelasJurusan?.data?.map((item) => item.name)
   
   const createUser = async () => {
     try {
@@ -36,14 +37,6 @@ const CreateUser = ({ navigation }) => {
 
   if (error) {
     return <Text>Error loading data</Text>;
-  }
-
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    )
   }
 
   return (
@@ -100,39 +93,49 @@ const CreateUser = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         dropdownStyle={styles.dropdownMenuStyle}
       />
-      <Text>kelas_jurusan</Text>
-      <SelectDropdown
-        data={responseData}
-        defaultValue={responseData[0]}
-        onSelect={(selectedKelas, index) =>
-          setFields({ ...fields, kelas_jurusan: selectedKelas })
-        }
-        renderButton={(selectedKelas, isOpened) => {
-          return (
-            <View style={styles.dropdownButtonStyle}>
-              <Text style={styles.dropdownButtonTxtStyle}>{selectedKelas}</Text>
-              <Icon
-                name={isOpened ? "chevron-up" : "chevron-down"}
-                style={styles.dropdownButtonArrowStyle}
+      <View className="flex-row flex-wrap">
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <View className="pr-2 flex-auto">
+              <Text className={`${textBasic} mb-2`}>Kelas Jurusan</Text>
+              <SelectDropdown
+                data={responseData}
+                defaultValue={responseData[0]}
+                onSelect={(selectedKelas, index) =>
+                  setFields({ ...fields, kelas_jurusan: selectedKelas })
+                }
+                renderButton={(selectedKelas, isOpened) => {
+                  return (
+                    <View style={styles.dropdownButtonStyle}>
+                      <Text style={styles.dropdownButtonTxtStyle}>
+                        {selectedKelas}
+                      </Text>
+                      <Icon
+                        name={isOpened ? "chevron-up" : "chevron-down"}
+                        style={styles.dropdownButtonArrowStyle}
+                      />
+                    </View>
+                  );
+                }}
+                renderItem={(item, index, isSelected) => {
+                  return (
+                    <View
+                      style={{
+                        ...styles.dropdownItemStyle,
+                        ...(isSelected && { backgroundColor: "#D2D9DF" }),
+                      }}
+                    >
+                      <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+                    </View>
+                  );
+                }}
+                showsVerticalScrollIndicator={false}
+                dropdownStyle={styles.dropdownMenuStyle}
               />
             </View>
-          );
-        }}
-        renderItem={(item, index, isSelected) => {
-          return (
-            <View
-              style={{
-                ...styles.dropdownItemStyle,
-                ...(isSelected && { backgroundColor: "#D2D9DF" }),
-              }}
-            >
-              <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-            </View>
-          );
-        }}
-        showsVerticalScrollIndicator={false}
-        dropdownStyle={styles.dropdownMenuStyle}
-      />
+          )}
+        </View>
       <Button title="create" onPress={createUser} />
     </View>
   );
