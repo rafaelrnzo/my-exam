@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import BASE_API_URL from "../../constant/ip";
 import { textTitle } from "../../assets/style/basic";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faPlus, faEllipsisVertical, faDesktop } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faEllipsisVertical, faDesktop, faUser } from '@fortawesome/free-solid-svg-icons'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheetModal from "./components/BottomSheetModal";
 import { useApi } from "../../utils/useApi";
@@ -20,7 +20,7 @@ const ListKelas = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const { data, error, isLoading } = useApi(`${BASE_API_URL}admin-sekolah/kelas-jurusan`);
-  const {deleteData}= useApi()
+  const { deleteData } = useApi()
 
   const toggleModal = (item) => {
     setSelectedItem(item);
@@ -29,6 +29,7 @@ const ListKelas = ({ navigation }) => {
 
   const deleteKelas = async (id) => {
     try {
+      n
       deleteData(`${BASE_API_URL}delete-kelas/${id}`)
       navigation.replace("MainAdmin");
     } catch (error) {
@@ -73,13 +74,17 @@ const ListKelas = ({ navigation }) => {
             </View>
             <View className="pt-5">
               <View className="flex justify-between flex-row items-center">
-                <Text></Text>
+                <View className="flex gap-x-2 flex-row items-center">
+                  <FontAwesomeIcon icon={faUser} color="#3b82f6" />
+                  <Text className="text-base font-semibold text-blue-500">
+                    {item.user_count}
+                  </Text>
+                </View>
                 <TouchableOpacity onPress={() =>
                   navigation.push("MonitoringPage", {
                     kelas_jurusan_id: item.id,
                     kelas_jurusan: item.name,
-                  })
-                }>
+                  })}>
                   <View className="flex flex-row  bg-blue-500 items-center p-2 px-3 rounded-md">
                     <FontAwesomeIcon icon={faDesktop} color="white" />
                     <Text className="text-base font-medium  text-white pl-2">Monitoring</Text>
@@ -97,7 +102,7 @@ const ListKelas = ({ navigation }) => {
           onClose={() => setModalVisible(false)}
           onDelete={() => deleteKelas(selectedItem.id)}
           onEdit={() => navigation.push("UpdateKelas", {
-            name_kelas: selectedItem.name,
+             name_kelas: selectedItem.name,
             id: selectedItem.id,
           })}
         />
