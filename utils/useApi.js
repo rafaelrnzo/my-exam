@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 export const useApi = (initialUrl) => {
-  const { data, error, mutate } = useSWR(initialUrl);
+  const { data, error, mutate } = useSWR(initialUrl, fetcher);
 
   const postData = async (url, newData) => {
     const token = await AsyncStorage.getItem('token');
@@ -29,6 +29,7 @@ export const useApi = (initialUrl) => {
         },
       });
       mutate(); // Revalidate the data
+      console.log(response.data);
       return response.data;
     } catch (error) {
       throw error;

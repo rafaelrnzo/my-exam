@@ -128,7 +128,7 @@ export default function App() {
         <Stack.Screen
           name="UjianPageUser"
           component={UjianPageUser}
-          options={{ headerBackVisible: false }}
+          options={{ headerShown:false }}
         />
         <Stack.Screen
           name="ListKelas"
