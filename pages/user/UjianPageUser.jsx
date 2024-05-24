@@ -125,7 +125,7 @@ const UjianPageUser = ({ navigation, route }) => {
 
   useEffect(() => {
     console.log(height, width);
-      if(height < 791.6363636363636){
+      if(height < 500){
         Alert.alert(
           'Split Screen Detected',
           'Aplikasi sedang berjalan dalam mode split screen. Beberapa fitur mungkin terbatas.',
