@@ -57,88 +57,94 @@ export default function App() {
   }, []);
 
   return (
-    <SWRConfig value={{ fetcher, dedupingInterval:2000 }}>
-    <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator initialRouteName="PortalPage">
-        <Stack.Screen
-          name="BlankScreen"
-          component={BlankScreen}
-          options={{ headerShown: false }}
+    <SWRConfig
+      value={{
+        fetcher,
+        dedupingInterval: 2000,
+        revalidateOnFocus: true,
+        revalidateOnReconnect: true,
+        shouldRetryOnError: false,
+        refreshInterval:1000
+      }}
+    >
+      <NavigationContainer ref={navigationRef}>
+        <Stack.Navigator initialRouteName="PortalPage">
+          <Stack.Screen
+            name="BlankScreen"
+            component={BlankScreen}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="PortalPage"
             component={PortalPage}
             options={{ headerShown: false }}
-            />
-        <Stack.Screen
-          name="LoginPage"
-          component={LoginPage}
-          options={{ headerShown: false }}
           />
-        <Stack.Screen
-          name="LoginAsAdmin"
-          component={LoginAsAdmin}
-          options={{ headerShown: false }}
+          <Stack.Screen
+            name="LoginPage"
+            component={LoginPage}
+            options={{ headerShown: false }}
           />
-        <Stack.Screen
-          name="HomePageUser"
-          component={HomePageUser}
-          options={{ headerShown: false }}
-          // options={{ headerBackVisible: true }}
-        />
-        <Stack.Screen
-          name="MainAdmin"
-          component={MainAdmin}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="CreateLinkAdmin" component={CreateLinkAdmin} />
-        <Stack.Screen name="UpdateUser" component={UpdateUser} />
-        <Stack.Screen name="CreateUser" component={CreateUser} />
-        <Stack.Screen
-          name="SubsPage"
-          component={SubsPage}
-          options={{ headerBackVisible: false }}
-        />
-        <Stack.Screen
-          name="PaymentScreen"
-          component={PaymentScreen}
-          options={{ headerBackVisible: false }}
-        />
-        <Stack.Screen name="UpdateLinkAdmin" component={UpdateLinkAdmin} />
-        <Stack.Screen name="HomePageAdmin" component={HomePageAdmin} />
-        <Stack.Screen
-          name="ListUser"
-          component={ListUser}
-          options={({ route }) => ({
-            headerTitle: route.params.kelas_jurusan,
-          })}
-        />
-        <Stack.Screen
-          name="MonitoringPage"
-          component={MonitoringPage}
-          options={({ route }) => ({
-            headerTitle: route.params.kelas_jurusan,
-          })}
-        />
-        {/* <Stack.Screen
+          <Stack.Screen
+            name="LoginAsAdmin"
+            component={LoginAsAdmin}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="HomePageUser"
+            component={HomePageUser}
+            options={{ headerShown: false }}
+            // options={{ headerBackVisible: true }}
+          />
+          <Stack.Screen
+            name="MainAdmin"
+            component={MainAdmin}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="CreateLinkAdmin" component={CreateLinkAdmin} />
+          <Stack.Screen name="UpdateUser" component={UpdateUser} />
+          <Stack.Screen name="CreateUser" component={CreateUser} />
+          <Stack.Screen
+            name="SubsPage"
+            component={SubsPage}
+            options={{ headerBackVisible: false }}
+          />
+          <Stack.Screen
+            name="PaymentScreen"
+            component={PaymentScreen}
+            options={{ headerBackVisible: false }}
+          />
+          <Stack.Screen name="UpdateLinkAdmin" component={UpdateLinkAdmin} />
+          <Stack.Screen name="HomePageAdmin" component={HomePageAdmin} />
+          <Stack.Screen
+            name="ListUser"
+            component={ListUser}
+            options={({ route }) => ({
+              headerTitle: route.params.kelas_jurusan,
+            })}
+          />
+          <Stack.Screen
+            name="MonitoringPage"
+            component={MonitoringPage}
+            options={({ route }) => ({
+              headerTitle: route.params.kelas_jurusan,
+            })}
+          />
+          {/* <Stack.Screen
           name="VerifyPage"
           component={VerifyPage}
           options={{ headerBackVisible: false }}
         /> */}
-        <Stack.Screen
-          name="UjianPageUser"
-          component={UjianPageUser}
-          options={{ headerShown:false }}
-        />
-        <Stack.Screen
-          name="ListKelas"
-          component={ListKelas}
-        />
-        <Stack.Screen name="RegisterPage" component={RegisterPage} />
-        <Stack.Screen name="CreateKelas" component={CreateKelas} />
-        <Stack.Screen name="UpdateKelas" component={UpdateKelas} />
-      </Stack.Navigator>
-    </NavigationContainer>
+          <Stack.Screen
+            name="UjianPageUser"
+            component={UjianPageUser}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="ListKelas" component={ListKelas} />
+          <Stack.Screen name="RegisterPage" component={RegisterPage} />
+          <Stack.Screen name="CreateKelas" component={CreateKelas} />
+          <Stack.Screen name="UpdateKelas" component={UpdateKelas} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </SWRConfig>
   );
 }

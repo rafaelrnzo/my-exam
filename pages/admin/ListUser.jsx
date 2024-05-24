@@ -54,7 +54,12 @@ const ListUser = ({ navigation, route }) => {
   const links = data?.data.links || []
 
   const handleLinkPress = (newUrl) => {
-    setUrl(newUrl);
+    if(newUrl === null){
+      setUrl(`${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}`)
+    } else{
+      setUrl(newUrl);
+    }
+    console.log(newUrl);
   };
 
   if (error) {
