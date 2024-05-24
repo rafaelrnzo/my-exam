@@ -28,7 +28,7 @@ const CreateUser = ({ navigation }) => {
         role: "",
         kelas_jurusan: "",
       });
-      navigation.pop();
+      navigation.replace('MainAdmin');
     } catch (error) {
       console.log(fields);
       ToastAndroid.show(error.message, ToastAndroid.LONG);
@@ -55,7 +55,6 @@ const CreateUser = ({ navigation }) => {
       />
       <Text>token</Text>
         <TextInput
-          maxLength={3}
           placeholder="token"
           value={fields.token}
           onChangeText={(text) => setFields({ ...fields, token: text })}

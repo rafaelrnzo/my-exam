@@ -34,7 +34,7 @@
     "react-native-screens": "~3.22.0",
     "react-native-select-dropdown": "^4.0.1",
     "react-native-svg": "^15.3.0",
-    "react-native-webview": "^13.6.3",
+    "react-native-webview": "^13.10.2",
     "swr": "^2.2.5"
   },
   "devDependencies": {

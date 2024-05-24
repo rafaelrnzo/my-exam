@@ -41,7 +41,7 @@ const UpdateUser = ({ navigation, route }) => {
         role: "",
         kelas_jurusan: "",
       });
-      navigation.pop();
+      navigation.replace('MainAdmin');
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }

@@ -34,7 +34,7 @@ const HomePageUser = ({ navigation }) => {
     }
   }, [userData]);
 
-  const createProgress = async (id, link_name) => {
+  const createProgress = async (id, link_name, link_title, waktu_pengerjaan) => {
     try {
       await postData(`${BASE_API_URL}progress/post`, {
         link_id: id,
@@ -43,6 +43,8 @@ const HomePageUser = ({ navigation }) => {
       navigation.navigate("UjianPageUser", {
         link_id: id,
         link_name: link_name.toString(),
+        link_title: link_title.toString(),
+        waktu_pengerjaan:waktu_pengerjaan
       });
     } catch (error) {
       console.log("Error creating progress:", error);
@@ -74,14 +76,14 @@ const HomePageUser = ({ navigation }) => {
       <ScrollView className="p-4 bg-slate-50">
         <Text>name: {fields.name}</Text>
         <Text>Ujian untuk kelas: {fields.kelas_jurusan}</Text>
-        <Button title="logout" onPress={() => logout()} />
+        <Button title="logout" onPress={logout} />
         <Text>Belum Dikerjakan</Text>
 
         {/* {belumDikerjakan.length > 0 ? (
           belumDikerjakan.map((item) => (
             <Card
               key={item.id}
-              press={() => createProgress(item.id, item.link_name)}
+              press={() => createProgress(item.id, item.link_name, item.link_title)}
               link_title={item.link_title}
               link_status={item.link_status}
             />
@@ -94,7 +96,7 @@ const HomePageUser = ({ navigation }) => {
           links.map((item, index) => (
             <Card
               key={item.id}
-              press={() => console.log("t")}
+              press={() => createProgress(item.id, item.link_name, item.link_title, item.waktu_pengerjaan)}
               link_title={item.link_title}
               link_status={item.link_status}
               status_progress={status[index]}
