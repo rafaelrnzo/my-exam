@@ -64,26 +64,27 @@ export default function App() {
           name="BlankScreen"
           component={BlankScreen}
           options={{ headerShown: false }}
-        />
+          />
           <Stack.Screen
             name="PortalPage"
             component={PortalPage}
             options={{ headerShown: false }}
-          />
+            />
         <Stack.Screen
           name="LoginPage"
           component={LoginPage}
           options={{ headerShown: false }}
-        />
+          />
         <Stack.Screen
           name="LoginAsAdmin"
           component={LoginAsAdmin}
           options={{ headerShown: false }}
-        />
+          />
         <Stack.Screen
           name="HomePageUser"
           component={HomePageUser}
-          options={{ headerBackVisible: false }}
+          options={{ headerShown: false }}
+          // options={{ headerBackVisible: true }}
         />
         <Stack.Screen
           name="MainAdmin"
