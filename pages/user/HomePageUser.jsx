@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, Button, View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApi } from '../../utils/useApi';
-import Card from '../../components/Card';
 import BASE_API_URL from '../../constant/ip';
 import { useLogout } from '../../utils/useLogout';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -78,7 +77,7 @@ const HomePageUser = ({ navigation }) => {
         <Button title="logout" onPress={() => logout()} />
         <Text>Belum Dikerjakan</Text>
 
-        {belumDikerjakan.length > 0 ? (
+        {/* {belumDikerjakan.length > 0 ? (
           belumDikerjakan.map((item) => (
             <Card
               key={item.id}
@@ -89,7 +88,7 @@ const HomePageUser = ({ navigation }) => {
           ))
         ) : (
           <Text>No links available</Text>
-        )}
+        )} */}
         <Text>Sudah Dikerjakan</Text>
         {links.length > 0 ? (
           links.map((item, index) => (
