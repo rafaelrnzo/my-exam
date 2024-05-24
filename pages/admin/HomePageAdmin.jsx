@@ -96,6 +96,7 @@ const HomePageAdmin = ({ navigation }) => {
                   id: item.id,
                 })
               }
+              time={item.waktu_pengerjaan_mulai}
               link_title={item.link_title}
               link_status={item.link_status}
               kelas_jurusan={item.kelas_jurusan.name}
