@@ -29,7 +29,6 @@ const ListKelas = ({ navigation }) => {
 
   const deleteKelas = async (id) => {
     try {
-      n
       deleteData(`${BASE_API_URL}delete-kelas/${id}`)
       navigation.replace("MainAdmin");
     } catch (error) {
@@ -47,7 +46,7 @@ const ListKelas = ({ navigation }) => {
       </View>
     )
   }
-  const kelasJurusan = data.data
+  const kelasJurusan = data?.data
   return (
     <SafeAreaView className="pt-6 bg-slate-50 h-full w-full">
       <View className="flex justify-center items-center py-4 border-b-[0.5px] border-slate-400 bg-white">

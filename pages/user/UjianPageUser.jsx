@@ -121,8 +121,6 @@ const UjianPageUser = ({ navigation, route }) => {
     };
   }, [currentState]);
   const {height, width} = useWindowDimensions();
-
-
   useEffect(() => {
     console.log(height, width);
       if(height < 500){
@@ -133,7 +131,7 @@ const UjianPageUser = ({ navigation, route }) => {
         { cancelable: false }
         );
       }
-  }, []);
+  }, [height]);
 
   const handleTimerFinish = () => {
     updateProgress("selesai");
