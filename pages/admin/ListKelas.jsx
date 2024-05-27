@@ -11,16 +11,19 @@ import React, { useState } from "react";
 import BASE_API_URL from "../../constant/ip";
 import { textTitle } from "../../assets/style/basic";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faPlus, faEllipsisVertical, faDesktop, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faEllipsisVertical, faDesktop, faUser, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheetModal from "./components/BottomSheetModal";
 import { useApi } from "../../utils/useApi";
+import { useLogout } from "../../utils/useLogout";
 
 const ListKelas = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const { data, error, isLoading } = useApi(`${BASE_API_URL}admin-sekolah/kelas-jurusan`);
   const { deleteData } = useApi()
+  const { logout } = useLogout();
+
 
   const toggleModal = (item) => {
     setSelectedItem(item);
@@ -49,8 +52,11 @@ const ListKelas = ({ navigation }) => {
   const kelasJurusan = data?.data
   return (
     <SafeAreaView className="pt-6 bg-slate-50 h-full w-full">
-      <View className="flex justify-center items-center py-4 border-b-[0.5px] border-slate-400 bg-white">
+      <View className="flex flex-row justify-between px-4 items-center py-4 border-b-[0.5px] border-slate-400 bg-white">
         <Text className={`${textTitle}`}>Classroom</Text>
+        <TouchableOpacity onPress={logout} >
+          <FontAwesomeIcon icon={faRightFromBracket} color="black" />
+        </TouchableOpacity>
       </View>
       <ScrollView className="p-4 flex gap-3">
         {kelasJurusan.map((item, index) => (
@@ -101,7 +107,7 @@ const ListKelas = ({ navigation }) => {
           onClose={() => setModalVisible(false)}
           onDelete={() => deleteKelas(selectedItem.id)}
           onEdit={() => navigation.push("UpdateKelas", {
-             name_kelas: selectedItem.name,
+            name_kelas: selectedItem.name,
             id: selectedItem.id,
           })}
         />
