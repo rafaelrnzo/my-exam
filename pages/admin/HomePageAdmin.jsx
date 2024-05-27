@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView, Text, Button, ActivityIndicator, View, TextInput, StyleSheet, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faFilter, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import BASE_API_URL from "../../constant/ip";
 import { useLogout } from "../../utils/useLogout";
 import { useApi } from "../../utils/useApi";
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { textBasic } from "../../assets/style/basic";
-import { FullWindowOverlay } from "react-native-screens";
 import Card from "./components/CardLinkAdmin";
+import BottomSheetFilter from "./components/BottomSheetFilter";
 
 const HomePageAdmin = ({ navigation }) => {
   const { logout } = useLogout();
   const { data: links, error, isLoading } = useApi(`${BASE_API_URL}admin-sekolah/links`);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("all");
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    // Update selected tab based on link_status from API
     if (links && links.data.length > 0) {
       setSelectedTab("all");
     }
@@ -42,21 +42,32 @@ const HomePageAdmin = ({ navigation }) => {
 
   const filteredLinks = links.data
     .filter(item => selectedTab === "all" || item.link_status === selectedTab)
-    .filter(item => item.link_title.toLowerCase().includes(searchQuery.toLowerCase()));
+    .filter(item => item.link_title.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter(item => !Object.keys(filters).some(key => filters[key] && item.kelas_jurusan.id !== parseInt(key)));
+
+  const classes = Array.from(new Set(links.data.map(item => item.kelas_jurusan.id)))
+    .map(id => {
+      return links.data.find(item => item.kelas_jurusan.id === id).kelas_jurusan;
+    });
 
   return (
     <SafeAreaView className="pt-10 bg-white h-full">
       <View className="bg-white flex items-center w-full">
-        <View style={styles.searchBar} className="f">
-          <View className="pr-2">
-            <FontAwesomeIcon icon={faSearch} color="#cbd5e1" />
+        <View className="w-full flex flex-row">
+          <View style={styles.searchBar} className="w-4/5">
+            <View className="pr-2">
+              <FontAwesomeIcon icon={faSearch} color="#cbd5e1" />
+            </View>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search by link title"
+              value={searchQuery}
+              onChangeText={text => setSearchQuery(text)}
+            />
           </View>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search by link title"
-            value={searchQuery}
-            onChangeText={text => setSearchQuery(text)}
-          />
+          <TouchableOpacity className="flex items-center flex-row" onPress={() => { setModalVisible(!isModalVisible) }}>
+            <FontAwesomeIcon icon={faFilter} color="#3b82f6" size={20} />
+          </TouchableOpacity>
         </View>
         <View style={styles.tabContainer}>
           <TouchableOpacity
@@ -82,7 +93,7 @@ const HomePageAdmin = ({ navigation }) => {
       <View className="p-4 bg-slate-50 h-full">
         {filteredLinks.length > 0 ? (
           filteredLinks.map((item) => (
-            <Card   
+            <Card
               key={item.id}
               press={() =>
                 navigation.push("UpdateLinkAdmin", {
@@ -105,11 +116,6 @@ const HomePageAdmin = ({ navigation }) => {
         ) : (
           <Text>No {selectedTab} links available</Text>
         )}
-        {/* <Button
-          title="Create link"
-          onPress={() => navigation.push("CreateLinkAdmin")}
-        /> */}
-        {/* <Button title="Logout" onPress={() => logout()} /> */}
       </View>
       <TouchableOpacity
         className="absolute bottom-4 right-4 w-14 h-14 bg-blue-500 rounded-full justify-center items-center shadow-lg"
@@ -117,7 +123,13 @@ const HomePageAdmin = ({ navigation }) => {
       >
         <FontAwesomeIcon icon={faPlus} color="white" />
       </TouchableOpacity>
-
+      <BottomSheetFilter
+        isVisible={isModalVisible}
+        onClose={() => setModalVisible(false)}
+        filters={filters}
+        setFilters={setFilters}
+        classes={classes}
+      />
     </SafeAreaView>
   );
 };
@@ -132,7 +144,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   searchBar: {
-    width: FullWindowOverlay,
     marginHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
@@ -140,7 +151,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#cbd5e1",
     borderRadius: 8,
-
     paddingHorizontal: 12,
   },
   searchIcon: {
