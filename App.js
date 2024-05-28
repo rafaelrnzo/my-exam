@@ -64,7 +64,6 @@ export default function App() {
         revalidateOnFocus: true,
         revalidateOnReconnect: true,
         shouldRetryOnError: true,
-        refreshInterval:1000
       }}
     >
       <NavigationContainer ref={navigationRef}>

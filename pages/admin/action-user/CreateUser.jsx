@@ -13,13 +13,19 @@ import BASE_API_URL from "../../../constant/ip";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useApi } from "../../../utils/useApi";
-import { buttonStyle, textBasic, textInputStyle, textTitle } from "../../../assets/style/basic";
+import {
+  buttonStyle,
+  textInputStyle,
+  textTitle,
+} from "../../../assets/style/basic";
 
-const CreateUser = ({ navigation }) => {
+const CreateUser = ({ navigation, route }) => {
+  const { sekolah, kelas_jurusan_id } = route.params;
   const [fields, setFields] = useState({
     name: "",
     password: "",
-    token: "",
+    tokenPrefix: "",
+    tokenSuffix: "",
     role: "",
     kelas_jurusan: "",
   });
@@ -33,15 +39,23 @@ const CreateUser = ({ navigation }) => {
 
   const createUser = async () => {
     try {
-      await postData(`${BASE_API_URL}admin-sekolah/post`, fields);
+      await postData(`${BASE_API_URL}admin-sekolah/post`, {
+        ...fields, token: fields.tokenPrefix
+      });
       setFields({
         name: "",
         password: "",
-        token: "",
+        tokenPrefix: "",
+        tokenSuffix: "",
         role: "",
         kelas_jurusan: "",
       });
-      navigation.replace("MainAdmin");
+      navigation.reset({
+        index: 0,
+        routes: [
+          { name: "ListUser", params: { kelas_jurusan_id: kelas_jurusan_id, sekolah:sekolah } },
+        ],
+      })
     } catch (error) {
       console.log(fields);
       ToastAndroid.show(error.message, ToastAndroid.LONG);
@@ -78,7 +92,26 @@ const CreateUser = ({ navigation }) => {
         className={`${textInputStyle}`}
         onChangeText={(text) => setFields({ ...fields, token: text })}
       />
-      <Text className={`${textTitle}`}>Role</Text>
+      <View className="flex flex-col">
+          <Text className={`${textTitle}`}>Token</Text>
+          <View className="flex flex-row">
+            <TextInput
+              placeholder="Token Prefix"
+              value={fields.tokenPrefix}
+              className={`${textInputStyle} w-1/2`}
+              onChangeText={(text) =>
+                setFields({ ...fields, tokenPrefix: text })
+              }
+            />
+            <TextInput
+              placeholder="Token Suffix"
+              value={sekolah}
+              className={`${textInputStyle} w-1/2`}
+              editable={false}
+            />
+          </View>
+        </View>
+      <Text className={`${textTitle} mb-2`}>Role</Text>
       <SelectDropdown
         data={["admin sekolah", "siswa"]}
         defaultValue={"admin sekolah"}
@@ -116,7 +149,7 @@ const CreateUser = ({ navigation }) => {
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
           <View className="pr-2 flex-auto">
-            <Text className={`${textBasic} mb-2`}>Kelas Jurusan</Text>
+            <Text className={`${textTitle} mb-2`}>Kelas Jurusan</Text>
             <SelectDropdown
               data={responseData || []}
               defaultValue={responseData[0]}

@@ -1,7 +1,5 @@
 import { View, Text, TouchableOpacity, Button, ActivityIndicator } from "react-native";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import BASE_API_URL from "../../constant/ip";
 import { useNavigation } from "@react-navigation/native";
 import { useLogout } from "../../utils/useLogout";

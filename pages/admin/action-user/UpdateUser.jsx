@@ -3,7 +3,6 @@ import {
   Text,
   TextInput,
   ToastAndroid,
-  Button,
   StyleSheet,
   ActivityIndicator,
   SafeAreaView,
@@ -16,18 +15,19 @@ import BASE_API_URL from "../../../constant/ip";
 import { useApi } from "../../../utils/useApi";
 import {
   buttonStyle,
-  textBasic,
   textInputStyle,
   textTitle,
 } from "../../../assets/style/basic";
 
 const UpdateUser = ({ navigation, route }) => {
-  const { id, name, token, role, kelas_jurusan } = route.params;
+  const { id, name, token, role, kelas_jurusan, kelas_jurusan_id, sekolah } =
+    route.params;
   const [fields, setFields] = useState({
-    name: name,
+    name: "",
     password: "",
-    token: token,
-    role: role,
+    tokenPrefix: "",
+    tokenSuffix: "",
+    role: "",
     kelas_jurusan: kelas_jurusan,
   });
   const {
@@ -38,9 +38,25 @@ const UpdateUser = ({ navigation, route }) => {
   const responseData = kelasJurusan?.data?.map((item) => item.name);
   const { putData } = useApi();
 
+  useEffect(() => {
+    const [prefix, suffix] = token.split("-");
+    setFields({
+      name: name,
+      password: "",
+      tokenPrefix: `${prefix}-${suffix}`,
+      tokenSuffix: `-${token.split("-").slice(2).join("-")}`,
+      role: role,
+      kelas_jurusan: kelas_jurusan,
+    });
+  }, [name, token, role, kelas_jurusan, fields.password]);
+
   const updateUser = async () => {
     try {
-      await putData(`${BASE_API_URL}admin-sekolah/${id}`, fields);
+      console.log("bro", fields.kelas_jurusan);
+      await putData(`${BASE_API_URL}admin-sekolah/${id}`, {
+        ...fields,
+        token: fields.tokenPrefix,
+      });
       setFields({
         name: "",
         password: "",
@@ -48,14 +64,19 @@ const UpdateUser = ({ navigation, route }) => {
         role: "",
         kelas_jurusan: "",
       });
-      navigation.replace("MainAdmin");
+      navigation.reset({
+        index: 0,
+        routes: [
+          { name: "ListUser", params: { kelas_jurusan_id: kelas_jurusan_id, sekolah:sekolah } },
+        ],
+      });
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };
 
   useEffect(() => {
-    console.log(fields.kelas_jurusan);
+    console.log("tes", fields.kelas_jurusan);
   }, []);
 
   if (error) {
@@ -67,68 +88,84 @@ const UpdateUser = ({ navigation, route }) => {
       style={{ paddingTop: 10 }}
       className="h-full w-full bg-slate-50 flex justify-start px-4 gap-2"
     >
-      <Text className={`${textBasic}`}>Nama</Text>
+      <Text className={`${textTitle}`}>Nama</Text>
       <TextInput
         placeholder="nama"
         value={fields.name}
         className={`${textInputStyle}`}
         onChangeText={(text) => setFields({ ...fields, name: text })}
       />
-      <Text className={`${textTitle}`}>password</Text>
+      <Text className={`${textTitle}`}>Password</Text>
       <TextInput
         placeholder="password"
         value={fields.password}
         className={`${textInputStyle}`}
         onChangeText={(text) => setFields({ ...fields, password: text })}
       />
-      <Text className={`${textTitle}`}>token</Text>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-        <TextInput
-          placeholder="token"
-          value={fields.token}
-          className={`${textInputStyle}`}
-          onChangeText={(text) => setFields({ ...fields, token: text })}
+      {fields.role == "admin sekolah" ? null : (
+        <View className="flex flex-col">
+          <Text className={`${textTitle}`}>Token</Text>
+          <View className="flex flex-row">
+            <TextInput
+              placeholder="Token Prefix"
+              value={fields.tokenPrefix}
+              className={`${textInputStyle} w-1/2`}
+              onChangeText={(text) =>
+                setFields({ ...fields, tokenPrefix: text })
+              }
+            />
+            <TextInput
+              placeholder="Token Suffix"
+              value={sekolah}
+              className={`${textInputStyle} w-1/2`}
+              editable={false}
+            />
+          </View>
+        </View>
+      )}
+      <View className="flex flex-col">
+        <Text className={`${textTitle} mb-2`}>Role</Text>
+        <SelectDropdown
+          data={["admin sekolah", "siswa"]}
+          defaultValue={fields.role}
+          onSelect={(selectedRole, index) =>
+            setFields({ ...fields, role: selectedRole })
+          }
+          renderButton={(selectedRole, isOpened) => {
+            return (
+              <View style={styles.dropdownButtonStyle}>
+                <Text style={styles.dropdownButtonTxtStyle}>
+                  {selectedRole}
+                </Text>
+                <Icon
+                  name={isOpened ? "chevron-up" : "chevron-down"}
+                  style={styles.dropdownButtonArrowStyle}
+                />
+              </View>
+            );
+          }}
+          renderItem={(item, index, isSelected) => {
+            return (
+              <View
+                style={{
+                  ...styles.dropdownItemStyle,
+                  ...(isSelected && { backgroundColor: "#D2D9DF" }),
+                }}
+              >
+                <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+              </View>
+            );
+          }}
+          showsVerticalScrollIndicator={false}
+          dropdownStyle={styles.dropdownMenuStyle}
         />
       </View>
-      <Text className={`${textTitle}`}>role</Text>
-      <SelectDropdown
-        data={["admin sekolah", "siswa"]}
-        defaultValue={fields.role}
-        onSelect={(selectedRole, index) =>
-          setFields({ ...fields, role: selectedRole })
-        }
-        renderButton={(selectedRole, isOpened) => {
-          return (
-            <View style={styles.dropdownButtonStyle}>
-              <Text style={styles.dropdownButtonTxtStyle}>{selectedRole}</Text>
-              <Icon
-                name={isOpened ? "chevron-up" : "chevron-down"}
-                style={styles.dropdownButtonArrowStyle}
-              />
-            </View>
-          );
-        }}
-        renderItem={(item, index, isSelected) => {
-          return (
-            <View
-              style={{
-                ...styles.dropdownItemStyle,
-                ...(isSelected && { backgroundColor: "#D2D9DF" }),
-              }}
-            >
-              <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-            </View>
-          );
-        }}
-        showsVerticalScrollIndicator={false}
-        dropdownStyle={styles.dropdownMenuStyle}
-      />
       <View className="flex-row flex-wrap">
         {isLoading ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
           <View className="pr-2 flex-auto">
-            <Text className={`${textBasic} mb-2`}>Kelas Jurusan</Text>
+            <Text className={`${textTitle} mb-2`}>Kelas Jurusan</Text>
             <SelectDropdown
               data={responseData}
               defaultValue={fields.kelas_jurusan}
@@ -167,7 +204,7 @@ const UpdateUser = ({ navigation, route }) => {
         )}
       </View>
       <TouchableOpacity className={`${buttonStyle}`} onPress={updateUser}>
-        <Text className="font-semibold text-white text-lg">Create</Text>
+        <Text className="font-semibold text-white text-lg">Update</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

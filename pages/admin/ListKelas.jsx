@@ -30,6 +30,7 @@ const ListKelas = ({ navigation }) => {
   const { data, error, isLoading } = useApi(
     `${BASE_API_URL}admin-sekolah/kelas-jurusan`
   );
+  const {data: userLoggedin, error: userError, isLoading: userLoad} = useApi(`${BASE_API_URL}get-data-login`)
   const { deleteData } = useApi();
   const { logout } = useLogout();
 
@@ -46,7 +47,7 @@ const ListKelas = ({ navigation }) => {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };
-  if (error) {
+  if (error || userError) {
     return (
       <View style={{ flex: 1,
         justifyContent: "center",
@@ -57,7 +58,7 @@ const ListKelas = ({ navigation }) => {
     );
   }
 
-  if (isLoading) {
+  if (isLoading || userLoad) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -82,6 +83,7 @@ const ListKelas = ({ navigation }) => {
               navigation.push("ListUser", {
                 kelas_jurusan_id: item.id,
                 kelas_jurusan: item.name,
+                sekolah: userLoggedin.sekolah
               })
             }
           >
@@ -90,7 +92,6 @@ const ListKelas = ({ navigation }) => {
               <TouchableOpacity onPress={() => toggleModal(item)}>
                 <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
               </TouchableOpacity>
-              {/* <BottomSheetModal isVisible={isModalVisible} onClose={toggleModal} text={item.name} /> */}
             </View>
             <View className="pt-5">
               <View className="flex justify-between flex-row items-center">
