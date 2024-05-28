@@ -63,7 +63,7 @@ export default function App() {
         dedupingInterval: 2000,
         revalidateOnFocus: true,
         revalidateOnReconnect: true,
-        shouldRetryOnError: false,
+        shouldRetryOnError: true,
         refreshInterval:1000
       }}
     >

@@ -1,10 +1,19 @@
-import { View, Text, TextInput, ToastAndroid, Button, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  ToastAndroid,
+  StyleSheet,
+  ActivityIndicator,
+  SafeAreaView,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState } from "react";
 import BASE_API_URL from "../../../constant/ip";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useApi } from "../../../utils/useApi";
-import { textBasic } from "../../../assets/style/basic";
+import { buttonStyle, textBasic, textInputStyle, textTitle } from "../../../assets/style/basic";
 
 const CreateUser = ({ navigation }) => {
   const [fields, setFields] = useState({
@@ -14,13 +23,17 @@ const CreateUser = ({ navigation }) => {
     role: "",
     kelas_jurusan: "",
   });
-  const {postData} = useApi()
-  const {data:kelasJurusan, error, isLoading} = useApi(`${BASE_API_URL}get-kelas`)
-  const responseData = kelasJurusan?.data?.map((item) => item.name)
-  
+  const { postData } = useApi();
+  const {
+    data: kelasJurusan,
+    error,
+    isLoading,
+  } = useApi(`${BASE_API_URL}get-kelas`);
+  const responseData = kelasJurusan?.data?.map((item) => item.name);
+
   const createUser = async () => {
     try {
-      await postData(`${BASE_API_URL}admin-sekolah/post`, fields)
+      await postData(`${BASE_API_URL}admin-sekolah/post`, fields);
       setFields({
         name: "",
         password: "",
@@ -28,7 +41,7 @@ const CreateUser = ({ navigation }) => {
         role: "",
         kelas_jurusan: "",
       });
-      navigation.replace('MainAdmin');
+      navigation.replace("MainAdmin");
     } catch (error) {
       console.log(fields);
       ToastAndroid.show(error.message, ToastAndroid.LONG);
@@ -40,26 +53,32 @@ const CreateUser = ({ navigation }) => {
   }
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
-      <Text>nama</Text>
+    <SafeAreaView
+      style={{ paddingTop: 10 }}
+      className="h-full w-full bg-slate-50 flex justify-start px-4 gap-2"
+    >
+      <Text className={`${textTitle}`}>Nama</Text>
       <TextInput
         placeholder="nama"
         value={fields.name}
+        className={`${textInputStyle}`}
         onChangeText={(text) => setFields({ ...fields, name: text })}
       />
-      <Text>password</Text>
+      <Text className={`${textTitle}`}>Password</Text>
       <TextInput
         placeholder="password"
         value={fields.password}
+        className={`${textInputStyle}`}
         onChangeText={(text) => setFields({ ...fields, password: text })}
       />
-      <Text>token</Text>
-        <TextInput
-          placeholder="token"
-          value={fields.token}
-          onChangeText={(text) => setFields({ ...fields, token: text })}
-        />
-      <Text>role</Text>
+      <Text className={`${textTitle}`}>Token</Text>
+      <TextInput
+        placeholder="token"
+        value={fields.token}
+        className={`${textInputStyle}`}
+        onChangeText={(text) => setFields({ ...fields, token: text })}
+      />
+      <Text className={`${textTitle}`}>Role</Text>
       <SelectDropdown
         data={["admin sekolah", "siswa"]}
         defaultValue={"admin sekolah"}
@@ -93,50 +112,52 @@ const CreateUser = ({ navigation }) => {
         dropdownStyle={styles.dropdownMenuStyle}
       />
       <View className="flex-row flex-wrap">
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#0000ff" />
-          ) : (
-            <View className="pr-2 flex-auto">
-              <Text className={`${textBasic} mb-2`}>Kelas Jurusan</Text>
-              <SelectDropdown
-                data={responseData}
-                defaultValue={responseData[0]}
-                onSelect={(selectedKelas, index) =>
-                  setFields({ ...fields, kelas_jurusan: selectedKelas })
-                }
-                renderButton={(selectedKelas, isOpened) => {
-                  return (
-                    <View style={styles.dropdownButtonStyle}>
-                      <Text style={styles.dropdownButtonTxtStyle}>
-                        {selectedKelas}
-                      </Text>
-                      <Icon
-                        name={isOpened ? "chevron-up" : "chevron-down"}
-                        style={styles.dropdownButtonArrowStyle}
-                      />
-                    </View>
-                  );
-                }}
-                renderItem={(item, index, isSelected) => {
-                  return (
-                    <View
-                      style={{
-                        ...styles.dropdownItemStyle,
-                        ...(isSelected && { backgroundColor: "#D2D9DF" }),
-                      }}
-                    >
-                      <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-                    </View>
-                  );
-                }}
-                showsVerticalScrollIndicator={false}
-                dropdownStyle={styles.dropdownMenuStyle}
-              />
-            </View>
-          )}
-        </View>
-      <Button title="create" onPress={createUser} />
-    </View>
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <View className="pr-2 flex-auto">
+            <Text className={`${textBasic} mb-2`}>Kelas Jurusan</Text>
+            <SelectDropdown
+              data={responseData || []}
+              defaultValue={responseData[0]}
+              onSelect={(selectedKelas, index) =>
+                setFields({ ...fields, kelas_jurusan: selectedKelas })
+              }
+              renderButton={(selectedKelas, isOpened) => {
+                return (
+                  <View style={styles.dropdownButtonStyle}>
+                    <Text style={styles.dropdownButtonTxtStyle}>
+                      {selectedKelas}
+                    </Text>
+                    <Icon
+                      name={isOpened ? "chevron-up" : "chevron-down"}
+                      style={styles.dropdownButtonArrowStyle}
+                    />
+                  </View>
+                );
+              }}
+              renderItem={(item, index, isSelected) => {
+                return (
+                  <View
+                    style={{
+                      ...styles.dropdownItemStyle,
+                      ...(isSelected && { backgroundColor: "#D2D9DF" }),
+                    }}
+                  >
+                    <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+                  </View>
+                );
+              }}
+              showsVerticalScrollIndicator={false}
+              dropdownStyle={styles.dropdownMenuStyle}
+            />
+          </View>
+        )}
+      </View>
+      <TouchableOpacity className={`${buttonStyle}`} onPress={createUser}>
+        <Text className="font-semibold text-white text-lg">Create</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 };
 

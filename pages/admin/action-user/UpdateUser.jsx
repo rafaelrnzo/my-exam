@@ -6,13 +6,20 @@ import {
   Button,
   StyleSheet,
   ActivityIndicator,
+  SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import BASE_API_URL from "../../../constant/ip";
 import { useApi } from "../../../utils/useApi";
-import { textBasic } from "../../../assets/style/basic";
+import {
+  buttonStyle,
+  textBasic,
+  textInputStyle,
+  textTitle,
+} from "../../../assets/style/basic";
 
 const UpdateUser = ({ navigation, route }) => {
   const { id, name, token, role, kelas_jurusan } = route.params;
@@ -41,7 +48,7 @@ const UpdateUser = ({ navigation, route }) => {
         role: "",
         kelas_jurusan: "",
       });
-      navigation.replace('MainAdmin');
+      navigation.replace("MainAdmin");
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
@@ -56,28 +63,34 @@ const UpdateUser = ({ navigation, route }) => {
   }
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
-      <Text>nama</Text>
+    <SafeAreaView
+      style={{ paddingTop: 10 }}
+      className="h-full w-full bg-slate-50 flex justify-start px-4 gap-2"
+    >
+      <Text className={`${textBasic}`}>Nama</Text>
       <TextInput
         placeholder="nama"
         value={fields.name}
+        className={`${textInputStyle}`}
         onChangeText={(text) => setFields({ ...fields, name: text })}
       />
-      <Text>password</Text>
+      <Text className={`${textTitle}`}>password</Text>
       <TextInput
         placeholder="password"
         value={fields.password}
+        className={`${textInputStyle}`}
         onChangeText={(text) => setFields({ ...fields, password: text })}
       />
-      <Text>token</Text>
+      <Text className={`${textTitle}`}>token</Text>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
         <TextInput
           placeholder="token"
           value={fields.token}
+          className={`${textInputStyle}`}
           onChangeText={(text) => setFields({ ...fields, token: text })}
         />
       </View>
-      <Text>role</Text>
+      <Text className={`${textTitle}`}>role</Text>
       <SelectDropdown
         data={["admin sekolah", "siswa"]}
         defaultValue={fields.role}
@@ -153,8 +166,10 @@ const UpdateUser = ({ navigation, route }) => {
           </View>
         )}
       </View>
-      <Button title="update" onPress={updateUser} />
-    </View>
+      <TouchableOpacity className={`${buttonStyle}`} onPress={updateUser}>
+        <Text className="font-semibold text-white text-lg">Create</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 };
 

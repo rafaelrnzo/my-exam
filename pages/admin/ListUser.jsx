@@ -14,8 +14,10 @@ import { useApi } from "../../utils/useApi";
 
 const ListUser = ({ navigation, route }) => {
   const [file, setFile] = useState(null);
-  const {kelas_jurusan_id} = route.params
-  const [url, setUrl] = useState(`${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}`);
+  const { kelas_jurusan_id } = route.params;
+  const [url, setUrl] = useState(
+    `${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}`
+  );
   const { data, error, isLoading, postData } = useApi(url);
 
   const pickFile = async () => {
@@ -35,7 +37,6 @@ const ListUser = ({ navigation, route }) => {
     }
   };
 
-
   const handleImport = async () => {
     try {
       const formData = new FormData();
@@ -44,19 +45,22 @@ const ListUser = ({ navigation, route }) => {
         type: "file/xlsx",
         name: file.assets[0].name,
       });
-      await postData(`${BASE_API_URL}admin-sekolah/siswa-import`, formData)
+      await postData(`${BASE_API_URL}admin-sekolah/siswa-import`, formData);
+      setFile(null)
     } catch (error) {
       console.error("Error importing siswa:", error);
     }
   };
 
-  const users = data?.data.data || []
-  const links = data?.data.links || []
+  const users = data?.data.data || [];
+  const links = data?.data.links || [];
 
   const handleLinkPress = (newUrl) => {
-    if(newUrl === null){
-      setUrl(`${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}`)
-    } else{
+    if (newUrl === null) {
+      setUrl(
+        `${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}`
+      );
+    } else {
       setUrl(newUrl);
     }
     console.log(newUrl);
@@ -71,7 +75,7 @@ const ListUser = ({ navigation, route }) => {
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
-    )
+    );
   }
 
   return (
@@ -106,16 +110,29 @@ const ListUser = ({ navigation, route }) => {
           >
             <Text>name: {item.name}</Text>
             <Text>kelas_jurusan: {item.kelas_jurusan.name ?? "admin"}</Text>
-            <Text>token: {item.token}</Text>
+            {item.role == "admin sekolah" ? null : (
+              <Text>token: {item.token}</Text>
+            )}
+
+            <Text>role: {item.role}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
       {links.length !== 0 ? (
         <View
-          style={{ flexDirection: "row", justifyContent: "center", gap: 4, paddingTop:10 }}
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            gap: 4,
+            paddingTop: 10,
+          }}
         >
           {links.map((item, index) => (
-            <Button key={index} onPress={() =>handleLinkPress(item.url)} title={item.label} />
+            <Button
+              key={index}
+              onPress={() => handleLinkPress(item.url)}
+              title={item.label}
+            />
           ))}
         </View>
       ) : null}

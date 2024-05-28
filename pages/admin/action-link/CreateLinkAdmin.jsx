@@ -97,7 +97,14 @@ const CreateLinkAdmin = ({ navigation }) => {
   };
 
   if (error) {
-    return <Text>Error loading data</Text>;
+    return (
+      <View style={{ flex: 1,
+        justifyContent: "center",
+        alignItems: "center", }}>
+        <Text>Error</Text>
+        <Button title="Logout" onPress={logout} />
+      </View>
+    );
   }
 
   return (
