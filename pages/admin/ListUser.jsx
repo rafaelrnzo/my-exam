@@ -13,9 +13,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { useApi } from "../../utils/useApi";
 import { textBasic, textTitle } from "../../assets/style/basic";
 import {
-  faDesktop,
   faEllipsisVertical,
-  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import BottomSheetModal from "./components/BottomSheetModal";
@@ -33,8 +31,12 @@ const ListUser = ({ navigation, route }) => {
   const deleteUser = async (id) => {
     try {
       deleteData(`${BASE_API_URL}admin-sekolah/${id}`);
-      navigation.replace("ListUser");
-    } catch (error) {
+      navigation.reset({
+        index: 0,
+        routes: [
+          { name: "ListUser", params: { kelas_jurusan_id: kelas_jurusan_id, sekolah:sekolah } },
+        ],
+      });    } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };

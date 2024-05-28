@@ -62,8 +62,12 @@ const CreateLinkAdmin = ({ navigation }) => {
     setFields({ ...fields, waktu_pengerjaan_selesai: currentTime });
   };
 
-  const {data: kelasJurusan, error, isLoading} = useApi(`${BASE_API_URL}get-kelas`);
-  const {postData} = useApi()
+  const {
+    data: kelasJurusan,
+    error,
+    isLoading,
+  } = useApi(`${BASE_API_URL}get-kelas`);
+  const { postData } = useApi();
   const responseData = kelasJurusan?.data?.map((item) => item.name);
 
   const createLink = async () => {
@@ -79,7 +83,7 @@ const CreateLinkAdmin = ({ navigation }) => {
           .slice(0, 19)
           .replace("T", " "),
       };
-      await postData(`${BASE_API_URL}links/post`, formattedFields)
+      await postData(`${BASE_API_URL}links/post`, formattedFields);
       setFields({
         link_name: "",
         link_title: "",
@@ -89,7 +93,10 @@ const CreateLinkAdmin = ({ navigation }) => {
         waktu_pengerjaan_mulai: new Date(),
         waktu_pengerjaan_selesai: new Date(),
       });
-      navigation.replace("MainAdmin");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainAdmin" }],
+      });
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
       console.log(error.response.data);
@@ -98,9 +105,7 @@ const CreateLinkAdmin = ({ navigation }) => {
 
   if (error) {
     return (
-      <View style={{ flex: 1,
-        justifyContent: "center",
-        alignItems: "center", }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Error</Text>
         <Button title="Logout" onPress={logout} />
       </View>

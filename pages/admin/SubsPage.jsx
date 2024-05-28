@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, Button, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Button,
+  ActivityIndicator,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import BASE_API_URL from "../../constant/ip";
 import { useNavigation } from "@react-navigation/native";
@@ -20,9 +26,17 @@ const SubsPage = () => {
       });
       const { data } = response;
       if (data.status === "success" && data.snap_token) {
-        navigation.navigate("PaymentScreen", {
-          snap_token: data.snap_token,
-          pay_token: data.pay_token,
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "ListUser",
+              params: {
+                snap_token: data.snap_token,
+                pay_token: data.pay_token,
+              },
+            },
+          ],
         });
       } else {
         console.log("Failed to process payment. Please try again later.");
@@ -41,7 +55,7 @@ const SubsPage = () => {
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
-    )
+    );
   }
 
   return (

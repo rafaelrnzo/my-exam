@@ -20,7 +20,7 @@ const MonitoringPage = ({ navigation, route }) => {
 
   const handleOpenModal = (userIndex, id) => {
     setCurrentUser(userIndex);
-    setCurrentId(id)
+    setCurrentId(id);
     setModalVisible(true);
   };
 
@@ -28,6 +28,15 @@ const MonitoringPage = ({ navigation, route }) => {
     try {
       await putData(`${BASE_API_URL}progress/${userId}`, {
         status_progress: newStatus,
+      });
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: "MonitoringPage",
+            params: { kelas_jurusan_id: kelas_jurusan_id },
+          },
+        ],
       });
     } catch (error) {
       console.error("Error updating status:", error, newStatus);
@@ -82,7 +91,7 @@ const MonitoringPage = ({ navigation, route }) => {
             <TouchableOpacity
               style={styles.userRow}
               key={index}
-              onPress={() => handleOpenModal(index,data.data.data[index].id)}
+              onPress={() => handleOpenModal(index, data.data.data[index].id)}
             >
               <Text>{data.data.data[index].id}</Text>
               <Text>{user.name}</Text>
@@ -96,7 +105,7 @@ const MonitoringPage = ({ navigation, route }) => {
           <StatusMonitoringModal
             visible={modalVisible}
             onClose={() => setModalVisible(false)}
-            onUpdateStatus={(newStatus) => 
+            onUpdateStatus={(newStatus) =>
               handleUpdateStatus(newStatus, currentId)
             }
             currentStatus={status[currentUser]}

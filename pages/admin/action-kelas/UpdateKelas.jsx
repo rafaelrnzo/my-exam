@@ -1,26 +1,43 @@
-import { View, Text, TextInput, ToastAndroid, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  ToastAndroid,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import React, { useState } from "react";
 import BASE_API_URL from "../../../constant/ip";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { buttonStyle, textBasic, textInputStyle } from "../../../assets/style/basic";
+import {
+  buttonStyle,
+  textBasic,
+  textInputStyle,
+} from "../../../assets/style/basic";
 import { useApi } from "../../../utils/useApi";
 
 const UpdateKelas = ({ navigation, route }) => {
   const { name_kelas, id } = route.params;
   const [fields, setFields] = useState({ name: name_kelas });
   const { putData } = useApi();
-  
+
   const update = async () => {
     try {
       await putData(`${BASE_API_URL}update-kelas/${id}`, fields);
       setFields({ name: "" });
-      navigation.replace("MainAdmin");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainAdmin" }],
+      });
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };
   return (
-    <SafeAreaView style={{ paddingTop: 0 }} className="h-full w-full bg-slate-50 flex justify-start">
+    <SafeAreaView
+      style={{ paddingTop: 0 }}
+      className="h-full w-full bg-slate-50 flex justify-start"
+    >
       <View className="flex gap-y-2  px-4">
         <Text className={`${textBasic} `}>Nama Kelas</Text>
         <TextInput
@@ -36,7 +53,7 @@ const UpdateKelas = ({ navigation, route }) => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 export default UpdateKelas;

@@ -1,25 +1,43 @@
-import { View, Text, TextInput, ToastAndroid, ActivityIndicator, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  ToastAndroid,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState } from "react";
 import BASE_API_URL from "../../../constant/ip";
 import { useApi } from "../../../utils/useApi";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { buttonStyle, textBasic, textInputStyle, textTitle } from "../../../assets/style/basic";
+import {
+  buttonStyle,
+  textBasic,
+  textInputStyle,
+  textTitle,
+} from "../../../assets/style/basic";
 
 const CreateKelas = ({ navigation }) => {
   const [fields, setFields] = useState({ name: "" });
-  const {postData} = useApi()
+  const { postData } = useApi();
 
   const createKelas = async () => {
     try {
-      await postData(`${BASE_API_URL}post-kelas`, fields)
+      await postData(`${BASE_API_URL}post-kelas`, fields);
       setFields({ name: "" });
-      navigation.replace("MainAdmin");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainAdmin" }],
+      });
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };
   return (
-    <SafeAreaView style={{ paddingTop: 0 }} className="h-full w-full bg-slate-50 flex justify-start">
+    <SafeAreaView
+      style={{ paddingTop: 0 }}
+      className="h-full w-full bg-slate-50 flex justify-start"
+    >
       <View className="flex gap-y-2  px-4">
         <Text className={`${textBasic} `}>Nama Kelas</Text>
         <TextInput

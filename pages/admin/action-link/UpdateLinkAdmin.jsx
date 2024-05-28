@@ -32,8 +32,8 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
     waktu_pengerjaan_selesai,
   } = route.params;
 
-  const initialStartDate = new Date(waktu_pengerjaan_mulai.replace(' ', 'T'));
-  const initialEndDate = new Date(waktu_pengerjaan_selesai.replace(' ', 'T'));
+  const initialStartDate = new Date(waktu_pengerjaan_mulai.replace(" ", "T"));
+  const initialEndDate = new Date(waktu_pengerjaan_selesai.replace(" ", "T"));
 
   const [fields, setFields] = useState({
     link_name,
@@ -98,7 +98,11 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
     }
   };
 
-  const { data: kelasJurusanData, error, isLoading } = useApi(`${BASE_API_URL}get-kelas`);
+  const {
+    data: kelasJurusanData,
+    error,
+    isLoading,
+  } = useApi(`${BASE_API_URL}get-kelas`);
   const responseData = kelasJurusanData?.data?.map((item) => item.name);
   const { putData } = useApi();
 
@@ -106,8 +110,14 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
     try {
       const formattedFields = {
         ...fields,
-        waktu_pengerjaan_mulai: fields.waktu_pengerjaan_mulai.toISOString().slice(0, 19).replace("T", " "),
-        waktu_pengerjaan_selesai: fields.waktu_pengerjaan_selesai.toISOString().slice(0, 19).replace("T", " "),
+        waktu_pengerjaan_mulai: fields.waktu_pengerjaan_mulai
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " "),
+        waktu_pengerjaan_selesai: fields.waktu_pengerjaan_selesai
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " "),
       };
       await putData(`${BASE_API_URL}links/${id}`, formattedFields);
       setFields({
@@ -119,7 +129,10 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
         waktu_pengerjaan_mulai: "",
         waktu_pengerjaan_selesai: "",
       });
-      navigation.replace("MainAdmin");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainAdmin" }],
+      });
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
       console.log(error.response.data);
@@ -127,7 +140,10 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={{ paddingTop: 10 }} className="h-full w-full bg-slate-50 flex justify-start">
+    <SafeAreaView
+      style={{ paddingTop: 10 }}
+      className="h-full w-full bg-slate-50 flex justify-start"
+    >
       <View className="flex gap-2 pt-4 px-4">
         <View className="flex gap-y-2">
           <Text className="textBasic">Link URL</Text>
@@ -152,15 +168,27 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
           <SelectDropdown
             data={["active", "inactive"]}
             defaultValue={fields.link_status}
-            onSelect={(selectedStatus) => setFields({ ...fields, link_status: selectedStatus })}
+            onSelect={(selectedStatus) =>
+              setFields({ ...fields, link_status: selectedStatus })
+            }
             renderButton={(selectedStatus, isOpened) => (
               <View style={styles.dropdownButtonStyle}>
-                <Text style={styles.dropdownButtonTxtStyle}>{selectedStatus}</Text>
-                <Icon name={isOpened ? "chevron-up" : "chevron-down"} style={styles.dropdownButtonArrowStyle} />
+                <Text style={styles.dropdownButtonTxtStyle}>
+                  {selectedStatus}
+                </Text>
+                <Icon
+                  name={isOpened ? "chevron-up" : "chevron-down"}
+                  style={styles.dropdownButtonArrowStyle}
+                />
               </View>
             )}
             renderItem={(item, index, isSelected) => (
-              <View style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: "#D2D9DF" }) }}>
+              <View
+                style={{
+                  ...styles.dropdownItemStyle,
+                  ...(isSelected && { backgroundColor: "#D2D9DF" }),
+                }}
+              >
                 <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
               </View>
             )}
@@ -177,15 +205,27 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
               <SelectDropdown
                 data={responseData}
                 defaultValue={fields.kelas_jurusan}
-                onSelect={(selectedKelas) => setFields({ ...fields, kelas_jurusan: selectedKelas })}
+                onSelect={(selectedKelas) =>
+                  setFields({ ...fields, kelas_jurusan: selectedKelas })
+                }
                 renderButton={(selectedKelas, isOpened) => (
                   <View style={styles.dropdownButtonStyle}>
-                    <Text style={styles.dropdownButtonTxtStyle}>{selectedKelas}</Text>
-                    <Icon name={isOpened ? "chevron-up" : "chevron-down"} style={styles.dropdownButtonArrowStyle} />
+                    <Text style={styles.dropdownButtonTxtStyle}>
+                      {selectedKelas}
+                    </Text>
+                    <Icon
+                      name={isOpened ? "chevron-up" : "chevron-down"}
+                      style={styles.dropdownButtonArrowStyle}
+                    />
                   </View>
                 )}
                 renderItem={(item, index, isSelected) => (
-                  <View style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: "#D2D9DF" }) }}>
+                  <View
+                    style={{
+                      ...styles.dropdownItemStyle,
+                      ...(isSelected && { backgroundColor: "#D2D9DF" }),
+                    }}
+                  >
                     <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
                   </View>
                 )}
@@ -199,14 +239,19 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
             <TextInput
               placeholder="Waktu"
               value={fields.waktu_pengerjaan.toString()}
-              onChangeText={(text) => setFields({ ...fields, waktu_pengerjaan: text })}
+              onChangeText={(text) =>
+                setFields({ ...fields, waktu_pengerjaan: text })
+              }
               className={`${textInputStyle}`}
             />
           </View>
         </View>
         <View>
           <Text>Waktu pengerjaan mulai</Text>
-          <Button onPress={() => setShowStartDatePicker(true)} title="Select Start Date and Time" />
+          <Button
+            onPress={() => setShowStartDatePicker(true)}
+            title="Select Start Date and Time"
+          />
           {showStartDatePicker && (
             <DateTimePicker
               value={fields.waktu_pengerjaan_mulai}
@@ -226,7 +271,10 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
           <Text>{fields.waktu_pengerjaan_mulai.toLocaleString()}</Text>
 
           <Text>Waktu pengerjaan selesai</Text>
-          <Button onPress={() => setShowEndDatePicker(true)} title="Select End Date and Time" />
+          <Button
+            onPress={() => setShowEndDatePicker(true)}
+            title="Select End Date and Time"
+          />
           {showEndDatePicker && (
             <DateTimePicker
               value={fields.waktu_pengerjaan_selesai}

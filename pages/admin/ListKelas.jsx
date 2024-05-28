@@ -30,7 +30,11 @@ const ListKelas = ({ navigation }) => {
   const { data, error, isLoading } = useApi(
     `${BASE_API_URL}admin-sekolah/kelas-jurusan`
   );
-  const {data: userLoggedin, error: userError, isLoading: userLoad} = useApi(`${BASE_API_URL}get-data-login`)
+  const {
+    data: userLoggedin,
+    error: userError,
+    isLoading: userLoad,
+  } = useApi(`${BASE_API_URL}get-data-login`);
   const { deleteData } = useApi();
   const { logout } = useLogout();
 
@@ -42,16 +46,17 @@ const ListKelas = ({ navigation }) => {
   const deleteKelas = async (id) => {
     try {
       deleteData(`${BASE_API_URL}delete-kelas/${id}`);
-      navigation.replace("MainAdmin");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainAdmin" }],
+      });
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   };
   if (error || userError) {
     return (
-      <View style={{ flex: 1,
-        justifyContent: "center",
-        alignItems: "center", }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Error</Text>
         <Button title="Logout" onPress={logout} />
       </View>
@@ -83,7 +88,7 @@ const ListKelas = ({ navigation }) => {
               navigation.push("ListUser", {
                 kelas_jurusan_id: item.id,
                 kelas_jurusan: item.name,
-                sekolah: userLoggedin.sekolah
+                sekolah: userLoggedin.sekolah,
               })
             }
           >

@@ -1,12 +1,17 @@
-import React, { useEffect } from 'react';
-import { View } from 'react-native';
-import { WebView } from 'react-native-webview';
-import { useApi } from '../../utils/useApi';
+import React, { useEffect } from "react";
+import { View } from "react-native";
+import { WebView } from "react-native-webview";
+import { useApi } from "../../utils/useApi";
 
 const PaymentScreen = ({ navigation, route }) => {
   const { snap_token, pay_token } = route.params;
-  const clientKey = 'SB-Mid-client-6nVp9w_Xc4Ghak7I';
-  const { data: statusPay, error, isLoading, mutate } = useApi(`${BASE_API_URL}get-pay/${pay_token}`);
+  const clientKey = "SB-Mid-client-6nVp9w_Xc4Ghak7I";
+  const {
+    data: statusPay,
+    error,
+    isLoading,
+    mutate,
+  } = useApi(`${BASE_API_URL}get-pay/${pay_token}`);
 
   const injectScript = `
     document.addEventListener("DOMContentLoaded", function() {
@@ -26,8 +31,11 @@ const PaymentScreen = ({ navigation, route }) => {
   }, [mutate]);
 
   useEffect(() => {
-    if (statusPay && statusPay !== 'pending') {
-      navigation.replace('MainAdmin');
+    if (statusPay && statusPay !== "pending") {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainAdmin" }],
+      });
     }
   }, [statusPay]);
 
@@ -43,7 +51,9 @@ const PaymentScreen = ({ navigation, route }) => {
         allowFileAccess={true}
         cacheMode="LOAD_NO_CACHE"
         injectedJavaScript={injectScript}
-        source={{ uri: `https://app.sandbox.midtrans.com/snap/v2/vtweb/${snap_token}` }}
+        source={{
+          uri: `https://app.sandbox.midtrans.com/snap/v2/vtweb/${snap_token}`,
+        }}
       />
     </View>
   );
