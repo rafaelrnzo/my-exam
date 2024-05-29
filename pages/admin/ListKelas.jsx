@@ -72,8 +72,8 @@ const ListKelas = ({ navigation }) => {
   }
   const kelasJurusan = data?.data;
   return (
-    <SafeAreaView className="pt-6 bg-slate-50 h-full w-full">
-      <View className="flex flex-row justify-between px-4 items-center py-4 border-b-[0.5px] border-slate-400 bg-white">
+    <SafeAreaView className="bg-slate-50 h-full w-full">
+      <View className="flex flex-row justify-between p-4 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
         <Text className={`${textTitle}`}>Classroom</Text>
         <TouchableOpacity onPress={logout}>
           <FontAwesomeIcon icon={faRightFromBracket} color="black" />

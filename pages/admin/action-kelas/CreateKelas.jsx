@@ -16,6 +16,8 @@ import {
   textInputStyle,
   textTitle,
 } from "../../../assets/style/basic";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
 const CreateKelas = ({ navigation }) => {
   const [fields, setFields] = useState({ name: "" });
@@ -35,10 +37,15 @@ const CreateKelas = ({ navigation }) => {
   };
   return (
     <SafeAreaView
-      style={{ paddingTop: 0 }}
-      className="h-full w-full bg-slate-50 flex justify-start"
+      className="h-full w-full bg-slate-50"
     >
-      <View className="flex gap-y-2  px-4">
+       <View className="flex flex-row p-4 gap-2 mb-2 items-center border-b-[0.5px] border-slate-400 bg-white">
+        <TouchableOpacity onPress={() => navigation.pop()}>
+          <FontAwesomeIcon icon={faArrowLeft} color="black" />
+        </TouchableOpacity>
+        <Text className={`${textTitle}`}>Create Kelas</Text>
+      </View>
+      <View className="flex gap-y-2 px-4">
         <Text className={`${textBasic} `}>Nama Kelas</Text>
         <TextInput
           placeholder="Nama kelas"

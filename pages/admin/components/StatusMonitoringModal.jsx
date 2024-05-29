@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, Button, StyleSheet } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { textTitle } from '../../../assets/style/basic';
 
 const StatusMonitoringModal = ({ visible, onClose, onUpdateStatus, currentStatus }) => {
   const [fields, setFields] = useState({
@@ -26,7 +27,7 @@ const StatusMonitoringModal = ({ visible, onClose, onUpdateStatus, currentStatus
     >
       <View style={styles.modalBackground}>
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Update Status</Text>
+          <Text className={`${textTitle} mb-4`}>Update Status</Text>
           <SelectDropdown
             data={["belum dikerjakan", "dikerjakan", "selesai", "keluar", "split screen"]}
             defaultValue={fields.link_status}
@@ -45,8 +46,10 @@ const StatusMonitoringModal = ({ visible, onClose, onUpdateStatus, currentStatus
             showsVerticalScrollIndicator={false}
             dropdownStyle={styles.dropdownMenuStyle}
           />
+          <View style={{ flexDirection:'row', gap:5, paddingTop: 15 }}>
           <Button title="Update" onPress={handleUpdate} />
           <Button title="Cancel" onPress={onClose} />
+          </View>
         </View>
       </View>
     </Modal>

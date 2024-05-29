@@ -18,8 +18,11 @@ import {
   buttonStyle,
   textBasic,
   textInputStyle,
+  textTitle,
 } from "../../../assets/style/basic";
 import { useApi } from "../../../utils/useApi";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 const CreateLinkAdmin = ({ navigation }) => {
   const [fields, setFields] = useState({
@@ -117,6 +120,12 @@ const CreateLinkAdmin = ({ navigation }) => {
       style={{ paddingTop: 10 }}
       className="h-full w-full bg-slate-50 flex justify-start"
     >
+       <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
+        <TouchableOpacity onPress={() => navigation.pop()}>
+          <FontAwesomeIcon icon={faArrowLeft} color="black" />
+        </TouchableOpacity>
+        <Text className={`${textTitle}`}>Create Link</Text>
+      </View>
       <View className="flex gap-2 pt-4 px-4">
         <View className="flex gap-y-2">
           <Text className={`${textBasic}`}>Link URL</Text>

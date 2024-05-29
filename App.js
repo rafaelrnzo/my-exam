@@ -23,8 +23,9 @@ import RegisterPage from "./pages/RegisterPage";
 import CreateKelas from "./pages/admin/action-kelas/CreateKelas";
 import UpdateKelas from "./pages/admin/action-kelas/UpdateKelas";
 import PortalPage from "./pages/PortalPage";
-import { SWRConfig } from "swr";
 import { fetcher } from "./utils/useApi";
+import { SWRConfig } from "swr";
+import { AppState } from "react-native";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -60,10 +61,29 @@ export default function App() {
     <SWRConfig
       value={{
         fetcher,
+        provider: () => new Map(),
         dedupingInterval: 2000,
         revalidateOnFocus: true,
         revalidateOnReconnect: true,
         shouldRetryOnError: true,
+        refreshWhenHidden: true,
+        initFocus(revalidate) {
+          let appState = AppState.currentState;
+          const onAppStateChange = (nextAppState) => {
+            if (
+              appState.match(/inactive|background/) &&
+              nextAppState === "active"
+            ) {
+              revalidate();
+            }
+            console.log("state change", nextAppState);
+            appState = nextAppState;
+          };
+          AppState.addEventListener("change", onAppStateChange);
+          return () => {
+            AppState.removeEventListener("change", onAppStateChange);
+          };
+        },
       }}
     >
       <NavigationContainer ref={navigationRef}>
@@ -99,9 +119,21 @@ export default function App() {
             component={MainAdmin}
             options={{ headerShown: false }}
           />
-          <Stack.Screen name="CreateLinkAdmin" component={CreateLinkAdmin} />
-          <Stack.Screen name="UpdateUser" component={UpdateUser} />
-          <Stack.Screen name="CreateUser" component={CreateUser} />
+          <Stack.Screen
+            name="CreateLinkAdmin"
+            component={CreateLinkAdmin}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="UpdateUser"
+            component={UpdateUser}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="CreateUser"
+            component={CreateUser}
+            options={{ headerShown: false }}
+          />
           <Stack.Screen
             name="SubsPage"
             component={SubsPage}
@@ -112,21 +144,17 @@ export default function App() {
             component={PaymentScreen}
             options={{ headerBackVisible: false }}
           />
-          <Stack.Screen name="UpdateLinkAdmin" component={UpdateLinkAdmin} />
+          <Stack.Screen name="UpdateLinkAdmin" component={UpdateLinkAdmin} options={{headerShown:false}}/>
           <Stack.Screen name="HomePageAdmin" component={HomePageAdmin} />
           <Stack.Screen
             name="ListUser"
             component={ListUser}
-            options={({ route }) => ({
-              headerTitle: route.params.kelas_jurusan,
-            })}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="MonitoringPage"
             component={MonitoringPage}
-            options={({ route }) => ({
-              headerTitle: route.params.kelas_jurusan,
-            })}
+            options={{ headerShown: false }}
           />
           {/* <Stack.Screen
           name="VerifyPage"
@@ -140,8 +168,16 @@ export default function App() {
           />
           <Stack.Screen name="ListKelas" component={ListKelas} />
           <Stack.Screen name="RegisterPage" component={RegisterPage} />
-          <Stack.Screen name="CreateKelas" component={CreateKelas} />
-          <Stack.Screen name="UpdateKelas" component={UpdateKelas} />
+          <Stack.Screen
+            name="CreateKelas"
+            component={CreateKelas}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="UpdateKelas"
+            component={UpdateKelas}
+            options={{ headerShown: false }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </SWRConfig>

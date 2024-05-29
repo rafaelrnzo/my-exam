@@ -25,7 +25,7 @@ const PaymentScreen = ({ navigation, route }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       mutate(); // Revalidate the data every 5 seconds
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [mutate]);

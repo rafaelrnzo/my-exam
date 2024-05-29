@@ -7,16 +7,31 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import BASE_API_URL from "../../constant/ip";
 import { useApi } from "../../utils/useApi";
 import StatusMonitoringModal from "./components/StatusMonitoringModal";
+import { textBasic, textTitle } from "../../assets/style/basic";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faArrowLeft, faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 
 const MonitoringPage = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentId, setCurrentId] = useState(null);
-  const { putData } = useApi();
+  const { kelas_jurusan_id, kelas_jurusan } = route.params;
+  const [url, setUrl] = useState(
+    `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`
+  );
+
+  const { data, error, isLoading, putData, mutate } = useApi(url);
+
+  // Handle case when data is undefined
+  const users = data?.data?.data.map((item) => item.user) || [];
+  const links = data?.data?.data.map((item) => item.link) || [];
+  const status = data?.data?.data.map((item) => item.status_progress) || [];
+  const paginations = data?.data?.links || [];
 
   const handleOpenModal = (userIndex, id) => {
     setCurrentUser(userIndex);
@@ -29,41 +44,14 @@ const MonitoringPage = ({ navigation, route }) => {
       await putData(`${BASE_API_URL}progress/${userId}`, {
         status_progress: newStatus,
       });
-      navigation.reset({
-        index: 0,
-        routes: [
-          {
-            name: "MonitoringPage",
-            params: { kelas_jurusan_id: kelas_jurusan_id },
-          },
-        ],
-      });
+      mutate(url); // Ensure data is revalidated
     } catch (error) {
       console.error("Error updating status:", error, newStatus);
     }
   };
 
-  const { kelas_jurusan_id } = route.params;
-  const [url, setUrl] = useState(
-    `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`
-  );
-
-  const { data, error, isLoading } = useApi(url);
-
-  const users = data?.data.data.map((item) => item.user) || [];
-  const links = data?.data.data.map((item) => item.link) || [];
-  const status = data?.data.data.map((item) => item.status_progress) || [];
-  const paginations = data?.data.links || [];
-
   const handleLinkPress = (newUrl) => {
-    if (newUrl === null) {
-      setUrl(
-        `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`
-      );
-    } else {
-      setUrl(newUrl);
-    }
-    console.log(newUrl);
+    setUrl(newUrl ? newUrl : `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`);
   };
 
   if (error) {
@@ -79,26 +67,31 @@ const MonitoringPage = ({ navigation, route }) => {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View>
+    <SafeAreaView className="bg-slate-50 h-full w-full">
+       <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
+        <TouchableOpacity onPress={() => navigation.pop()}>
+          <FontAwesomeIcon icon={faArrowLeft} color="black" />
+        </TouchableOpacity>
+        <Text className={`${textTitle}`}>Monitoring {kelas_jurusan}</Text>
+      </View>
+      <ScrollView className="flex flex-col gap-3 px-4 mt-2">
         {users.length == 0 ? (
-          <>
-            <Text>tidak ada user ujian</Text>
-            <Button title="tes" onPress={() => console.log(kelas_jurusan_id)} />
-          </>
+          <Text>tidak ada user ujian</Text>
         ) : (
           users.map((user, index) => (
-            <TouchableOpacity
-              style={styles.userRow}
-              key={index}
-              onPress={() => handleOpenModal(index, data.data.data[index].id)}
-            >
-              <Text>{data.data.data[index].id}</Text>
-              <Text>{user.name}</Text>
-              <Text>{user.kelas_jurusan}</Text>
-              <Text>{links[index]?.link_title}</Text>
-              <Text>{status[index]}</Text>
-            </TouchableOpacity>
+            <View
+            key={links[index].id}
+            className="p-3 border border-slate-300 rounded-lg w-auto flex "
+          >
+            <View className="flex-row flex justify-between">
+              <Text className={`${textTitle}`}>{user.name}</Text>
+              <TouchableOpacity onPress={() => handleOpenModal(index, data.data.data[index].id)}>
+                <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
+              </TouchableOpacity>
+            </View>
+            <Text className={`${textBasic}`}>Mengerjakan {links[index]?.link_title}</Text>
+            <Text className={`${textBasic}`}>{status[index]}</Text>
+          </View>
           ))
         )}
         {currentUser !== null && (
@@ -111,7 +104,6 @@ const MonitoringPage = ({ navigation, route }) => {
             currentStatus={status[currentUser]}
           />
         )}
-      </View>
       {paginations.length !== 0 && (
         <View style={styles.paginationContainer}>
           {paginations.map((item, index) => (
@@ -123,6 +115,7 @@ const MonitoringPage = ({ navigation, route }) => {
           ))}
         </View>
       )}
+      </ScrollView>
     </SafeAreaView>
   );
 };

@@ -29,7 +29,7 @@ export const useApi = (initialUrl) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      mutate(); // Revalidate the data
+      mutate(url); // Revalidate the data
       return response.data;
     } catch (error) {
       console.error("Error posting data:", error);
@@ -45,7 +45,7 @@ export const useApi = (initialUrl) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      mutate(); // Revalidate the data
+      mutate(url); // Revalidate the data
       return response.data;
     } catch (error) {
       console.error("Error updating data:", error);
@@ -61,7 +61,7 @@ export const useApi = (initialUrl) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      mutate(); // Revalidate the data
+      mutate(url); // Revalidate the data
       return response.data;
     } catch (error) {
       console.error("Error deleting data:", error);
