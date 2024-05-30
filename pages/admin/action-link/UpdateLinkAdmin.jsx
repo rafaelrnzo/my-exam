@@ -113,14 +113,8 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
     try {
       const formattedFields = {
         ...fields,
-        waktu_pengerjaan_mulai: fields.waktu_pengerjaan_mulai
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " "),
-        waktu_pengerjaan_selesai: fields.waktu_pengerjaan_selesai
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " "),
+        waktu_pengerjaan_mulai: fields.waktu_pengerjaan_mulai.toISOString(),
+        waktu_pengerjaan_selesai: fields.waktu_pengerjaan_selesai.toISOString(),
       };
       await putData(`${BASE_API_URL}links/${id}`, formattedFields);
       setFields({
@@ -132,6 +126,7 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
         waktu_pengerjaan_mulai: "",
         waktu_pengerjaan_selesai: "",
       });
+      console.log(fields.waktu_pengerjaan_mulai, fields.waktu_pengerjaan_selesai);
       navigation.reset({
         index: 0,
         routes: [{ name: "MainAdmin" }],
@@ -147,7 +142,7 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
       style={{ paddingTop: 10 }}
       className="h-full w-full bg-slate-50 flex justify-start"
     >
-       <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
+      <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
         <TouchableOpacity onPress={() => navigation.pop()}>
           <FontAwesomeIcon icon={faArrowLeft} color="black" />
         </TouchableOpacity>

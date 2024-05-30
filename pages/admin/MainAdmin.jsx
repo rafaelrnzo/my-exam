@@ -27,9 +27,6 @@ const MainAdmin = () => {
         },
       });
       setsubsData(response.data.data);
-      if (subsData.length != 0) {
-        await AsyncStorage.setItem("status_pay", "paid");
-      }
       console.log("ini subs dat", response.data.data);
     } catch (error) {
       console.log("ini subs data", subsData);
@@ -37,16 +34,15 @@ const MainAdmin = () => {
   };
 
   useEffect(() => {
-    const status_pay = AsyncStorage.getItem('status_pay')
-    if (status_pay == '' || status_pay == null) {
-      getSubsData();
-    }
+   getSubsData()
   }, []);
 
   return (
     <SafeAreaView className="h-full w-full">
-      {AsyncStorage.getItem("status_pay") ? (
-        <Tab.Navigator
+      {subsData.length == 0 ? (
+        <SubsPage />
+      ) : (
+         <Tab.Navigator
           screenOptions={{
             tabBarStyle: {
               paddingVertical: 8,
@@ -91,8 +87,6 @@ const MainAdmin = () => {
             }}
           />
         </Tab.Navigator>
-      ) : (
-        <SubsPage />
       )}
     </SafeAreaView>
   );

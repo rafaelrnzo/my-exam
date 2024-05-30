@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginPage from "./pages/LoginPage";
 import HomePageUser from "./pages/user/HomePageUser";
 import HomePageAdmin from "./pages/admin/HomePageAdmin";
-// import VerifyPage from "./pages/VerifyPage";
+import VerifyPage from "./pages/VerifyPage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef } from "react";
 import BlankScreen from "./components/BlankScreen";
@@ -33,24 +33,15 @@ export default function App() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const role = await AsyncStorage.getItem("role");
-      const token = await AsyncStorage.getItem("token");
-      console.log(role, token);
-      if (token && role == "siswa") {
+      const role = await AsyncStorage.getItem('role');
+      const token = await AsyncStorage.getItem('token');
+      if (token && role) {
         navigationRef.current?.reset({
           index: 0,
-          routes: [{ name: "HomePageUser" }],
-        });
-      } else if (token && role == "admin sekolah") {
-        navigationRef.current?.reset({
-          index: 0,
-          routes: [{ name: "MainAdmin" }],
+          routes: [{ name: 'VerifyPage' }]
         });
       } else {
-        navigationRef.current?.reset({
-          index: 0,
-          routes: [{ name: "PortalPage" }],
-        });
+        navigationRef.current?.navigate('VerifyPage');
       }
     };
 
@@ -69,6 +60,7 @@ export default function App() {
         refreshWhenHidden: true,
         initFocus(revalidate) {
           let appState = AppState.currentState;
+
           const onAppStateChange = (nextAppState) => {
             if (
               appState.match(/inactive|background/) &&
@@ -76,12 +68,16 @@ export default function App() {
             ) {
               revalidate();
             }
-            console.log("state change", nextAppState);
             appState = nextAppState;
           };
-          AppState.addEventListener("change", onAppStateChange);
+
+          const subscription = AppState.addEventListener(
+            "change",
+            onAppStateChange
+          );
+
           return () => {
-            AppState.removeEventListener("change", onAppStateChange);
+            subscription.remove();
           };
         },
       }}
@@ -144,7 +140,11 @@ export default function App() {
             component={PaymentScreen}
             options={{ headerBackVisible: false }}
           />
-          <Stack.Screen name="UpdateLinkAdmin" component={UpdateLinkAdmin} options={{headerShown:false}}/>
+          <Stack.Screen
+            name="UpdateLinkAdmin"
+            component={UpdateLinkAdmin}
+            options={{ headerShown: false }}
+          />
           <Stack.Screen name="HomePageAdmin" component={HomePageAdmin} />
           <Stack.Screen
             name="ListUser"
@@ -156,18 +156,22 @@ export default function App() {
             component={MonitoringPage}
             options={{ headerShown: false }}
           />
-          {/* <Stack.Screen
+          <Stack.Screen
           name="VerifyPage"
           component={VerifyPage}
           options={{ headerBackVisible: false }}
-        /> */}
+        />
           <Stack.Screen
             name="UjianPageUser"
             component={UjianPageUser}
             options={{ headerShown: false }}
           />
           <Stack.Screen name="ListKelas" component={ListKelas} />
-          <Stack.Screen name="RegisterPage" component={RegisterPage} />
+          <Stack.Screen
+            name="RegisterPage"
+            component={RegisterPage}
+            options={{ headerShown: false }}
+          />
           <Stack.Screen
             name="CreateKelas"
             component={CreateKelas}

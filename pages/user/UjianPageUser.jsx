@@ -6,8 +6,6 @@ import {
   Alert,
   AppState,
   Text,
-  Dimensions,
-  Button,
   ToastAndroid,
   TouchableOpacity,
 } from "react-native";
@@ -19,22 +17,19 @@ import BASE_API_URL from "../../constant/ip";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import TimerComponent from "../admin/components/TimerComponent";
-import {useWindowDimensions} from 'react-native';
-
+import { useWindowDimensions } from "react-native";
 
 const UjianPageUser = ({ navigation, route }) => {
   usePreventScreenCapture();
   const [currentState, setCurrentState] = useState(AppState.currentState);
-  const [isSplitScreen, setIsSplitScreen] = useState(false);
   const { link_id, link_name, link_title, waktu_pengerjaan } = route.params;
 
   const updateProgress = async (progress) => {
     try {
       const token = await AsyncStorage.getItem("token");
       const response = await axios.put(
-        `${BASE_API_URL}progress/user`,
+        `${BASE_API_URL}progress/user/${link_id}`,
         {
-          link_id: link_id,
           status_progress: progress,
         },
         {
@@ -61,12 +56,9 @@ const UjianPageUser = ({ navigation, route }) => {
       const response = await axios.get(`${BASE_API_URL}progress/${link_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (
-        response.data.data.status_progress === "split screen"
-      ) {
+      if (response?.data?.data?.status_progress === "split screen") {
         navigation.replace("HomePageUser");
-      }
-      console.log(response.data.data.status_progress);
+      } 
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
@@ -120,17 +112,17 @@ const UjianPageUser = ({ navigation, route }) => {
       appStateListener.remove();
     };
   }, [currentState]);
-  const {height, width} = useWindowDimensions();
+  const { height, width } = useWindowDimensions();
   useEffect(() => {
     console.log(height, width);
-      if(height < 500){
-        Alert.alert(
-          'Split Screen Detected',
-          'Aplikasi sedang berjalan dalam mode split screen. Beberapa fitur mungkin terbatas.',
-          [{ text: "OK", onPress: () => updateProgress("split screen") }],
+    if (height < 500) {
+      Alert.alert(
+        "Split Screen Detected",
+        "Aplikasi sedang berjalan dalam mode split screen. Beberapa fitur mungkin terbatas.",
+        [{ text: "OK", onPress: () => updateProgress("split screen") }],
         { cancelable: false }
-        );
-      }
+      );
+    }
   }, [height]);
 
   const handleTimerFinish = () => {
@@ -142,10 +134,16 @@ const UjianPageUser = ({ navigation, route }) => {
       <View className="flex flex-row justify-between bg-white p-4 items-center">
         <Text className="text-blue-500 text-lg">{link_title}</Text>
         <View className="flex flex-row items-center">
-          <FontAwesomeIcon icon={faClock} color="blue" size={17}/>
-          <TimerComponent waktu_pengerjaan={waktu_pengerjaan} onFinish={handleTimerFinish} />
+          <FontAwesomeIcon icon={faClock} color="blue" size={17} />
+          <TimerComponent
+            waktu_pengerjaan={waktu_pengerjaan}
+            onFinish={handleTimerFinish}
+          />
         </View>
-        <TouchableOpacity className="bg-blue-500 p-2 rounded" onPress={()=>updateProgress('selesai')}>
+        <TouchableOpacity
+          className="bg-blue-500 p-2 rounded"
+          onPress={() => updateProgress("selesai")}
+        >
           <Text className="text-white">Finish</Text>
         </TouchableOpacity>
       </View>

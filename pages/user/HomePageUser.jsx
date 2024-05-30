@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, Button, View, ActivityIndicator } from 'react-native';
+import { ScrollView, Text, Button, View, ActivityIndicator, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApi } from '../../utils/useApi';
 import BASE_API_URL from '../../constant/ip';
@@ -7,6 +7,8 @@ import { useLogout } from '../../utils/useLogout';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { textTitle } from '../../assets/style/basic';
 import Card from '../admin/components/CardLinkAdmin';
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 const HomePageUser = ({ navigation }) => {
   const [fields, setFields] = useState({
@@ -64,29 +66,30 @@ const HomePageUser = ({ navigation }) => {
     )
   }
 
-  const links = progressData.data.map((item) => item.link);
-  const status = progressData.data.map((item) => item.status_progress);
-  const belumDikerjakan = linksData.data;
+  const links = progressData?.data?.map((item) => item.link);
+  const status = progressData?.data?.map((item) => item.status_progress);
+  const belumDikerjakan = linksData?.data;
 
   return (
-    <SafeAreaView className="h-full w-full bg-white ">
-      <View className="flex justify-center items-center py-3 border-b-[0.5px] border-slate-400 bg-white">
-        <Text className={`${textTitle}`}>ExamTen</Text>
-    
+    <SafeAreaView className="flex justify-start h-full w-full bg-white ">
+       <View className="flex flex-row justify-between p-4 items-center border-b-[0.5px] border-slate-400 bg-white">
+        <Text className={`${textTitle}`}>ExamTen {fields.kelas_jurusan}</Text>
+        <TouchableOpacity onPress={logout}>
+          <FontAwesomeIcon icon={faRightFromBracket} color="black" />
+        </TouchableOpacity>
       </View>
-      <ScrollView className="p-4 bg-slate-50">
-        <Text>name: {fields.name}</Text>
-        <Text>Ujian untuk kelas: {fields.kelas_jurusan}</Text>
-        <Button title="logout" onPress={logout} />
-        <Text>Belum Dikerjakan</Text>
-
+      <ScrollView className="p-4">
+        <Text>Halo, {fields.name}</Text>
+        <Text>Ujian untuk {fields.kelas_jurusan}</Text>
+        <Text>Ujian belum dikerjakan</Text>
         {belumDikerjakan.length > 0 ? (
           belumDikerjakan.map((item) => (
             <Card
               key={item.id}
-              press={() => createProgress(item.id, item.link_name, item.link_title)}
+              press={() => createProgress(item.id, item.link_name, item.link_title, item.waktu_pengerjaan)}
               link_title={item.link_title}
-              link_status={item.link_status}
+              time={item.waktu_pengerjaan_mulai}
+              kelas_jurusan={fields.kelas_jurusan}
             />
           ))
         ) : (
@@ -97,12 +100,10 @@ const HomePageUser = ({ navigation }) => {
           links.map((item, index) => (
             <Card
               key={item.id}
-              press={() => createProgress(item.id, item.link_name, item.link_title, item.waktu_pengerjaan)}
               link_title={item.link_title}
-              link_status={item.link_status}
               status_progress={status[index]}
               time={item.waktu_pengerjaan_mulai}
-              kelas_jurusan={item.kelas_jurusan?.name}
+              kelas_jurusan={fields.kelas_jurusan}
             />
           ))
         ) : (

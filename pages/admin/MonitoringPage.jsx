@@ -14,7 +14,10 @@ import { useApi } from "../../utils/useApi";
 import StatusMonitoringModal from "./components/StatusMonitoringModal";
 import { textBasic, textTitle } from "../../assets/style/basic";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faArrowLeft, faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faEllipsisVertical,
+} from "@fortawesome/free-solid-svg-icons";
 
 const MonitoringPage = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -51,7 +54,11 @@ const MonitoringPage = ({ navigation, route }) => {
   };
 
   const handleLinkPress = (newUrl) => {
-    setUrl(newUrl ? newUrl : `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`);
+    setUrl(
+      newUrl
+        ? newUrl
+        : `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`
+    );
   };
 
   if (error) {
@@ -68,7 +75,7 @@ const MonitoringPage = ({ navigation, route }) => {
 
   return (
     <SafeAreaView className="bg-slate-50 h-full w-full">
-       <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
+      <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
         <TouchableOpacity onPress={() => navigation.pop()}>
           <FontAwesomeIcon icon={faArrowLeft} color="black" />
         </TouchableOpacity>
@@ -80,18 +87,34 @@ const MonitoringPage = ({ navigation, route }) => {
         ) : (
           users.map((user, index) => (
             <View
-            key={links[index].id}
-            className="p-3 border border-slate-300 rounded-lg w-auto flex "
-          >
-            <View className="flex-row flex justify-between">
-              <Text className={`${textTitle}`}>{user.name}</Text>
-              <TouchableOpacity onPress={() => handleOpenModal(index, data.data.data[index].id)}>
-                <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
-              </TouchableOpacity>
+              key={links[index].id}
+              className="p-3 border border-slate-300 rounded-lg w-auto flex "
+            >
+              <View className="flex-row flex justify-between">
+                <Text className={`${textTitle}`}>{user.name}</Text>
+                <TouchableOpacity
+                  onPress={() =>
+                    handleOpenModal(index, data.data.data[index].id)
+                  }
+                >
+                  <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
+                </TouchableOpacity>
+              </View>
+              <Text className={`${textBasic}`}>
+                Mengerjakan {links[index]?.link_title}
+              </Text>
+              <Text
+                className={`${textBasic} ${
+                  status[index] === "keluar"
+                    ? "bg-red-400 p-2 mt-2 rounded-lg border w-1/4 text-center"
+                    : status[index] === "selesai"
+                    ? "bg-green-400 p-2 mt-2 rounded-lg border w-1/4 text-center"
+                    : "bg-blue-400 p-2 mt-2 rounded-lg border w-1/4 text-center"
+                }`}
+              >
+                {status[index]}
+              </Text>
             </View>
-            <Text className={`${textBasic}`}>Mengerjakan {links[index]?.link_title}</Text>
-            <Text className={`${textBasic}`}>{status[index]}</Text>
-          </View>
           ))
         )}
         {currentUser !== null && (
@@ -104,17 +127,17 @@ const MonitoringPage = ({ navigation, route }) => {
             currentStatus={status[currentUser]}
           />
         )}
-      {paginations.length !== 0 && (
-        <View style={styles.paginationContainer}>
-          {paginations.map((item, index) => (
-            <Button
-              key={index}
-              onPress={() => handleLinkPress(item.url)}
-              title={item.label}
-            />
-          ))}
-        </View>
-      )}
+        {paginations.length !== 0 && (
+          <View style={styles.paginationContainer}>
+            {paginations.map((item, index) => (
+              <Button
+                key={index}
+                onPress={() => handleLinkPress(item.url)}
+                title={item.label}
+              />
+            ))}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

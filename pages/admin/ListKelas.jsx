@@ -19,7 +19,6 @@ import {
   faUser,
   faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheetModal from "./components/BottomSheetModal";
 import { useApi } from "../../utils/useApi";
 import { useLogout } from "../../utils/useLogout";
@@ -30,6 +29,8 @@ const ListKelas = ({ navigation }) => {
   const { data, error, isLoading } = useApi(
     `${BASE_API_URL}admin-sekolah/kelas-jurusan`
   );
+  const kelasJurusan = data?.data || [];
+
   const {
     data: userLoggedin,
     error: userError,
@@ -57,7 +58,7 @@ const ListKelas = ({ navigation }) => {
   if (error || userError) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Error</Text>
+        <ActivityIndicator size="large" color="#0000ff" />
         <Button title="Logout" onPress={logout} />
       </View>
     );
@@ -70,7 +71,6 @@ const ListKelas = ({ navigation }) => {
       </View>
     );
   }
-  const kelasJurusan = data?.data;
   return (
     <SafeAreaView className="bg-slate-50 h-full w-full">
       <View className="flex flex-row justify-between p-4 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
@@ -80,51 +80,53 @@ const ListKelas = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <ScrollView className="p-4 flex gap-3">
-        {kelasJurusan.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            className="p-3 border border-slate-300 rounded-lg w-auto flex "
-            onPress={() =>
-              navigation.push("ListUser", {
-                kelas_jurusan_id: item.id,
-                kelas_jurusan: item.name,
-                sekolah: userLoggedin.sekolah,
-              })
-            }
-          >
-            <View className="flex-row flex justify-between">
-              <Text className={`${textTitle}`}>{item.name}</Text>
-              <TouchableOpacity onPress={() => toggleModal(item)}>
-                <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
-              </TouchableOpacity>
-            </View>
-            <View className="pt-5">
-              <View className="flex justify-between flex-row items-center">
-                <View className="flex gap-x-2 flex-row items-center">
-                  <FontAwesomeIcon icon={faUser} color="#3b82f6" />
-                  <Text className="text-base font-semibold text-blue-500">
-                    {item.user_count}
-                  </Text>
+        {kelasJurusan.length === 0
+          ? <Text>belum ada kelas</Text>
+          : kelasJurusan?.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                className="p-3 border border-slate-300 rounded-lg w-auto flex "
+                onPress={() =>
+                  navigation.push("ListUser", {
+                    kelas_jurusan_id: item.id,
+                    kelas_jurusan: item.name,
+                    sekolah: userLoggedin.sekolah,
+                  })
+                }
+              >
+                <View className="flex-row flex justify-between">
+                  <Text className={`${textTitle}`}>{item.name}</Text>
+                  <TouchableOpacity onPress={() => toggleModal(item)}>
+                    <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.push("MonitoringPage", {
-                      kelas_jurusan_id: item.id,
-                      kelas_jurusan: item.name,
-                    })
-                  }
-                >
-                  <View className="flex flex-row  bg-blue-500 items-center p-2 px-3 rounded-md">
-                    <FontAwesomeIcon icon={faDesktop} color="white" />
-                    <Text className="text-base font-medium  text-white pl-2">
-                      Monitoring
-                    </Text>
+                <View className="pt-5">
+                  <View className="flex justify-between flex-row items-center">
+                    <View className="flex gap-x-2 flex-row items-center">
+                      <FontAwesomeIcon icon={faUser} color="#3b82f6" />
+                      <Text className="text-base font-semibold text-blue-500">
+                        {item.user_count}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.push("MonitoringPage", {
+                          kelas_jurusan_id: item.id,
+                          kelas_jurusan: item.name,
+                        })
+                      }
+                    >
+                      <View className="flex flex-row  bg-blue-500 items-center p-2 px-3 rounded-md">
+                        <FontAwesomeIcon icon={faDesktop} color="white" />
+                        <Text className="text-base font-medium  text-white pl-2">
+                          Monitoring
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
+                </View>
+              </TouchableOpacity>
+            ))}
       </ScrollView>
       {selectedItem && (
         <BottomSheetModal

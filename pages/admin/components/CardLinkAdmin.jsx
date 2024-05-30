@@ -6,9 +6,9 @@ import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { faCalendar, faLink } from "@fortawesome/free-regular-svg-icons";
 // import { textHero, textTitle } from '../assets/style/basic'
 
-const Card = ({ time, link_title, link_status, press, status_progress, kelas_jurusan }) => {
+const Card = ({ time, link_title, link_status, press, status_progress, kelas_jurusan, onLongPress }) => {
   return (
-    <TouchableOpacity onPress={press} className="p-3 border-slate-300 border rounded-lg mt-3 w-full">
+    <TouchableOpacity onLongPress={onLongPress} onPress={press} className="p-3 border-slate-300 border rounded-lg mt-3 w-full">
       <View className="flex  justify-between  max-w-full">
         <View className="flex pb-3">
 

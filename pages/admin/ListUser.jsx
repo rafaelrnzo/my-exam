@@ -7,14 +7,16 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import BASE_API_URL from "../../constant/ip";
 import * as DocumentPicker from "expo-document-picker";
 import { useApi } from "../../utils/useApi";
 import { textBasic, textTitle } from "../../assets/style/basic";
-import { faArrowLeft, faEllipsisVertical, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import BottomSheetModal from "./components/BottomSheetModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const ListUser = ({ navigation, route }) => {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -63,13 +65,29 @@ const ListUser = ({ navigation, route }) => {
         type: "file/xlsx",
         name: file.assets[0].name,
       });
-      await postData(`${BASE_API_URL}admin-sekolah/siswa-import`, formData);
-      mutate(url)
+  
+      const token = await AsyncStorage.getItem("token");
+  
+      const response = await axios.post(
+        `${BASE_API_URL}admin-sekolah/siswa-import`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      console.log("Response: ", response.data);
+      mutate(url);
       setFile(null);
     } catch (error) {
-      console.error("Error importing siswa:", error);
+      console.error("Error importing siswa:", error.message);
+      console.error("Error details:", error.config, error.response?.data);
     }
   };
+  
 
   const handleLinkPress = (newUrl) => {
     if (newUrl === null) {
@@ -124,6 +142,7 @@ const ListUser = ({ navigation, route }) => {
             navigation.push("CreateUser", {
               sekolah: sekolah,
               kelas_jurusan_id: kelas_jurusan_id,
+              kelas_jurusan: kelas_jurusan
             })
           }
         />
@@ -150,12 +169,14 @@ const ListUser = ({ navigation, route }) => {
             <Text className={`${textBasic}`}>{item.role}</Text>
           </View>
         ))}
-        {links.length !== 0 ? (
+      </ScrollView>
+      {links.length !== 0 ? (
           <View
             style={{
               flexDirection: "row",
               justifyContent: "center",
               gap: 4,
+              padding: 10
             }}
           >
             {links.map((item, index) => (
@@ -167,7 +188,6 @@ const ListUser = ({ navigation, route }) => {
             ))}
           </View>
         ) : null}
-      </ScrollView>
       {selectedItem && (
         <BottomSheetModal
           isVisible={isModalVisible}

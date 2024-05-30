@@ -4,12 +4,19 @@ import {
   TouchableOpacity,
   Button,
   ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import BASE_API_URL from "../../constant/ip";
 import { useNavigation } from "@react-navigation/native";
 import { useLogout } from "../../utils/useLogout";
 import { useApi } from "../../utils/useApi";
+import { textTitle } from "../../assets/style/basic";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SubsPage = () => {
   const navigation = useNavigation();
@@ -19,21 +26,25 @@ const SubsPage = () => {
 
   const handleSubmit = async (item_name, price, item_id) => {
     try {
-      await postData(`${BASE_API_URL}pay`, {
-        item_name: item_name,
-        price: price,
-        item_id: item_id,
-      });
-      const { data } = response;
-      if (data.status === "success" && data.snap_token) {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.post(
+        `${BASE_API_URL}pay`,
+        {
+          item_name: item_name,
+          price: price,
+          item_id: item_id,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.status === "success" && response.data.snap_token) {
         navigation.reset({
           index: 0,
           routes: [
             {
-              name: "ListUser",
+              name: "PaymentScreen",
               params: {
-                snap_token: data.snap_token,
-                pay_token: data.pay_token,
+                snap_token: response.data.snap_token,
+                pay_token: response.data.pay_token,
               },
             },
           ],
@@ -59,24 +70,30 @@ const SubsPage = () => {
   }
 
   return (
-    <View>
-      <Text>SubsPage</Text>
-      {subsData.data.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          style={{ padding: 10, borderColor: "black", borderWidth: 1 }}
-        >
-          <Text>{item.name}</Text>
-          <Text>desc: dasdsa{item.description}</Text>
-          <Text>{item.price}</Text>
-          <Button
-            onPress={() => handleSubmit(item.name, item.price, item.id)}
-            title="buy"
-          />
+    <SafeAreaView className="bg-slate-50 h-full w-full">
+      <View className="flex flex-row justify-between p-4 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
+        <Text className={`${textTitle}`}>Subscription</Text>
+        <TouchableOpacity onPress={logout}>
+          <FontAwesomeIcon icon={faRightFromBracket} color="black" />
         </TouchableOpacity>
-      ))}
-      <Button title="logout" onPress={() => logout()} />
-    </View>
+      </View>
+      <ScrollView className="px-4">
+        {subsData.data.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            style={{ padding: 10, borderColor: "black", borderWidth: 1 }}
+          >
+            <Text>{item.name}</Text>
+            <Text>description: {item.description}</Text>
+            <Text>{item.price}</Text>
+            <Button
+              onPress={() => handleSubmit(item.name, item.price, item.id)}
+              title="buy"
+            />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

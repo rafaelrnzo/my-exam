@@ -49,7 +49,10 @@ const CreateLinkAdmin = ({ navigation }) => {
   const onStartTimeChange = (event, selectedTime) => {
     const currentTime = selectedTime || fields.waktu_pengerjaan_mulai;
     setShowStartTimePicker(false);
-    setFields({ ...fields, waktu_pengerjaan_mulai: currentTime });
+    const newDate = new Date(fields.waktu_pengerjaan_mulai);
+    newDate.setHours(currentTime.getHours());
+    newDate.setMinutes(currentTime.getMinutes());
+    setFields({ ...fields, waktu_pengerjaan_mulai: newDate });
   };
 
   const onEndDateChange = (event, selectedDate) => {
@@ -62,7 +65,10 @@ const CreateLinkAdmin = ({ navigation }) => {
   const onEndTimeChange = (event, selectedTime) => {
     const currentTime = selectedTime || fields.waktu_pengerjaan_selesai;
     setShowEndTimePicker(false);
-    setFields({ ...fields, waktu_pengerjaan_selesai: currentTime });
+    const newDate = new Date(fields.waktu_pengerjaan_selesai);
+    newDate.setHours(currentTime.getHours());
+    newDate.setMinutes(currentTime.getMinutes());
+    setFields({ ...fields, waktu_pengerjaan_selesai: newDate });
   };
 
   const {
@@ -77,14 +83,8 @@ const CreateLinkAdmin = ({ navigation }) => {
     try {
       const formattedFields = {
         ...fields,
-        waktu_pengerjaan_mulai: fields.waktu_pengerjaan_mulai
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " "),
-        waktu_pengerjaan_selesai: fields.waktu_pengerjaan_selesai
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " "),
+        waktu_pengerjaan_mulai: fields.waktu_pengerjaan_mulai.toISOString(),
+        waktu_pengerjaan_selesai: fields.waktu_pengerjaan_selesai.toISOString(),
       };
       await postData(`${BASE_API_URL}links/post`, formattedFields);
       setFields({
@@ -96,6 +96,7 @@ const CreateLinkAdmin = ({ navigation }) => {
         waktu_pengerjaan_mulai: new Date(),
         waktu_pengerjaan_selesai: new Date(),
       });
+      console.log(fields.waktu_pengerjaan_mulai, fields.waktu_pengerjaan_selesai);
       navigation.reset({
         index: 0,
         routes: [{ name: "MainAdmin" }],
@@ -120,7 +121,7 @@ const CreateLinkAdmin = ({ navigation }) => {
       style={{ paddingTop: 10 }}
       className="h-full w-full bg-slate-50 flex justify-start"
     >
-       <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
+      <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
         <TouchableOpacity onPress={() => navigation.pop()}>
           <FontAwesomeIcon icon={faArrowLeft} color="black" />
         </TouchableOpacity>
@@ -281,7 +282,11 @@ const CreateLinkAdmin = ({ navigation }) => {
           <Text>{fields.waktu_pengerjaan_selesai.toLocaleString()}</Text>
         </View>
         <View className="pt-4">
-          <TouchableOpacity className={`${buttonStyle}`} onPress={createLink}>
+          <TouchableOpacity
+            className={`${buttonStyle}`}
+            onPress={createLink}
+            disabled={fields.link_name.length === 0 ? true : false}
+          >
             <Text className="font-semibold text-white text-lg">Create</Text>
           </TouchableOpacity>
         </View>

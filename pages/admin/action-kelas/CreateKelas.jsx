@@ -55,7 +55,7 @@ const CreateKelas = ({ navigation }) => {
         />
       </View>
       <View className="pt-6 px-4">
-        <TouchableOpacity className={`${buttonStyle}`} onPress={createKelas}>
+        <TouchableOpacity className={`${buttonStyle}`} onPress={createKelas} disabled={fields.name.length === 0 ? true : false}>
           <Text className="font-semibold text-white text-lg">Create</Text>
         </TouchableOpacity>
       </View>

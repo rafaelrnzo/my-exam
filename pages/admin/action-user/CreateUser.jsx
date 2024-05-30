@@ -22,7 +22,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
 const CreateUser = ({ navigation, route }) => {
-  const { sekolah, kelas_jurusan_id } = route.params;
+  const { sekolah, kelas_jurusan_id, kelas_jurusan } = route.params;
   const [fields, setFields] = useState({
     name: "",
     password: "",
@@ -56,6 +56,7 @@ const CreateUser = ({ navigation, route }) => {
       navigation.replace("ListUser", {
         kelas_jurusan_id: kelas_jurusan_id,
         sekolah: sekolah,
+        kelas_jurusan: kelas_jurusan
       });
     } catch (error) {
       console.log(fields);
@@ -92,13 +93,6 @@ const CreateUser = ({ navigation, route }) => {
           value={fields.password}
           className={`${textInputStyle}`}
           onChangeText={(text) => setFields({ ...fields, password: text })}
-        />
-        <Text className={`${textTitle}`}>Token</Text>
-        <TextInput
-          placeholder="token"
-          value={fields.token}
-          className={`${textInputStyle}`}
-          onChangeText={(text) => setFields({ ...fields, token: text })}
         />
         <View className="flex flex-col">
           <Text className={`${textTitle}`}>Token</Text>
@@ -197,7 +191,7 @@ const CreateUser = ({ navigation, route }) => {
             </View>
           )}
         </View>
-        <TouchableOpacity className={`${buttonStyle}`} onPress={createUser}>
+        <TouchableOpacity className={`${buttonStyle}`} onPress={createUser} disabled={fields.name.length === 0? true : false}>
           <Text className="font-semibold text-white text-lg">Create</Text>
         </TouchableOpacity>
       </View>

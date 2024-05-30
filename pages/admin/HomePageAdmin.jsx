@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, Button, ActivityIndicator, View, TextInput, StyleSheet, TouchableOpacity } from "react-native";
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faFilter, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
+import {
+  SafeAreaView,
+  Text,
+  Button,
+  ActivityIndicator,
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ToastAndroid,
+} from "react-native";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faFilter, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import BASE_API_URL from "../../constant/ip";
 import { useLogout } from "../../utils/useLogout";
 import { useApi } from "../../utils/useApi";
@@ -11,14 +22,33 @@ import BottomSheetFilter from "./components/BottomSheetFilter";
 
 const HomePageAdmin = ({ navigation }) => {
   const { logout } = useLogout();
-  const { data: links, error, isLoading } = useApi(`${BASE_API_URL}admin-sekolah/links`);
+  const {
+    data: links,
+    error,
+    isLoading,
+    deleteData,
+    mutate
+  } = useApi(`${BASE_API_URL}admin-sekolah/links`);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("all");
   const [isModalVisible, setModalVisible] = useState(false);
   const [filters, setFilters] = useState({});
 
+  const deleteLink = async (id) => {
+    try {
+      await deleteData(`${BASE_API_URL}links/${id}`);
+      await mutate(`${BASE_API_URL}admin-sekolah/links`);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainAdmin" }],
+      });
+    } catch (error) {
+      ToastAndroid.show(error.message, ToastAndroid.LONG);
+    }
+  };
+
   useEffect(() => {
-    if (links && links.data.length > 0) {
+    if (links && links?.data?.length > 0) {
       setSelectedTab("all");
     }
   }, [links]);
@@ -40,18 +70,29 @@ const HomePageAdmin = ({ navigation }) => {
     );
   }
 
-  const filteredLinks = links.data
-    .filter(item => selectedTab === "all" || item.link_status === selectedTab)
-    .filter(item => item.link_title.toLowerCase().includes(searchQuery.toLowerCase()))
-    .filter(item => !Object.keys(filters).some(key => filters[key] && item.kelas_jurusan.id !== parseInt(key)));
+  const filteredLinks = links?.data
+    ?.filter(
+      (item) => selectedTab === "all" || item.link_status === selectedTab
+    )
+    ?.filter((item) =>
+      item.link_title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    ?.filter(
+      (item) =>
+        !Object.keys(filters).some(
+          (key) => filters[key] && item.kelas_jurusan.id !== parseInt(key)
+        )
+    ) || [];
 
-  const classes = Array.from(new Set(links.data.map(item => item.kelas_jurusan.id)))
-    .map(id => {
-      return links.data.find(item => item.kelas_jurusan.id === id).kelas_jurusan;
+    const classes = Array.from(
+      new Set(links?.data?.map((item) => item.kelas_jurusan.id))
+    ).map((id) => {
+      return links?.data?.find((item) => item.kelas_jurusan.id === id)
+        ?.kelas_jurusan;
     });
 
   return (
-    <SafeAreaView className="pt-10 bg-white h-full">
+    <SafeAreaView className="pt-10 bg-white w-full h-full">
       <View className="bg-white flex items-center w-full">
         <View className="w-full flex flex-row">
           <View style={styles.searchBar} className="w-4/5">
@@ -62,38 +103,77 @@ const HomePageAdmin = ({ navigation }) => {
               style={styles.searchInput}
               placeholder="Search by link title"
               value={searchQuery}
-              onChangeText={text => setSearchQuery(text)}
+              onChangeText={(text) => setSearchQuery(text)}
             />
           </View>
-          <TouchableOpacity className="flex items-center flex-row" onPress={() => { setModalVisible(!isModalVisible) }}>
+          <TouchableOpacity
+            className="flex items-center flex-row"
+            onPress={() => {
+              setModalVisible(!isModalVisible);
+            }}
+          >
             <FontAwesomeIcon icon={faFilter} color="#3b82f6" size={20} />
           </TouchableOpacity>
         </View>
         <View style={styles.tabContainer}>
           <TouchableOpacity
-            style={[styles.tabButton, selectedTab === "all" && styles.selectedTab]}
+            style={[
+              styles.tabButton,
+              selectedTab === "all" && styles.selectedTab,
+            ]}
             onPress={() => setSelectedTab("all")}
           >
-            <Text style={[styles.tabText, selectedTab === "all" && styles.selectedText]} className={`${textBasic}`}>Recently</Text>
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === "all" && styles.selectedText,
+              ]}
+              className={`${textBasic}`}
+            >
+              Recently
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.tabButton, selectedTab === "active" && styles.selectedTab]}
+            style={[
+              styles.tabButton,
+              selectedTab === "active" && styles.selectedTab,
+            ]}
             onPress={() => setSelectedTab("active")}
           >
-            <Text style={[styles.tabText, selectedTab === "active" && styles.selectedText]} className={`${textBasic}`}>Active</Text>
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === "active" && styles.selectedText,
+              ]}
+              className={`${textBasic}`}
+            >
+              Active
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.tabButton, selectedTab === "inactive" && styles.selectedTab]}
+            style={[
+              styles.tabButton,
+              selectedTab === "inactive" && styles.selectedTab,
+            ]}
             onPress={() => setSelectedTab("inactive")}
           >
-            <Text style={[styles.tabText, selectedTab === "inactive" && styles.selectedText]} className={`${textBasic}`}>Inactive </Text>
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === "inactive" && styles.selectedText,
+              ]}
+              className={`${textBasic}`}
+            >
+              Inactive
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
-      <View className="p-4 bg-slate-50 h-full">
+      <ScrollView className="px-4 bg-slate-50 h-full">
         {filteredLinks.length > 0 ? (
           filteredLinks.map((item) => (
             <Card
+              onLongPress={() => deleteLink(item.id)}
               key={item.id}
               press={() =>
                 navigation.push("UpdateLinkAdmin", {
@@ -116,7 +196,7 @@ const HomePageAdmin = ({ navigation }) => {
         ) : (
           <Text>No {selectedTab} links available</Text>
         )}
-      </View>
+      </ScrollView>
       <TouchableOpacity
         className="absolute bottom-4 right-4 w-14 h-14 bg-blue-500 rounded-full justify-center items-center shadow-lg"
         onPress={() => navigation.push("CreateLinkAdmin")}
