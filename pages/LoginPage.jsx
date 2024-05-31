@@ -51,7 +51,7 @@ const LoginPage = ({ navigation }) => {
         </View>
 
         <View className="pt-2">
-          <TouchableOpacity onPress={() => login(`${BASE_API_URL}login-siswa`, 'VerifyPage')} className={`${buttonStyle}`}>
+          <TouchableOpacity onPress={() => login(`${BASE_API_URL}login-siswa`, 'HomePageUser')} className={`${buttonStyle}`}>
             <Text className={`${textTitle} text-slate-50 text-lg`}>Login</Text>
           </TouchableOpacity>
         </View>

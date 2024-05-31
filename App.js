@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginPage from "./pages/LoginPage";
 import HomePageUser from "./pages/user/HomePageUser";
 import HomePageAdmin from "./pages/admin/HomePageAdmin";
-import VerifyPage from "./pages/VerifyPage";
+// import VerifyPage from "./pages/VerifyPage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef } from "react";
 import BlankScreen from "./components/BlankScreen";
@@ -33,15 +33,24 @@ export default function App() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const role = await AsyncStorage.getItem('role');
-      const token = await AsyncStorage.getItem('token');
-      if (token && role) {
+      const role = await AsyncStorage.getItem("role");
+      const token = await AsyncStorage.getItem("token");
+      console.log(role, token);
+      if (token && role == "siswa") {
         navigationRef.current?.reset({
           index: 0,
-          routes: [{ name: 'VerifyPage' }]
+          routes: [{ name: "HomePageUser" }],
+        });
+      } else if (token && role == "admin sekolah") {
+        navigationRef.current?.reset({
+          index: 0,
+          routes: [{ name: "MainAdmin" }],
         });
       } else {
-        navigationRef.current?.navigate('VerifyPage');
+        navigationRef.current?.reset({
+          index: 0,
+          routes: [{ name: "PortalPage" }],
+        });
       }
     };
 
@@ -156,11 +165,11 @@ export default function App() {
             component={MonitoringPage}
             options={{ headerShown: false }}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
           name="VerifyPage"
           component={VerifyPage}
           options={{ headerBackVisible: false }}
-        />
+        /> */}
           <Stack.Screen
             name="UjianPageUser"
             component={UjianPageUser}
