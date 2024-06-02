@@ -26,7 +26,7 @@ const HomePageUser = ({ navigation }) => {
 
   const streamEventLinks = async () => {
     const token = await AsyncStorage.getItem("token");
-    const eventSource = new CustomEventSource(`${BASE_API_URL}links`, {
+    const eventSource = new CustomEventSource(`${BASE_API_URL}stream-links`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
