@@ -20,6 +20,7 @@ import {
 } from "../../../assets/style/basic";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { useLogout } from "../../../utils/useLogout";
 
 const UpdateUser = ({ navigation, route }) => {
   const { id, name, token, role, kelas_jurusan, kelas_jurusan_id, sekolah } =
@@ -39,6 +40,7 @@ const UpdateUser = ({ navigation, route }) => {
   } = useApi(`${BASE_API_URL}get-kelas`);
   const responseData = kelasJurusan?.data?.map((item) => item.name);
   const { putData } = useApi();
+  const {logout} = useLogout()
 
   useEffect(() => {
     const [prefix, suffix] = token.split("-");
@@ -76,7 +78,10 @@ const UpdateUser = ({ navigation, route }) => {
   };
 
   if (error) {
-    return <Text>Error loading data</Text>;
+    return <View style={{ flex:1 }}>
+    <Text>Error</Text>
+    <Button title="Logout" onPress={logout} />
+  </View>
   }
 
   return (

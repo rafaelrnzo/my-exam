@@ -12,11 +12,15 @@ import BASE_API_URL from "../../constant/ip";
 import * as DocumentPicker from "expo-document-picker";
 import { useApi } from "../../utils/useApi";
 import { textBasic, textTitle } from "../../assets/style/basic";
-import { faArrowLeft, faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faEllipsisVertical,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import BottomSheetModal from "./components/BottomSheetModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { useLogout } from "../../utils/useLogout";
 
 const ListUser = ({ navigation, route }) => {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -27,14 +31,14 @@ const ListUser = ({ navigation, route }) => {
     `${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}`
   );
   const { data, error, isLoading, postData, deleteData, mutate } = useApi(url);
-
+  const { logout } = useLogout();
   const users = data?.data?.data || [];
   const links = data?.data?.links || [];
 
   const deleteUser = async (id) => {
     try {
       deleteData(`${BASE_API_URL}admin-sekolah/${id}`);
-      mutate(url)
+      mutate(url);
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
@@ -65,9 +69,9 @@ const ListUser = ({ navigation, route }) => {
         type: "file/xlsx",
         name: file.assets[0].name,
       });
-  
+
       const token = await AsyncStorage.getItem("token");
-  
+
       const response = await axios.post(
         `${BASE_API_URL}admin-sekolah/siswa-import`,
         formData,
@@ -78,7 +82,7 @@ const ListUser = ({ navigation, route }) => {
           },
         }
       );
-  
+
       console.log("Response: ", response.data);
       mutate(url);
       setFile(null);
@@ -87,7 +91,6 @@ const ListUser = ({ navigation, route }) => {
       console.error("Error details:", error.config, error.response?.data);
     }
   };
-  
 
   const handleLinkPress = (newUrl) => {
     if (newUrl === null) {
@@ -101,7 +104,12 @@ const ListUser = ({ navigation, route }) => {
   };
 
   if (error) {
-    return <Text>Error loading data</Text>;
+    return (
+      <View style={styles.centered}>
+        <Text>Error</Text>
+        <Button title="Logout" onPress={logout} />
+      </View>
+    );
   }
 
   if (isLoading) {
@@ -119,8 +127,8 @@ const ListUser = ({ navigation, route }) => {
 
   return (
     <SafeAreaView className="bg-slate-50 h-full w-full">
-       <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
-       <TouchableOpacity onPress={() => navigation.replace('MainAdmin')}>
+      <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
+        <TouchableOpacity onPress={() => navigation.replace("MainAdmin")}>
           <FontAwesomeIcon icon={faArrowLeft} color="black" />
         </TouchableOpacity>
         <Text className={`${textTitle}`}>{kelas_jurusan}</Text>
@@ -142,7 +150,7 @@ const ListUser = ({ navigation, route }) => {
             navigation.push("CreateUser", {
               sekolah: sekolah,
               kelas_jurusan_id: kelas_jurusan_id,
-              kelas_jurusan: kelas_jurusan
+              kelas_jurusan: kelas_jurusan,
             })
           }
         />
@@ -171,23 +179,23 @@ const ListUser = ({ navigation, route }) => {
         ))}
       </ScrollView>
       {links.length !== 0 ? (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              gap: 4,
-              padding: 10
-            }}
-          >
-            {links.map((item, index) => (
-              <Button
-                key={index}
-                onPress={() => handleLinkPress(item.url)}
-                title={item.label}
-              />
-            ))}
-          </View>
-        ) : null}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            gap: 4,
+            padding: 10,
+          }}
+        >
+          {links.map((item, index) => (
+            <Button
+              key={index}
+              onPress={() => handleLinkPress(item.url)}
+              title={item.label}
+            />
+          ))}
+        </View>
+      ) : null}
       {selectedItem && (
         <BottomSheetModal
           isVisible={isModalVisible}

@@ -58,7 +58,10 @@ const SubsPage = () => {
   };
 
   if (error) {
-    return <Text>Error loading data</Text>;
+    return<View style={{ flex:1 }}>
+    <Text>Error</Text>
+    <Button title="Logout" onPress={logout} />
+  </View>
   }
 
   if (isLoading) {

@@ -5,7 +5,6 @@ import { useApi } from '../../utils/useApi';
 import BASE_API_URL from '../../constant/ip';
 import { useLogout } from '../../utils/useLogout';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { textTitle } from '../../assets/style/basic';
 import Card from '../admin/components/CardLinkAdmin';
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -18,24 +17,72 @@ const HomePageUser = ({ navigation }) => {
     role: "",
     kelas_jurusan: "",
   });
-
+  const [belumData, setBelumData] = useState([]);
+  const [linksData, setLinksData] = useState([]);
+  const [statusData, setStatusData] = useState([]);
   const { data: userData, error: userError } = useApi(`${BASE_API_URL}get-data-login`);
-  const { data: progressData, error: progressError } = useApi(`${BASE_API_URL}progress`);
-  const { data: linksData, error: linksError } = useApi(`${BASE_API_URL}links`);
   const { postData } = useApi();
-  const { logout } = useLogout()
+  const { logout } = useLogout();
+
+  const streamEventLinks = async () => {
+    const token = await AsyncStorage.getItem("token");
+    const eventSource = new CustomEventSource(`${BASE_API_URL}links`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    eventSource.addEventListener("message", (event) => {
+      const data = JSON.parse(event.data).data;
+      setBelumData(data);
+    });
+    return eventSource;
+  };
+
+  const streamEventProgress = async () => {
+    const token = await AsyncStorage.getItem("token");
+    const eventSource = new CustomEventSource(`${BASE_API_URL}stream-user-progress`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    eventSource.addEventListener("message", (event) => {
+      const data = JSON.parse(event.data).data;
+      setLinksData(data.map((item) => item.link));
+      setStatusData(data.map((item) => item.status_progress));
+    });
+    return eventSource;
+  };
 
   useEffect(() => {
     if (userData) {
-      const token = AsyncStorage.getItem("token");
-      setFields({
-        name: userData.name,
-        token: token,
-        role: userData.role,
-        kelas_jurusan: userData.kelas_jurusan,
-      });
+      const fetchToken = async () => {
+        const token = await AsyncStorage.getItem("token");
+        setFields({
+          name: userData.name,
+          token: token,
+          role: userData.role,
+          kelas_jurusan: userData.kelas_jurusan,
+        });
+      };
+      fetchToken();
     }
   }, [userData]);
+
+  useEffect(() => {
+    let eventSourceLinks, eventSourceProgress;
+
+    const startStreamEvents = async () => {
+      eventSourceLinks = await streamEventLinks();
+      eventSourceProgress = await streamEventProgress();
+    };
+
+    startStreamEvents();
+
+    return () => {
+      if (eventSourceLinks) eventSourceLinks.close();
+      if (eventSourceProgress) eventSourceProgress.close();
+    };
+  }, []);
 
   const createProgress = async (id, link_name, link_title, waktu_pengerjaan) => {
     try {
@@ -47,33 +94,34 @@ const HomePageUser = ({ navigation }) => {
         link_id: id,
         link_name: link_name.toString(),
         link_title: link_title.toString(),
-        waktu_pengerjaan:waktu_pengerjaan
+        waktu_pengerjaan: waktu_pengerjaan,
       });
     } catch (error) {
       console.log("Error creating progress:", error);
     }
   };
 
-  if (userError || progressError || linksError) {
-    return <Text>Error loading data</Text>;
+  if (userError) {
+    return (
+      <View style={{ flex: 1 }}>
+        <Text>Error</Text>
+        <Button title="Logout" onPress={logout} />
+      </View>
+    );
   }
 
-  if (!userData || !progressData || !linksData) {
+  if (!userData) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
-    )
+    );
   }
-
-  const links = progressData?.data?.map((item) => item.link);
-  const status = progressData?.data?.map((item) => item.status_progress);
-  const belumDikerjakan = linksData?.data;
 
   return (
     <SafeAreaView className="flex justify-start h-full w-full bg-white ">
-       <View className="flex flex-row justify-between p-4 items-center border-b-[0.5px] border-slate-400 bg-white">
-        <Text className={`${textTitle}`}>ExamTen {fields.kelas_jurusan}</Text>
+      <View className="flex flex-row justify-between p-4 items-center border-b-[0.5px] border-slate-400 bg-white">
+        <Text className="text-lg font-bold">ExamTen {fields.kelas_jurusan}</Text>
         <TouchableOpacity onPress={logout}>
           <FontAwesomeIcon icon={faRightFromBracket} color="black" />
         </TouchableOpacity>
@@ -82,8 +130,8 @@ const HomePageUser = ({ navigation }) => {
         <Text>Halo, {fields.name}</Text>
         <Text>Ujian untuk {fields.kelas_jurusan}</Text>
         <Text>Ujian belum dikerjakan</Text>
-        {belumDikerjakan.length > 0 ? (
-          belumDikerjakan.map((item) => (
+        {belumData.length > 0 ? (
+          belumData.map((item) => (
             <Card
               key={item.id}
               press={() => createProgress(item.id, item.link_name, item.link_title, item.waktu_pengerjaan)}
@@ -96,12 +144,12 @@ const HomePageUser = ({ navigation }) => {
           <Text>No links available</Text>
         )}
         <Text>Sudah Dikerjakan</Text>
-        {links.length > 0 ? (
-          links.map((item, index) => (
+        {linksData.length > 0 ? (
+          linksData.map((item, index) => (
             <Card
               key={item.id}
               link_title={item.link_title}
-              status_progress={status[index]}
+              status_progress={statusData[index]}
               time={item.waktu_pengerjaan_mulai}
               kelas_jurusan={fields.kelas_jurusan}
             />
