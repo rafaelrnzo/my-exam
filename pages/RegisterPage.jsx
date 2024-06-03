@@ -27,6 +27,7 @@ const RegisterPage = ({ navigation }) => {
     password: "",
     sekolah: "",
     kelas_jurusan: "",
+    token:"none"
   });
   const [kelasJurusan, setkelasJurusan] = useState([]);
   const [sekolah, setSekolah] = useState([]);
