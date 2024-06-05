@@ -1,25 +1,18 @@
-import React, { useEffect, useState } from "react";
-import {
-  ScrollView,
-  Text,
-  Button,
-  View,
-  ActivityIndicator,
-  TouchableOpacity,
-  RefreshControl,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useApi } from "../../utils/useApi";
-import BASE_API_URL from "../../constant/ip";
-import { useLogout } from "../../utils/useLogout";
-import { SafeAreaView } from "react-native-safe-area-context";
-import Card from "../admin/components/CardLinkAdmin";
-import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import axios from "axios";
-import eventEmitter from "../../utils/eventEmitter";
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Button, RefreshControl, SafeAreaView } from 'react-native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLogout } from '../../utils/useLogout';
+import Card from '../admin/components/CardLinkAdmin';
+import { useUpdate } from '../../utils/updateContext';
+import { useApi } from '../../utils/useApi';
+import BASE_API_URL from '../../constant/ip';
+import io from 'socket.io-client';
+const SOCKET_URL = 'http://192.168.1.3:6001'; // Sesuaikan dengan URL server Anda jika diperlukan
 
 const HomePageUser = ({ navigation }) => {
+  const { updateTrigger, triggerUpdate } = useUpdate();
   const [fields, setFields] = useState({
     name: "",
     password: "",
@@ -27,13 +20,11 @@ const HomePageUser = ({ navigation }) => {
     role: "",
     kelas_jurusan: "",
   });
-  const [belumData, setBelumData] = useState([]);
-  const [linksData, setLinksData] = useState([]);
-  const [statusData, setStatusData] = useState([]);
-  const { data: userData, error: userError } = useApi(
-    `${BASE_API_URL}get-data-login`
-  );
-  const { postData } = useApi();
+  const socket = io(SOCKET_URL);
+  const { data: userData, error: userError } = useApi(`${BASE_API_URL}get-data-login`);
+  const { data: linksData, mutate: mutateLinks } = useApi(`${BASE_API_URL}links`);
+  const { data: progressData, mutate: mutateProgress } = useApi(`${BASE_API_URL}progress`);
+  const {postData} = useApi()
   const { logout } = useLogout();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -44,36 +35,24 @@ const HomePageUser = ({ navigation }) => {
   }, []);
 
   const fetchData = async () => {
-    eventLinks();
-    eventProgress();
-    console.log("Data refreshed");
-    // Setelah data di-fetch, set refreshing ke false
-  };
-
-  const eventLinks = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(`${BASE_API_URL}links`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setBelumData(response.data.data);
-  };
-  const eventProgress = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(`${BASE_API_URL}progress`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setLinksData(response.data.data.map((item) => item.link));
-    setStatusData(response.data.data.map((item) => item.status_progress));
+    await mutateLinks();
+    await mutateProgress();
+    console.log("Data refreshed from monitoring");
   };
 
   useEffect(() => {
-    eventEmitter.on('linkCreated', fetchData())
-    fetchData()
-  }, []);
+    socket.on('fetch', (data) => {
+      console.log('fetch from server', data);
+      fetchData()
+    })
+  }, [])
+
+  useEffect(() => {
+    if (updateTrigger) {
+      fetchData();
+      triggerUpdate(); // Reset update trigger
+    }
+  }, [updateTrigger]);
 
   useEffect(() => {
     if (userData) {
@@ -90,18 +69,16 @@ const HomePageUser = ({ navigation }) => {
     }
   }, [userData]);
 
-  const createProgress = async (
-    id,
-    link_name,
-    link_title,
-    waktu_pengerjaan
-  ) => {
+  const createProgress = async (id, link_name, link_title, waktu_pengerjaan) => {
     try {
-      await postData(`${BASE_API_URL}progress/post`, {
-        link_id: id,
-        status_progress: "dikerjakan",
+      await postData({
+        url: `${BASE_API_URL}progress/post`,
+        newData: { 
+          link_id: id,
+          status_progress: "dikerjakan" 
+        },
       });
-      eventEmitter.emit('progressCreated')
+      socket.emit('ujian-dikerjakan')
       navigation.navigate("UjianPageUser", {
         link_id: id,
         link_name: link_name.toString(),
@@ -130,12 +107,14 @@ const HomePageUser = ({ navigation }) => {
     );
   }
 
+  const belumData = linksData?.data || [];
+  const links = progressData?.data?.map((item) => item.link) || [];
+  const status = progressData?.data?.map((item) => item.status_progress) || [];
+
   return (
-    <SafeAreaView className="flex justify-start h-full w-full bg-white ">
+    <SafeAreaView className="flex justify-start h-full w-full bg-white">
       <View className="flex flex-row justify-between p-4 items-center border-b-[0.5px] border-slate-400 bg-white">
-        <Text className="text-lg font-bold">
-          ExamTen {fields.kelas_jurusan}
-        </Text>
+        <Text className="text-lg font-bold">ExamTen {fields.kelas_jurusan}</Text>
         <TouchableOpacity onPress={logout}>
           <FontAwesomeIcon icon={faRightFromBracket} color="black" />
         </TouchableOpacity>
@@ -170,12 +149,12 @@ const HomePageUser = ({ navigation }) => {
           <Text>No links available</Text>
         )}
         <Text>Sudah Dikerjakan</Text>
-        {linksData.length > 0 ? (
-          linksData.map((item, index) => (
+        {links.length > 0 ? (
+          links.map((item, index) => (
             <Card
               key={item.id}
               link_title={item.link_title}
-              status_progress={statusData[index]}
+              status_progress={status[index]}
               time={item.waktu_pengerjaan_mulai}
               kelas_jurusan={fields.kelas_jurusan}
             />

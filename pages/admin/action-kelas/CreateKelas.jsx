@@ -25,7 +25,10 @@ const CreateKelas = ({ navigation }) => {
 
   const createKelas = async () => {
     try {
-      await postData(`${BASE_API_URL}post-kelas`, fields);
+      await postData({
+        url: `${BASE_API_URL}post-kelas`,
+        newData: fields
+      });
       setFields({ name: "" });
       navigation.reset({
         index: 0,

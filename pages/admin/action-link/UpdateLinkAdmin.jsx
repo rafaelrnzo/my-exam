@@ -116,7 +116,10 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
         waktu_pengerjaan_mulai: fields.waktu_pengerjaan_mulai.toISOString(),
         waktu_pengerjaan_selesai: fields.waktu_pengerjaan_selesai.toISOString(),
       };
-      await putData(`${BASE_API_URL}links/${id}`, formattedFields);
+      await putData({
+        url: `${BASE_API_URL}links/${id}`, 
+        updatedData: formattedFields
+      });
       setFields({
         link_name: "",
         link_title: "",

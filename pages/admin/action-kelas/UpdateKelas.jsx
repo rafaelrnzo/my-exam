@@ -25,7 +25,10 @@ const UpdateKelas = ({ navigation, route }) => {
 
   const update = async () => {
     try {
-      await putData(`${BASE_API_URL}update-kelas/${id}`, fields);
+      await putData({
+        url: `${BASE_API_URL}update-kelas/${id}`, 
+        updatedData: fields
+      });
       setFields({ name: "" });
       navigation.reset({
         index: 0,

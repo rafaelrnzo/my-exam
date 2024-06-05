@@ -18,11 +18,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import TimerComponent from "../admin/components/TimerComponent";
 import { useWindowDimensions } from "react-native";
+import io from 'socket.io-client';
+
+const SOCKET_URL = 'http://192.168.1.3:6001'; // Sesuaikan dengan URL server Anda jika diperlukan
 
 const UjianPageUser = ({ navigation, route }) => {
   usePreventScreenCapture();
+  const { height, width } = useWindowDimensions();
   const [currentState, setCurrentState] = useState(AppState.currentState);
   const { link_id, link_name, link_title, waktu_pengerjaan } = route.params;
+  const socket = io(SOCKET_URL);
 
   const updateProgress = async (progress) => {
     try {
@@ -43,6 +48,7 @@ const UjianPageUser = ({ navigation, route }) => {
         response.data.data === "split screen" ||
         response.data.data === "selesai"
       ) {
+        socket.emit('ujian-change')
         navigation.replace("HomePageUser");
       }
     } catch (error) {
@@ -67,6 +73,13 @@ const UjianPageUser = ({ navigation, route }) => {
   useEffect(() => {
     getStatusProgress();
   }, []);
+
+  useEffect(() => {
+    socket.on('fetch', (data) => {
+      console.log('fetch from server', data);
+      fetchData()
+    })
+  }, [])
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -112,7 +125,6 @@ const UjianPageUser = ({ navigation, route }) => {
       appStateListener.remove();
     };
   }, [currentState]);
-  const { height, width } = useWindowDimensions();
   useEffect(() => {
     console.log(height, width);
     if (height < 500) {

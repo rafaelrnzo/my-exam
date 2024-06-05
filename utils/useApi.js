@@ -1,4 +1,4 @@
-import useSWR from 'swr';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
@@ -7,8 +7,9 @@ const getToken = async () => {
   return await AsyncStorage.getItem('token');
 };
 
-// Custom fetcher for SWR
-export const fetcher = async (url) => {
+// Fetcher function
+const fetcher = async ({ queryKey }) => {
+  const [url] = queryKey;
   const token = await getToken();
   const response = await axios.get(url, {
     headers: {
@@ -19,63 +20,70 @@ export const fetcher = async (url) => {
 };
 
 export const useApi = (initialUrl) => {
-  const { data, error, mutate } = useSWR(initialUrl, { revalidateOnFocus: true });
+  const queryClient = useQueryClient();
 
-  const postData = async (url, newData) => {
-    try {
+  const { data, error, isLoading } = useQuery([initialUrl], fetcher, {
+    refetchOnWindowFocus: true,
+  });
+
+  const postData = useMutation(
+    async ({ url, newData }) => {
       const token = await getToken();
       const response = await axios.post(url, newData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      mutate(url); // Revalidate the data
       return response.data;
-    } catch (error) {
-      console.error("Error posting data:", error);
-      throw error;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([initialUrl]);
+      },
     }
-  };
+  );
 
-  const putData = async (url, updatedData) => {
-    try {
+  const putData = useMutation(
+    async ({ url, updatedData }) => {
       const token = await getToken();
       const response = await axios.put(url, updatedData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      mutate(url); // Revalidate the data
       return response.data;
-    } catch (error) {
-      console.error("Error updating data:", error);
-      throw error;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([initialUrl]);
+      },
     }
-  };
+  );
 
-  const deleteData = async (url) => {
-    try {
+  const deleteData = useMutation(
+    async (url) => {
       const token = await getToken();
       const response = await axios.delete(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      mutate(url); // Revalidate the data
       return response.data;
-    } catch (error) {
-      console.error("Error deleting data:", error);
-      throw error;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([initialUrl]);
+      },
     }
-  };
+  );
 
   return {
     data,
     error,
-    isLoading: !error && !data,
-    mutate,
-    postData,
-    putData,
-    deleteData
+    isLoading,
+    postData: postData.mutateAsync,
+    putData: putData.mutateAsync,
+    deleteData: deleteData.mutateAsync,
+    mutate: () => queryClient.invalidateQueries([initialUrl]),
   };
 };

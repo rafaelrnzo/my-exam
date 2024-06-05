@@ -41,9 +41,12 @@ const CreateUser = ({ navigation, route }) => {
 
   const createUser = async () => {
     try {
-      await postData(`${BASE_API_URL}admin-sekolah/post`, {
-        ...fields,
-        token: fields.tokenPrefix,
+      await postData({
+        url: `${BASE_API_URL}admin-sekolah/post`,
+        newData: {
+          ...fields,
+          token: fields.tokenPrefix,
+        },
       });
       setFields({
         name: "",
@@ -56,7 +59,7 @@ const CreateUser = ({ navigation, route }) => {
       navigation.replace("ListUser", {
         kelas_jurusan_id: kelas_jurusan_id,
         sekolah: sekolah,
-        kelas_jurusan: kelas_jurusan
+        kelas_jurusan: kelas_jurusan,
       });
     } catch (error) {
       console.log(fields);
@@ -65,10 +68,12 @@ const CreateUser = ({ navigation, route }) => {
   };
 
   if (error) {
-    return <View style={{ flex:1 }}>
-    <Text>Error</Text>
-    <Button title="Logout" onPress={logout} />
-  </View>
+    return (
+      <View style={{ flex: 1 }}>
+        <Text>Error</Text>
+        <Button title="Logout" onPress={logout} />
+      </View>
+    );
   }
 
   return (
@@ -194,7 +199,11 @@ const CreateUser = ({ navigation, route }) => {
             </View>
           )}
         </View>
-        <TouchableOpacity className={`${buttonStyle}`} onPress={createUser} disabled={fields.name.length === 0? true : false}>
+        <TouchableOpacity
+          className={`${buttonStyle}`}
+          onPress={createUser}
+          disabled={fields.name.length === 0 ? true : false}
+        >
           <Text className="font-semibold text-white text-lg">Create</Text>
         </TouchableOpacity>
       </View>

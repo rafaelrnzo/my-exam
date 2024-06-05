@@ -40,7 +40,7 @@ const UpdateUser = ({ navigation, route }) => {
   } = useApi(`${BASE_API_URL}get-kelas`);
   const responseData = kelasJurusan?.data?.map((item) => item.name);
   const { putData } = useApi();
-  const {logout} = useLogout()
+  const { logout } = useLogout();
 
   useEffect(() => {
     const [prefix, suffix] = token.split("-");
@@ -56,9 +56,12 @@ const UpdateUser = ({ navigation, route }) => {
 
   const updateUser = async () => {
     try {
-      await putData(`${BASE_API_URL}admin-sekolah/${id}`, {
-        ...fields,
-        token: fields.tokenPrefix,
+      await putData({
+        url: `${BASE_API_URL}admin-sekolah/${id}`,
+        updatedData: {
+          ...fields,
+          token: fields.tokenPrefix,
+        },
       });
       setFields({
         name: "",
@@ -70,7 +73,7 @@ const UpdateUser = ({ navigation, route }) => {
       navigation.push("ListUser", {
         kelas_jurusan_id: kelas_jurusan_id,
         sekolah: sekolah,
-        kelas_jurusan: kelas_jurusan
+        kelas_jurusan: kelas_jurusan,
       });
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
@@ -78,10 +81,12 @@ const UpdateUser = ({ navigation, route }) => {
   };
 
   if (error) {
-    return <View style={{ flex:1 }}>
-    <Text>Error</Text>
-    <Button title="Logout" onPress={logout} />
-  </View>
+    return (
+      <View style={{ flex: 1 }}>
+        <Text>Error</Text>
+        <Button title="Logout" onPress={logout} />
+      </View>
+    );
   }
 
   return (

@@ -1,28 +1,20 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  SafeAreaView,
-  Button,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-} from "react-native";
-import BASE_API_URL from "../../constant/ip";
-import { useApi } from "../../utils/useApi";
+// MonitoringPage.js
+import React, { useEffect, useState } from 'react';
+import { View, Text, Button, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { useLogout } from '../../utils/useLogout';
+import { useApi } from '../../utils/useApi';
+import { useUpdate } from '../../utils/updateContext';
+import BASE_API_URL from '../../constant/ip';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faArrowLeft, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
+import { textBasic, textTitle } from '../../assets/style/basic';
 import StatusMonitoringModal from "./components/StatusMonitoringModal";
-import { textBasic, textTitle } from "../../assets/style/basic";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faArrowLeft,
-  faEllipsisVertical,
-} from "@fortawesome/free-solid-svg-icons";
-import { useLogout } from "../../utils/useLogout";
-import eventEmitter from "../../utils/eventEmitter";
+import io from 'socket.io-client';
+
+const SOCKET_URL = 'http://192.168.1.3:6001'; // Sesuaikan dengan URL server Anda jika diperlukan
 
 const MonitoringPage = ({ navigation, route }) => {
+  const { updateTrigger, triggerUpdate } = useUpdate();
   const [modalVisible, setModalVisible] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentId, setCurrentId] = useState(null);
@@ -30,10 +22,11 @@ const MonitoringPage = ({ navigation, route }) => {
   const [url, setUrl] = useState(
     `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`
   );
+  const socket = io(SOCKET_URL);
 
   const { data, error, isLoading, putData, mutate } = useApi(url);
   const { logout } = useLogout();
-  // Handle case when data is undefined
+
   const users = data?.data?.data.map((item) => item.user) || [];
   const links = data?.data?.data.map((item) => item.link) || [];
   const status = data?.data?.data.map((item) => item.status_progress) || [];
@@ -47,10 +40,11 @@ const MonitoringPage = ({ navigation, route }) => {
 
   const handleUpdateStatus = async (newStatus, userId) => {
     try {
-      await putData(`${BASE_API_URL}progress/${userId}`, {
-        status_progress: newStatus,
+      await putData({
+        url: `${BASE_API_URL}progress/${userId}`,
+        updatedData: { status_progress: newStatus },
       });
-      mutate(url); // Ensure data is revalidated
+      socket.emit('progressUpdated')
     } catch (error) {
       console.error("Error updating status:", error, newStatus);
     }
@@ -72,22 +66,42 @@ const MonitoringPage = ({ navigation, route }) => {
   }, []);
 
   const fetchData = async () => {
-    mutate(url)
+    mutate(url);
     console.log("Data refreshed");
   };
 
   useEffect(() => {
-    eventEmitter.on("progressCreated", mutate(url))
-  
-    return () => {
-      eventEmitter.off("progressCreated", mutate(url))
+    if(updateTrigger){
+      mutate();
+      triggerUpdate()
     }
+  }, [updateTrigger, triggerUpdate]);
+
+  useEffect(() => {
+
+    socket.on('connect', (data) => {
+      console.log('Connected to server', data);
+    });
+
+    socket.on('ujian-change-callback', () => {
+      fetchData()
+    })
+    socket.on('ujian-dikerjakan-callback', () => {
+      fetchData()
+    })
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from server');
+    });
+
+    return () => {
+      socket.disconnect(); // Tutup koneksi saat komponen di-unmount
+    };
   }, [])
-  
 
   if (error) {
     return (
-      <View style={styles.centered}>
+      <View>
         <Text>Error</Text>
         <Button title="Logout" onPress={logout} />
       </View>
@@ -103,20 +117,18 @@ const MonitoringPage = ({ navigation, route }) => {
   }
 
   return (
-    <SafeAreaView className="bg-slate-50 h-full w-full">
-      <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
+    <SafeAreaView className="flex flex-col bg-slate-50 h-full w-full">
+      <View className="flex flex-row p-4 gap-2 items-center border-b-[0.5px] border-slate-400 bg-white">
         <TouchableOpacity onPress={() => navigation.pop()}>
           <FontAwesomeIcon icon={faArrowLeft} color="black" />
         </TouchableOpacity>
         <Text className={`${textTitle}`}>Monitoring {kelas_jurusan}</Text>
       </View>
-      <ScrollView className="flex flex-col gap-3 px-4 mt-2"
-      refreshControl={
-        <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-        />
-    }
+      <ScrollView
+        className="flex flex-col gap-3 px-4 mt-2 flex-2"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         {users.length == 0 ? (
           <Text>tidak ada user ujian</Text>
@@ -145,7 +157,9 @@ const MonitoringPage = ({ navigation, route }) => {
                     ? "bg-red-400 p-2 mt-2 rounded-lg border text-center"
                     : status[index] === "selesai"
                     ? "bg-green-400 p-2 mt-2 rounded-lg border text-center"
-                    : "bg-blue-400 p-2 mt-2 rounded-lg border text-center"
+                    : status[index] === "dikerjakan"
+                    ? "bg-blue-400 p-2 mt-2 rounded-lg border text-center"
+                    : "bg-transparent p-2 mt-2 border-slate-300 border text-center rounded text-slate-500"
                 }`}
               >
                 {status[index]}
@@ -163,38 +177,20 @@ const MonitoringPage = ({ navigation, route }) => {
             currentStatus={status[currentUser]}
           />
         )}
-        {paginations.length !== 0 && (
-          <View style={styles.paginationContainer}>
-            {paginations.map((item, index) => (
-              <Button
-                key={index}
-                onPress={() => handleLinkPress(item.url)}
-                title={item.label}
-              />
-            ))}
-          </View>
-        )}
       </ScrollView>
+      {paginations.length !== 0 && (
+        <View className="flex flex-row justify-between pb-10 px-4">
+          {paginations.map((item, index) => (
+            <Button
+              key={index}
+              onPress={() => handleLinkPress(item.url)}
+              title={item.label}
+            />
+          ))}
+        </View>
+      )}
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  safeArea: {
-    padding: 20,
-  },
-  userRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  paginationContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 20,
-  },
-});
 
 export default MonitoringPage;

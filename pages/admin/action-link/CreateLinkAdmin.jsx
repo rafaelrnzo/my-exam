@@ -23,7 +23,6 @@ import {
 import { useApi } from "../../../utils/useApi";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import eventEmitter from "../../../utils/eventEmitter";
 
 const CreateLinkAdmin = ({ navigation }) => {
   const [fields, setFields] = useState({
@@ -87,8 +86,10 @@ const CreateLinkAdmin = ({ navigation }) => {
         waktu_pengerjaan_mulai: fields.waktu_pengerjaan_mulai.toISOString(),
         waktu_pengerjaan_selesai: fields.waktu_pengerjaan_selesai.toISOString(),
       };
-      await postData(`${BASE_API_URL}links/post`, formattedFields);
-      eventEmitter.emit('linkCreated')
+      await postData({
+        url: `${BASE_API_URL}links/post`,
+        newData: formattedFields
+      });
       setFields({
         link_name: "",
         link_title: "",
