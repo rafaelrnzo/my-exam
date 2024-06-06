@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ToastAndroid,
+  RefreshControl,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faFilter, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
@@ -33,6 +34,12 @@ const HomePageAdmin = ({ navigation }) => {
   const [selectedTab, setSelectedTab] = useState("all");
   const [isModalVisible, setModalVisible] = useState(false);
   const [filters, setFilters] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    mutate().then(() => setRefreshing(false));
+  }, []);
 
   const deleteLink = async (id) => {
     try {
@@ -55,7 +62,7 @@ const HomePageAdmin = ({ navigation }) => {
 
   if (isLoading) {
     return (
-      <View style={styles.centered}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
@@ -63,7 +70,7 @@ const HomePageAdmin = ({ navigation }) => {
 
   if (error) {
     return (
-      <View style={styles.centered}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Error</Text>
         <Button title="Logout" onPress={logout} />
       </View>
@@ -169,7 +176,11 @@ const HomePageAdmin = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView className="px-4 bg-slate-50 h-full">
+      <ScrollView className="px-4 bg-slate-50 h-full" 
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      >
         {filteredLinks.length > 0 ? (
           filteredLinks.map((item) => (
             <Card
@@ -217,11 +228,6 @@ const HomePageAdmin = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 4,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
   searchBar: {
     marginHorizontal: 16,

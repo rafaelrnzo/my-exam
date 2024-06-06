@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomePageAdmin from "./HomePageAdmin";
-import { SafeAreaView, Text } from "react-native";
-import axios from "axios";
+import { ActivityIndicator, Button, SafeAreaView, Text, View } from "react-native";
 import BASE_API_URL from "../../constant/ip";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import SubsPage from "./SubsPage";
 import ListKelas from "./ListKelas";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -12,34 +10,35 @@ import {
   faClipboard as faClipboardSolid,
   faLink as faLinkSolid,
 } from "@fortawesome/free-solid-svg-icons";
-import { faClipboard, faLink } from "@fortawesome/free-regular-svg-icons";
+import { faClipboard } from "@fortawesome/free-regular-svg-icons";
+import { useApi } from "../../utils/useApi";
+import { useLogout } from "../../utils/useLogout";
 
 const MainAdmin = () => {
   const Tab = createBottomTabNavigator();
-  const [subsData, setsubsData] = useState([]);
+  const {data, isLoading, error, mutate} = useApi(`${BASE_API_URL}admin-sekolah`)
+  const {logout} = useLogout()
 
-  const getSubsData = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`${BASE_API_URL}admin-sekolah`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setsubsData(response.data.data);
-      console.log("ini subs dat", response.data.data);
-    } catch (error) {
-      console.log("ini subs data", subsData);
-    }
-  };
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Error</Text>
+        <Button title="Logout" onPress={logout} />
+      </View>
+    );
+  }
 
-  useEffect(() => {
-   getSubsData()
-  }, []);
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className="h-full w-full">
-      {subsData.length == 0 ? (
+      {data === 'not paid' ? (
         <SubsPage />
       ) : (
          <Tab.Navigator

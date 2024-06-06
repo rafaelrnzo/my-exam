@@ -9,7 +9,7 @@ import { useUpdate } from '../../utils/updateContext';
 import { useApi } from '../../utils/useApi';
 import BASE_API_URL from '../../constant/ip';
 import io from 'socket.io-client';
-const SOCKET_URL = 'http://192.168.1.3:6001'; // Sesuaikan dengan URL server Anda jika diperlukan
+import SOCKET_URL from '../../constant/ip_ws';
 
 const HomePageUser = ({ navigation }) => {
   const { updateTrigger, triggerUpdate } = useUpdate();
@@ -26,7 +26,6 @@ const HomePageUser = ({ navigation }) => {
   const { data: progressData, mutate: mutateProgress } = useApi(`${BASE_API_URL}progress`);
   const {postData} = useApi()
   const { logout } = useLogout();
-
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = React.useCallback(() => {

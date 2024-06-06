@@ -12,7 +12,7 @@ import BASE_API_URL from "../../constant/ip";
 import { useNavigation } from "@react-navigation/native";
 import { useLogout } from "../../utils/useLogout";
 import { useApi } from "../../utils/useApi";
-import { textTitle } from "../../assets/style/basic";
+import { textBasic, textTitle } from "../../assets/style/basic";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import axios from "axios";
@@ -58,10 +58,12 @@ const SubsPage = () => {
   };
 
   if (error) {
-    return<View style={{ flex:1 }}>
-    <Text>Error</Text>
-    <Button title="Logout" onPress={logout} />
-  </View>
+    return (
+      <View style={{ flex: 1 }}>
+        <Text>Error</Text>
+        <Button title="Logout" onPress={logout} />
+      </View>
+    );
   }
 
   if (isLoading) {
@@ -82,18 +84,22 @@ const SubsPage = () => {
       </View>
       <ScrollView className="px-4">
         {subsData.data.map((item) => (
-          <TouchableOpacity
+          <View
             key={item.id}
-            style={{ padding: 10, borderColor: "black", borderWidth: 1 }}
+            className="flex flex-col p-3 border-slate-300 border rounded-lg mt-3 w-full"
           >
-            <Text>{item.name}</Text>
-            <Text>description: {item.description}</Text>
-            <Text>{item.price}</Text>
-            <Button
+            <Text className={`${textTitle}`}>{item.name}</Text>
+            <Text className={`${textBasic}`}>
+              Description {item.description}
+            </Text>
+            <Text className={`${textBasic}`}>{item.price}</Text>
+            <TouchableOpacity
+              className="bg-blue-500 py-2 px-4 rounded"
               onPress={() => handleSubmit(item.name, item.price, item.id)}
-              title="buy"
-            />
-          </TouchableOpacity>
+            >
+              <Text className="text-white font-bold">Buy</Text>
+            </TouchableOpacity>
+          </View>
         ))}
       </ScrollView>
     </SafeAreaView>

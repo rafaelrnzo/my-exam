@@ -5,8 +5,7 @@ import HomePageUser from "./pages/user/HomePageUser";
 import HomePageAdmin from "./pages/admin/HomePageAdmin";
 // import VerifyPage from "./pages/VerifyPage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect, useRef, useState } from "react";
-import BlankScreen from "./components/BlankScreen";
+import { useEffect, useRef } from "react";
 import UjianPageUser from "./pages/user/UjianPageUser";
 import LoginAsAdmin from "./pages/LoginAsAdmin";
 import MainAdmin from "./pages/admin/MainAdmin";
@@ -58,17 +57,11 @@ export default function App() {
 
   const queryClient = new QueryClient();
 
-
   return (
     <QueryClientProvider client={queryClient}>
       <UpdateProvider>
         <NavigationContainer ref={navigationRef}>
           <Stack.Navigator initialRouteName="PortalPage">
-            <Stack.Screen
-              name="BlankScreen"
-              component={BlankScreen}
-              options={{ headerShown: false }}
-            />
             <Stack.Screen
               name="PortalPage"
               component={PortalPage}

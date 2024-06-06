@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Button,
+  RefreshControl,
 } from "react-native";
 import React, { useState } from "react";
 import BASE_API_URL from "../../constant/ip";
@@ -26,7 +27,7 @@ import { useLogout } from "../../utils/useLogout";
 const ListKelas = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
-  const { data, error, isLoading } = useApi(
+  const { data, error, isLoading, mutate } = useApi(
     `${BASE_API_URL}admin-sekolah/kelas-jurusan`
   );
   const kelasJurusan = data?.data || [];
@@ -38,6 +39,12 @@ const ListKelas = ({ navigation }) => {
   } = useApi(`${BASE_API_URL}get-data-login`);
   const { deleteData } = useApi();
   const { logout } = useLogout();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    mutate().then(() => setRefreshing(false));
+  }, []);
 
   const toggleModal = (item) => {
     setSelectedItem(item);
@@ -79,7 +86,11 @@ const ListKelas = ({ navigation }) => {
           <FontAwesomeIcon icon={faRightFromBracket} color="black" />
         </TouchableOpacity>
       </View>
-      <ScrollView className="p-4 flex gap-3">
+      <ScrollView className="p-4 flex gap-3"
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      >
         {kelasJurusan.length === 0
           ? <Text>belum ada kelas</Text>
           : kelasJurusan?.map((item, index) => (

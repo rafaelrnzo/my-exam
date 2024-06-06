@@ -40,7 +40,7 @@ const CreateKelas = ({ navigation }) => {
   };
   return (
     <SafeAreaView
-      className="h-full w-full bg-slate-50"
+      className="h-full w-full bg-white"
     >
        <View className="flex flex-row p-4 gap-2 mb-2 items-center border-b-[0.5px] border-slate-400 bg-white">
         <TouchableOpacity onPress={() => navigation.pop()}>

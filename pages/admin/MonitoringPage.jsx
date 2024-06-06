@@ -1,17 +1,30 @@
 // MonitoringPage.js
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
-import { useLogout } from '../../utils/useLogout';
-import { useApi } from '../../utils/useApi';
-import { useUpdate } from '../../utils/updateContext';
-import BASE_API_URL from '../../constant/ip';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowLeft, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
-import { textBasic, textTitle } from '../../assets/style/basic';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Button,
+  ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
+  RefreshControl,
+  TouchableOpacity,
+} from "react-native";
+import { useLogout } from "../../utils/useLogout";
+import { useApi } from "../../utils/useApi";
+import { useUpdate } from "../../utils/updateContext";
+import BASE_API_URL from "../../constant/ip";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faArrowLeft,
+  faChevronLeft,
+  faChevronRight,
+  faEllipsisVertical,
+} from "@fortawesome/free-solid-svg-icons";
+import { textBasic, textTitle } from "../../assets/style/basic";
 import StatusMonitoringModal from "./components/StatusMonitoringModal";
-import io from 'socket.io-client';
-
-const SOCKET_URL = 'http://192.168.1.3:6001'; // Sesuaikan dengan URL server Anda jika diperlukan
+import io from "socket.io-client";
+import SOCKET_URL from "../../constant/ip_ws";
 
 const MonitoringPage = ({ navigation, route }) => {
   const { updateTrigger, triggerUpdate } = useUpdate();
@@ -44,7 +57,7 @@ const MonitoringPage = ({ navigation, route }) => {
         url: `${BASE_API_URL}progress/${userId}`,
         updatedData: { status_progress: newStatus },
       });
-      socket.emit('progressUpdated')
+      socket.emit("progressUpdated");
     } catch (error) {
       console.error("Error updating status:", error, newStatus);
     }
@@ -71,33 +84,32 @@ const MonitoringPage = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    if(updateTrigger){
+    if (updateTrigger) {
       mutate();
-      triggerUpdate()
+      triggerUpdate();
     }
   }, [updateTrigger, triggerUpdate]);
 
   useEffect(() => {
-
-    socket.on('connect', (data) => {
-      console.log('Connected to server', data);
+    socket.on("connect", () => {
+      console.log("Connected to server");
     });
 
-    socket.on('ujian-change-callback', () => {
-      fetchData()
-    })
-    socket.on('ujian-dikerjakan-callback', () => {
-      fetchData()
-    })
+    socket.on("ujian-change-callback", () => {
+      fetchData();
+    });
+    socket.on("ujian-dikerjakan-callback", () => {
+      fetchData();
+    });
 
-    socket.on('disconnect', () => {
-      console.log('Disconnected from server');
+    socket.on("disconnect", () => {
+      console.log("Disconnected from server");
     });
 
     return () => {
-      socket.disconnect(); // Tutup koneksi saat komponen di-unmount
+      socket.disconnect();
     };
-  }, [])
+  }, []);
 
   if (error) {
     return (
@@ -179,13 +191,23 @@ const MonitoringPage = ({ navigation, route }) => {
         )}
       </ScrollView>
       {paginations.length !== 0 && (
-        <View className="flex flex-row justify-between pb-10 px-4">
+        <View className="flex flex-row justify-center gap-4 pb-10 px-4">
           {paginations.map((item, index) => (
-            <Button
+            <TouchableOpacity
               key={index}
+              className="bg-blue-500 py-2 px-4 rounded"
               onPress={() => handleLinkPress(item.url)}
-              title={item.label}
-            />
+            >
+              <Text className="text-white font-bold">
+                {item.label === "&laquo; Previous" ? (
+                  <FontAwesomeIcon icon={faChevronLeft} color="white" />
+                ) : item.label === "Next &raquo;" ? (
+                  <FontAwesomeIcon icon={faChevronRight} color="white" />
+                ) : (
+                  item.label
+                )}
+              </Text>
+            </TouchableOpacity>
           ))}
         </View>
       )}

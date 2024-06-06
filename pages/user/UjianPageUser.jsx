@@ -19,8 +19,7 @@ import { faClock } from "@fortawesome/free-regular-svg-icons";
 import TimerComponent from "../admin/components/TimerComponent";
 import { useWindowDimensions } from "react-native";
 import io from 'socket.io-client';
-
-const SOCKET_URL = 'http://192.168.1.3:6001'; // Sesuaikan dengan URL server Anda jika diperlukan
+import SOCKET_URL from "../../constant/ip_ws";
 
 const UjianPageUser = ({ navigation, route }) => {
   usePreventScreenCapture();

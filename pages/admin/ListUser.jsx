@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   ToastAndroid,
+  RefreshControl,
 } from "react-native";
 import React, { useState } from "react";
 import BASE_API_URL from "../../constant/ip";
@@ -15,6 +16,8 @@ import { useApi } from "../../utils/useApi";
 import { textBasic, textTitle } from "../../assets/style/basic";
 import {
   faArrowLeft,
+  faChevronLeft,
+  faChevronRight,
   faEllipsisVertical,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -31,10 +34,16 @@ const ListUser = ({ navigation, route }) => {
   const [url, setUrl] = useState(
     `${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}`
   );
-  const { data, error, isLoading, postData, deleteData, mutate } = useApi(url);
+  const { data, error, isLoading, deleteData, mutate } = useApi(url);
   const { logout } = useLogout();
   const users = data?.data?.data || [];
   const links = data?.data?.links || [];
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    mutate().then(() => setRefreshing(false));
+  }, []);
 
   const deleteUser = async (id) => {
     try {
@@ -106,7 +115,7 @@ const ListUser = ({ navigation, route }) => {
 
   if (error) {
     return (
-      <View style={styles.centered}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Error</Text>
         <Button title="Logout" onPress={logout} />
       </View>
@@ -142,21 +151,38 @@ const ListUser = ({ navigation, route }) => {
           paddingTop: 15,
         }}
       >
-        <Button title="Pilih File Excel" onPress={pickFile} />
+        <TouchableOpacity
+          className="bg-blue-500 py-2 px-4 rounded"
+          onPress={pickFile}
+        >
+          <Text className="text-white font-bold">Pilih File Excel</Text>
+        </TouchableOpacity>
         {<Text>{file?.assets[0].name}</Text>}
-        <Button title="import" onPress={handleImport} />
-        <Button
-          title="create"
+        <TouchableOpacity
+          className="bg-blue-500 py-2 px-4 rounded"
+          onPress={handleImport}
+        >
+          <Text className="text-white font-bold">Import</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="bg-blue-500 py-2 px-4 rounded"
           onPress={() =>
             navigation.push("CreateUser", {
-              sekolah: sekolah,
-              kelas_jurusan_id: kelas_jurusan_id,
-              kelas_jurusan: kelas_jurusan,
+              sekolah,
+              kelas_jurusan_id,
+              kelas_jurusan,
             })
           }
-        />
+        >
+          <Text className="text-white font-bold">Create</Text>
+        </TouchableOpacity>
       </View>
-      <ScrollView className="p-4 flex gap-3">
+      <ScrollView
+        className="p-4 flex gap-3"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {users.map((item) => (
           <View
             key={item.id}
@@ -175,28 +201,31 @@ const ListUser = ({ navigation, route }) => {
               <Text className={`${textBasic}`}>{item.token}</Text>
             )}
 
-            <Text className={`${textBasic}`}>{item.role}</Text>
+            <Text className={`${textBasic} border rounded-full px-2 w-32 my-2`}>{item.role}</Text>
           </View>
         ))}
       </ScrollView>
-      {links.length !== 0 ? (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            gap: 4,
-            padding: 10,
-          }}
-        >
+      {links.length !== 0 && (
+        <View className="flex flex-row justify-center gap-4 pb-10 px-4">
           {links.map((item, index) => (
-            <Button
+            <TouchableOpacity
               key={index}
+              className="bg-blue-500 py-2 px-4 rounded"
               onPress={() => handleLinkPress(item.url)}
-              title={item.label}
-            />
+            >
+              <Text className="text-white font-bold">
+                {item.label === "&laquo; Previous" ? (
+                  <FontAwesomeIcon icon={faChevronLeft} color="white" />
+                ) : item.label === "Next &raquo;" ? (
+                  <FontAwesomeIcon icon={faChevronRight} color="white" />
+                ) : (
+                  item.label
+                )}
+              </Text>
+            </TouchableOpacity>
           ))}
         </View>
-      ) : null}
+      )}
       {selectedItem && (
         <BottomSheetModal
           isVisible={isModalVisible}

@@ -2,9 +2,7 @@ import { Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { textSubtitle } from '../../../assets/style/basic'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons'
-import { faCalendar, faLink } from "@fortawesome/free-regular-svg-icons";
-// import { textHero, textTitle } from '../assets/style/basic'
+import { faCalendar } from "@fortawesome/free-regular-svg-icons";
 
 const Card = ({ time, link_title, link_status, press, status_progress, kelas_jurusan, onLongPress }) => {
   return (

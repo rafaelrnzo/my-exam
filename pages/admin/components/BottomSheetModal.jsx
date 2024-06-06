@@ -2,8 +2,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
-import { textBasic, textTitle } from '../../../assets/style/basic';
-import { faClipboard, faLink } from "@fortawesome/free-regular-svg-icons";
+import { textBasic } from '../../../assets/style/basic';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
