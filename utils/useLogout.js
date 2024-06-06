@@ -17,6 +17,7 @@ export const useLogout = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      console.log('logging out');
       await AsyncStorage.multiRemove(['token', 'role', 'name']);
       navigation.navigate('PortalPage');
     } catch (error) {

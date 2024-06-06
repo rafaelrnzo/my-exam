@@ -10,6 +10,7 @@ import { useApi } from '../../utils/useApi';
 import BASE_API_URL from '../../constant/ip';
 import io from 'socket.io-client';
 import SOCKET_URL from '../../constant/ip_ws';
+import { textBasic, textSubtitle, textTitle } from '../../assets/style/basic';
 
 const HomePageUser = ({ navigation }) => {
   const { updateTrigger, triggerUpdate } = useUpdate();
@@ -124,9 +125,9 @@ const HomePageUser = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <Text>Halo, {fields.name}</Text>
-        <Text>Ujian untuk {fields.kelas_jurusan}</Text>
-        <Text>Ujian belum dikerjakan</Text>
+        <Text className={`${textTitle}`}>Halo, {fields.name}</Text>
+        <Text className={`${textBasic}`}>Ujian untuk {fields.kelas_jurusan}</Text>
+        <Text className={`${textBasic}`}>Ujian belum dikerjakan</Text>
         {belumData.length > 0 ? (
           belumData.map((item) => (
             <Card
@@ -147,7 +148,7 @@ const HomePageUser = ({ navigation }) => {
         ) : (
           <Text>No links available</Text>
         )}
-        <Text>Sudah Dikerjakan</Text>
+        <Text className={`${textBasic} mt-2`}>Ujian Sudah Dikerjakan</Text>
         {links.length > 0 ? (
           links.map((item, index) => (
             <Card

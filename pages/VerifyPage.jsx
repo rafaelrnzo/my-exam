@@ -10,7 +10,7 @@ import "expo-dev-client";
 
 const VerifyPage = ({ navigation }) => {
   const [textError, settextError] = useState("");
-  const { logoutUser } = useLogout();
+  const { logout } = useLogout();
 
   const navigateToPage = (role) => {
     switch (role) {
@@ -59,7 +59,7 @@ const VerifyPage = ({ navigation }) => {
           .catch((error) => {
             console.log("Error:", error);
             settextError("Serial number error");
-            logoutUser();
+            logout();
             navigation.reset({
               index: 0,
               routes: [{ name: "PortalPage" }],
@@ -69,7 +69,7 @@ const VerifyPage = ({ navigation }) => {
     } catch (error) {
       console.log("Error:", error);
       settextError("Serial number error");
-      logoutUser();
+      logout();
       navigation.reset({
         index: 0,
         routes: [{ name: "PortalPage" }],
@@ -86,13 +86,11 @@ const VerifyPage = ({ navigation }) => {
       {textError ? (
         <Text className={`${textHero}`}>{textError}</Text>
       ) : (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View>
           <ActivityIndicator size="large" color="#0000ff" />
         </View>
       )}
-      <Button title="logout" onPress={logoutUser} />
+      <Button title="logout" onPress={logout} />
     </View>
   );
 };
