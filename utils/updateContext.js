@@ -9,7 +9,6 @@ export const UpdateProvider = ({ children }) => {
 
     const triggerUpdate = () => {
         setUpdateTrigger(prev => !prev);
-        // console.log(updateTrigger);
     };
 
     return (

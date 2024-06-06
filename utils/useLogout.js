@@ -20,7 +20,6 @@ export const useLogout = () => {
       await AsyncStorage.multiRemove(['token', 'role', 'name']);
       navigation.navigate('PortalPage');
     } catch (error) {
-      console.log('Error logging out:', error);
       await AsyncStorage.multiRemove(['token', 'role', 'name']);
       navigation.navigate('PortalPage');
     }

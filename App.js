@@ -33,7 +33,6 @@ export default function App() {
     const checkAuth = async () => {
       const role = await AsyncStorage.getItem("role");
       const token = await AsyncStorage.getItem("token");
-      console.log(role, token);
       if (token && role == "siswa") {
         navigationRef.current?.reset({
           index: 0,
