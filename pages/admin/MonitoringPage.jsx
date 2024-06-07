@@ -22,7 +22,6 @@ import {
   faChevronLeft,
   faChevronRight,
   faEllipsisVertical,
-  faFilter,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { textBasic, textTitle } from "../../assets/style/basic";
