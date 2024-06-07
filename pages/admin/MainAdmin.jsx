@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomePageAdmin from "./HomePageAdmin";
-import { ActivityIndicator, Button, SafeAreaView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  SafeAreaView,
+  Text,
+  View,
+} from "react-native";
 import BASE_API_URL from "../../constant/ip";
 import SubsPage from "./SubsPage";
 import ListKelas from "./ListKelas";
@@ -11,37 +17,32 @@ import {
   faLink as faLinkSolid,
 } from "@fortawesome/free-solid-svg-icons";
 import { faClipboard } from "@fortawesome/free-regular-svg-icons";
-import { useApi } from "../../utils/useApi";
-import { useLogout } from "../../utils/useLogout";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const MainAdmin = () => {
   const Tab = createBottomTabNavigator();
-  const {data, isLoading, error, mutate} = useApi(`${BASE_API_URL}admin-sekolah`)
-  const {logout} = useLogout()
+  const [subsData, setsubsData] = useState('none' || [])
 
-  if (error) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Error</Text>
-        <Button title="Logout" onPress={logout} />
-      </View>
-    );
-  }
+  const getSubsData = async () => {
+    const token = await AsyncStorage.getItem("token");
+    const response = await axios.get(`${BASE_API_URL}admin-sekolah`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log(response.data);
+    setsubsData(response.data)
+  };
 
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
+  useEffect(() => {
+    getSubsData()
+  }, [])
+  
   return (
     <SafeAreaView className="h-full w-full">
-      {data === 'not paid' ? (
+      {subsData.token === "none" ? (
         <SubsPage />
       ) : (
-         <Tab.Navigator
+        <Tab.Navigator
           screenOptions={{
             tabBarStyle: {
               paddingVertical: 8,

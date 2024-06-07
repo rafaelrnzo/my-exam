@@ -25,7 +25,6 @@ export const useApi = (initialUrl) => {
   const { data, error, isLoading } = useQuery([initialUrl], fetcher, {
     refetchOnWindowFocus: true,
   });
-
   const postData = useMutation(
     async ({ url, newData }) => {
       const token = await getToken();

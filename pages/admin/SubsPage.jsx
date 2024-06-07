@@ -97,7 +97,7 @@ const SubsPage = () => {
               className="bg-blue-500 py-2 px-4 rounded"
               onPress={() => handleSubmit(item.name, item.price, item.id)}
             >
-              <Text className="text-white font-bold">Buy</Text>
+              <Text className="text-white font-bold text-center">Buy</Text>
             </TouchableOpacity>
           </View>
         ))}
