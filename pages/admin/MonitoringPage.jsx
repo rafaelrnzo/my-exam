@@ -1,5 +1,5 @@
 // MonitoringPage.js
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   ScrollView,
   RefreshControl,
   TouchableOpacity,
+  StyleSheet,
+  TextInput
 } from "react-native";
 import { useLogout } from "../../utils/useLogout";
 import { useApi } from "../../utils/useApi";
@@ -20,6 +22,8 @@ import {
   faChevronLeft,
   faChevronRight,
   faEllipsisVertical,
+  faFilter,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { textBasic, textTitle } from "../../assets/style/basic";
 import StatusMonitoringModal from "./components/StatusMonitoringModal";
@@ -35,6 +39,8 @@ const MonitoringPage = ({ navigation, route }) => {
   const [url, setUrl] = useState(
     `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`
   );
+  const [searchQuery, setSearchQuery] = useState("");
+
   const socket = io(SOCKET_URL);
 
   const { data, error, isLoading, putData, mutate } = useApi(url);
@@ -44,6 +50,15 @@ const MonitoringPage = ({ navigation, route }) => {
   const links = data?.data?.data.map((item) => item.link) || [];
   const status = data?.data?.data.map((item) => item.status_progress) || [];
   const paginations = data?.data?.links || [];
+
+  const filteredUsers = useMemo(() => {
+    if (searchQuery === "") {
+      return users;
+    }
+    return users.filter((user) =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, users]);
 
   const handleOpenModal = (userIndex, id) => {
     setCurrentUser(userIndex);
@@ -73,7 +88,7 @@ const MonitoringPage = ({ navigation, route }) => {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchData().then(() => setRefreshing(false));
   }, []);
@@ -88,7 +103,7 @@ const MonitoringPage = ({ navigation, route }) => {
       mutate();
       triggerUpdate();
     }
-  }, [updateTrigger, triggerUpdate]);
+  }, [updateTrigger, triggerUpdate, mutate]);
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -130,11 +145,23 @@ const MonitoringPage = ({ navigation, route }) => {
 
   return (
     <SafeAreaView className="flex flex-col bg-slate-50 h-full w-full">
-      <View className="flex flex-row p-4 gap-2 items-center border-b-[0.5px] border-slate-400 bg-white">
-        <TouchableOpacity onPress={() => navigation.pop()}>
+      <View className="bg-white flex items-center w-full py-3">
+        <View className="w-full flex flex-row items-center">
+        <TouchableOpacity onPress={() => navigation.pop()} className="ml-4">
           <FontAwesomeIcon icon={faArrowLeft} color="black" />
         </TouchableOpacity>
-        <Text className={`${textTitle}`}>Monitoring {kelas_jurusan}</Text>
+          <View style={styles.searchBar}>
+            <View className="pr-2">
+              <FontAwesomeIcon icon={faSearch} color="#cbd5e1" />
+            </View>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search by name"
+              value={searchQuery}
+              onChangeText={(text) => setSearchQuery(text)}
+            />
+          </View>
+        </View>
       </View>
       <ScrollView
         className="flex flex-col gap-3 px-4 mt-2 flex-2"
@@ -142,10 +169,10 @@ const MonitoringPage = ({ navigation, route }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {users.length == 0 ? (
+        {filteredUsers.length === 0 ? (
           <Text>tidak ada user ujian</Text>
         ) : (
-          users.map((user, index) => (
+          filteredUsers.map((user, index) => (
             <View
               key={links[index].id}
               className="p-3 border border-slate-300 rounded-lg w-auto flex "
@@ -214,5 +241,25 @@ const MonitoringPage = ({ navigation, route }) => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  searchBar: {
+    marginHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: "#cbd5e1",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 6,
+  },
+})
 
 export default MonitoringPage;
