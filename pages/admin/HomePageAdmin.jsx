@@ -91,36 +91,39 @@ const HomePageAdmin = ({ navigation }) => {
         )
     ) || [];
 
-    const classes = Array.from(
-      new Set(links?.data?.map((item) => item.kelas_jurusan.id))
-    ).map((id) => {
-      return links?.data?.find((item) => item.kelas_jurusan.id === id)
-        ?.kelas_jurusan;
-    });
+  const classes = Array.from(
+    new Set(links?.data?.map((item) => item.kelas_jurusan.id))
+  ).map((id) => {
+    return links?.data?.find((item) => item.kelas_jurusan.id === id)
+      ?.kelas_jurusan;
+  });
 
   return (
     <SafeAreaView className="pt-10 bg-white w-full h-full">
       <View className="bg-white flex items-center w-full">
-        <View className="w-full flex flex-row">
-          <View style={styles.searchBar} className="w-4/5">
-            <View className="pr-2">
+        <View className="w-full flex flex-row px-4 max-w-screen items-center ">
+          <View className="flex-grow border border-slate-300  px-5 p-2.5 rounded-lg flex flex-row items-center">
+            <View className="px-2">
               <FontAwesomeIcon icon={faSearch} color="#cbd5e1" />
             </View>
             <TextInput
-              style={styles.searchInput}
+              // style={styles.searchInput}
+              className=" "
               placeholder="Search by link title"
               value={searchQuery}
               onChangeText={(text) => setSearchQuery(text)}
             />
           </View>
-          <TouchableOpacity
-            className="flex items-center flex-row"
-            onPress={() => {
-              setModalVisible(!isModalVisible);
-            }}
-          >
-            <FontAwesomeIcon icon={faFilter} color="#3b82f6" size={20} />
-          </TouchableOpacity>
+          <View className="w-auto flex-none px-2 ">
+            <TouchableOpacity
+              className="flex items-center flex-row"
+              onPress={() => {
+                setModalVisible(!isModalVisible);
+              }}
+            >
+              <FontAwesomeIcon icon={faFilter} color="#3b82f6" size={20} />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.tabContainer}>
           <TouchableOpacity
@@ -176,10 +179,10 @@ const HomePageAdmin = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView className="px-4 bg-slate-50 h-full" 
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
+      <ScrollView className="px-4 bg-slate-50 h-full"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         {filteredLinks.length > 0 ? (
           filteredLinks.map((item) => (

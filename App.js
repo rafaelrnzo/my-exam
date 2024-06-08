@@ -24,6 +24,7 @@ import UpdateKelas from "./pages/admin/action-kelas/UpdateKelas";
 import PortalPage from "./pages/PortalPage";
 import { UpdateProvider } from "./utils/updateContext";
 import { QueryClient, QueryClientProvider } from "react-query";
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -38,16 +39,19 @@ export default function App() {
           index: 0,
           routes: [{ name: "VerifyPage" }],
         });
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
       } else if (token && role == "admin sekolah") {
         navigationRef.current?.reset({
           index: 0,
           routes: [{ name: "MainAdmin" }],
         });
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
       } else {
         navigationRef.current?.reset({
           index: 0,
           routes: [{ name: "PortalPage" }],
         });
+        await ScreenOrientation.unlockAsync();
       }
     };
 
@@ -128,11 +132,6 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-          name="VerifyPage"
-          component={VerifyPage}
-          options={{ headerBackVisible: false }}
-        />
-            <Stack.Screen
               name="UjianPageUser"
               component={UjianPageUser}
               options={{ headerShown: false }}
@@ -155,8 +154,8 @@ export default function App() {
             />
           </Stack.Navigator>
         </NavigationContainer>
-    </UpdateProvider>
+      </UpdateProvider>
     </QueryClientProvider>
-    
   );
 }
+

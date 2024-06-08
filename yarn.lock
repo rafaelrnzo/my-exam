@@ -3330,6 +3330,11 @@ expo-screen-capture@~6.0.1:
   resolved "https://registry.yarnpkg.com/expo-screen-capture/-/expo-screen-capture-6.0.1.tgz#b1e7c2b095cab8650f7a6e99ffc4e5d522550165"
   integrity sha512-rJnwcKxZ6anfEx2xFeRo9MAVp2JgI4S+TuhUurHRf9rildPVorS2JvLey3i5xZPs7CxEe2xcijTmr5WT5Lw4dA==
 
+expo-screen-orientation@~7.0.5:
+  version "7.0.5"
+  resolved "https://registry.yarnpkg.com/expo-screen-orientation/-/expo-screen-orientation-7.0.5.tgz#0a517982151c6519fa4b10ce27047de39c1f92cf"
+  integrity sha512-1j0MzVzYpjKQo4BWowQ3ZYwC3OnddX/8k06C8VYTAxMyd8ou1k+rG4tm+GIV2n2RSzc3g7cfPlQwSYr3/SGmbg==
+
 expo-updates-interface@~0.16.2:
   version "0.16.2"
   resolved "https://registry.yarnpkg.com/expo-updates-interface/-/expo-updates-interface-0.16.2.tgz#ad1ac2ca8ee5a8cc84052ea3c18a11da64da569b"
