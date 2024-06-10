@@ -204,7 +204,7 @@ const ListUser = ({ navigation, route }) => {
               </TouchableOpacity>
             </View>
             <Text className="text-sm text-gray-500 mb-1">
-              {item.kelas_jurusan.name ?? "admin"}
+              {item.kelas_jurusan}
             </Text>
             {item.role !== "admin sekolah" && (
               <Text className="text-sm text-gray-500 mb-2">{item.token}</Text>

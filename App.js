@@ -81,7 +81,7 @@ export default function App() {
               options={{ headerShown: false }}
             />
             {/* <Stack.Screen
-              name="VerivyPage"
+              name="VerifyPage"
               component={VerifyPage}
               options={{ headerShown: false }}
             /> */}
