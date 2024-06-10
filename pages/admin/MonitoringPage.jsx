@@ -143,18 +143,21 @@ const MonitoringPage = ({ navigation, route }) => {
   }
 
   return (
-    <SafeAreaView className="flex flex-col bg-slate-50 h-full w-full">
-      <View className="bg-white flex items-center w-full py-3">
-        <View className="w-full flex flex-row items-center">
-        <TouchableOpacity onPress={() => navigation.pop()} className="ml-4">
-          <FontAwesomeIcon icon={faArrowLeft} color="black" />
-        </TouchableOpacity>
-          <View style={styles.searchBar}>
-            <View className="pr-2">
+    <SafeAreaView className="flex flex-col bg-white h-full w-full ">
+      <View className="bg-white flex items-center w-full  flex-row  py-4 pt-8 ">
+        <View className="w-full flex flex-row  max-w-screen items-center px-4 ">
+          <View className="flex-none">
+            <TouchableOpacity onPress={() => navigation.pop()} className=" p-4">
+              <FontAwesomeIcon icon={faArrowLeft} color="black" />
+            </TouchableOpacity>
+          </View>
+          <View className=" flex-grow border border-slate-300  px-5 p-2.5 rounded-lg flex flex-row items-center">
+            <View className="px-2">
               <FontAwesomeIcon icon={faSearch} color="#cbd5e1" />
             </View>
             <TextInput
-              style={styles.searchInput}
+              // style={styles.searchInput}
+              className=" "
               placeholder="Search by name"
               value={searchQuery}
               onChangeText={(text) => setSearchQuery(text)}
@@ -163,7 +166,7 @@ const MonitoringPage = ({ navigation, route }) => {
         </View>
       </View>
       <ScrollView
-        className="flex flex-col gap-3 px-4 mt-2 flex-2"
+        className="flex flex-col gap-3 px-4 mt-2 flex-2 bg-slate-50"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -174,7 +177,7 @@ const MonitoringPage = ({ navigation, route }) => {
           filteredUsers.map((user, index) => (
             <View
               key={links[index].id}
-              className="p-3 border border-slate-300 rounded-lg w-auto flex "
+              className="p-3 border border-slate-300 bg-white rounded-lg w-auto flex "
             >
               <View className="flex-row flex justify-between">
                 <Text className={`${textTitle}`}>{user.name}</Text>
@@ -190,15 +193,14 @@ const MonitoringPage = ({ navigation, route }) => {
                 Mengerjakan {links[index]?.link_title}
               </Text>
               <Text
-                className={`${textBasic} ${
-                  status[index] === "keluar"
-                    ? "bg-red-400 p-2 mt-2 rounded-lg border text-center"
-                    : status[index] === "selesai"
+                className={`${textBasic} ${status[index] === "keluar"
+                  ? "bg-red-400 p-2 mt-2 rounded-lg border text-center"
+                  : status[index] === "selesai"
                     ? "bg-green-400 p-2 mt-2 rounded-lg border text-center"
                     : status[index] === "dikerjakan"
-                    ? "bg-blue-400 p-2 mt-2 rounded-lg border text-center"
-                    : "bg-transparent p-2 mt-2 border-slate-300 border text-center rounded text-slate-500"
-                }`}
+                      ? "bg-blue-400 p-2 mt-2 rounded-lg border text-center"
+                      : "bg-transparent p-2 mt-2 border-slate-300 border text-center rounded text-slate-500"
+                  }`}
               >
                 {status[index]}
               </Text>
@@ -216,7 +218,7 @@ const MonitoringPage = ({ navigation, route }) => {
           />
         )}
       </ScrollView>
-      {paginations.length !== 0 && (
+      {/* {paginations.length !== 0 && (
         <View className="flex flex-row justify-center gap-4 pb-10 px-4">
           {paginations.map((item, index) => (
             <TouchableOpacity
@@ -236,7 +238,7 @@ const MonitoringPage = ({ navigation, route }) => {
             </TouchableOpacity>
           ))}
         </View>
-      )}
+      )} */}
     </SafeAreaView>
   );
 };

@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginPage from "./pages/LoginPage";
 import HomePageUser from "./pages/user/HomePageUser";
 import HomePageAdmin from "./pages/admin/HomePageAdmin";
-import VerifyPage from "./pages/VerifyPage";
+// import VerifyPage from "./pages/VerifyPage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef } from "react";
 import UjianPageUser from "./pages/user/UjianPageUser";
@@ -24,6 +24,7 @@ import UpdateKelas from "./pages/admin/action-kelas/UpdateKelas";
 import PortalPage from "./pages/PortalPage";
 import { UpdateProvider } from "./utils/updateContext";
 import { QueryClient, QueryClientProvider } from "react-query";
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -38,21 +39,29 @@ export default function App() {
           index: 0,
           routes: [{ name: "VerifyPage" }],
         });
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
       } else if (token && role == "admin sekolah") {
         navigationRef.current?.reset({
           index: 0,
           routes: [{ name: "MainAdmin" }],
         });
+        // Check if the device is a tablet
+        const isTablet = await ScreenOrientation.getPlatformOrientationLockAsync();
+        if (!isTablet) {
+          await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+        }
       } else {
         navigationRef.current?.reset({
           index: 0,
           routes: [{ name: "PortalPage" }],
         });
+        await ScreenOrientation.unlockAsync();
       }
     };
-
+  
     checkAuth();
   }, []);
+  
 
   const queryClient = new QueryClient();
 
@@ -71,6 +80,11 @@ export default function App() {
               component={LoginPage}
               options={{ headerShown: false }}
             />
+            {/* <Stack.Screen
+              name="VerivyPage"
+              component={VerifyPage}
+              options={{ headerShown: false }}
+            /> */}
             <Stack.Screen
               name="LoginAsAdmin"
               component={LoginAsAdmin}
@@ -128,11 +142,6 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-          name="VerifyPage"
-          component={VerifyPage}
-          options={{ headerBackVisible: false }}
-        />
-            <Stack.Screen
               name="UjianPageUser"
               component={UjianPageUser}
               options={{ headerShown: false }}
@@ -155,8 +164,8 @@ export default function App() {
             />
           </Stack.Navigator>
         </NavigationContainer>
-    </UpdateProvider>
+      </UpdateProvider>
     </QueryClientProvider>
-    
   );
 }
+

@@ -8,8 +8,9 @@ import {
   ActivityIndicator,
   ToastAndroid,
   RefreshControl,
+  TextInput,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BASE_API_URL from "../../constant/ip";
 import * as DocumentPicker from "expo-document-picker";
 import { useApi } from "../../utils/useApi";
@@ -19,6 +20,7 @@ import {
   faChevronLeft,
   faChevronRight,
   faEllipsisVertical,
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import BottomSheetModal from "./components/BottomSheetModal";
@@ -30,6 +32,7 @@ const ListUser = ({ navigation, route }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [file, setFile] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { kelas_jurusan_id, sekolah, kelas_jurusan } = route.params;
   const [url, setUrl] = useState(
     `${BASE_API_URL}admin-sekolah?kelas_jurusan_id=${kelas_jurusan_id}`
@@ -135,13 +138,31 @@ const ListUser = ({ navigation, route }) => {
     setModalVisible(!isModalVisible);
   };
 
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <SafeAreaView className="bg-slate-50 h-full w-full">
-      <View className="flex flex-row p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-400 bg-white">
-        <TouchableOpacity onPress={() => navigation.replace("MainAdmin")}>
-          <FontAwesomeIcon icon={faArrowLeft} color="black" />
-        </TouchableOpacity>
-        <Text className={`${textTitle}`}>{kelas_jurusan}</Text>
+      <View className="flex flex-col p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-300 bg-white">
+        <View className="flex-row flex w-full items-center">
+          <View>
+            <TouchableOpacity onPress={() => navigation.replace("MainAdmin")} className="pr-2 p-2">
+              <FontAwesomeIcon icon={faArrowLeft} color="black" />
+            </TouchableOpacity>
+          </View>
+          <View>
+            <Text className={`${textTitle}`}>{kelas_jurusan}</Text>
+          </View>
+        </View>
+        <View className="flex flex-row items-center border border-slate-300 px-5 p-2.5 rounded-lg mx-4 my-2">
+          <TextInput
+            placeholder="Search by name"
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)}
+            className="flex-grow"
+          />
+        </View>
       </View>
       <View
         style={{
@@ -164,18 +185,6 @@ const ListUser = ({ navigation, route }) => {
         >
           <Text className="text-white font-bold">Import</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          className="bg-blue-500 py-2 px-4 rounded"
-          onPress={() =>
-            navigation.push("CreateUser", {
-              sekolah,
-              kelas_jurusan_id,
-              kelas_jurusan,
-            })
-          }
-        >
-          <Text className="text-white font-bold">Create</Text>
-        </TouchableOpacity>
       </View>
       <ScrollView
         className="p-4 flex gap-3"
@@ -183,29 +192,45 @@ const ListUser = ({ navigation, route }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {users.map((item) => (
+        {filteredUsers.map((item) => (
           <View
             key={item.id}
-            className="p-3 border border-slate-300 rounded-lg w-auto flex "
+            className="bg-white p-4 border border-slate-300 rounded-lg w-auto flex shadow-md mb-3"
           >
-            <View className="flex-row flex justify-between">
-              <Text className={`${textTitle}`}>{item.name}</Text>
+            <View className="flex flex-row justify-between items-center mb-2">
+              <Text className="text-lg font-semibold">{item.name}</Text>
               <TouchableOpacity onPress={() => toggleModal(item)}>
                 <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
               </TouchableOpacity>
             </View>
-            <Text className={`${textBasic}`}>
+            <Text className="text-sm text-gray-500 mb-1">
               {item.kelas_jurusan.name ?? "admin"}
             </Text>
-            {item.role == "admin sekolah" ? null : (
-              <Text className={`${textBasic}`}>{item.token}</Text>
+            {item.role !== "admin sekolah" && (
+              <Text className="text-sm text-gray-500 mb-2">{item.token}</Text>
             )}
-
-            <Text className={`${textBasic} border rounded-full px-2 w-32 my-2`}>{item.role}</Text>
+            <View>
+              <View className="border border-blue-500 rounded-full px-2 py-1">
+                <Text className="text-blue-500 font-medium text-center">{item.role}</Text>
+              </View>
+            </View>
           </View>
         ))}
+
       </ScrollView>
-      {links.length !== 0 && (
+      <TouchableOpacity
+        className="absolute bottom-4 right-4 w-14 h-14 bg-blue-500 rounded-full justify-center items-center shadow-lg"
+        onPress={() =>
+          navigation.push("CreateUser", {
+            sekolah,
+            kelas_jurusan_id,
+            kelas_jurusan,
+          })
+        }
+      >
+        <FontAwesomeIcon icon={faPlus} color="white" />
+      </TouchableOpacity>
+      {/* {links.length !== 0 && (
         <View className="flex flex-row justify-center gap-4 pb-10 px-4">
           {links.map((item, index) => (
             <TouchableOpacity
@@ -225,7 +250,7 @@ const ListUser = ({ navigation, route }) => {
             </TouchableOpacity>
           ))}
         </View>
-      )}
+      )} */}
       {selectedItem && (
         <BottomSheetModal
           isVisible={isModalVisible}
