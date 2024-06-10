@@ -77,14 +77,16 @@ const HomePageAdmin = ({ navigation }) => {
     );
   }
 
-  const filteredLinks = links?.data
-    ?.filter(
+  const sortedLinks = links?.data?.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) || [];
+
+  const filteredLinks = sortedLinks
+    .filter(
       (item) => selectedTab === "all" || item.link_status === selectedTab
     )
-    ?.filter((item) =>
+    .filter((item) =>
       item.link_title.toLowerCase().includes(searchQuery.toLowerCase())
     )
-    ?.filter(
+    .filter(
       (item) =>
         !Object.keys(filters).some(
           (key) => filters[key] && item.kelas_jurusan.id !== parseInt(key)

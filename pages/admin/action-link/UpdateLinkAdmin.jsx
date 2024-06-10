@@ -11,6 +11,7 @@ import {
   ScrollView,
   Platform,
   KeyboardAvoidingView,
+  ToastAndroid,
 } from "react-native";
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -132,7 +133,6 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
         waktu_pengerjaan_mulai: "",
         waktu_pengerjaan_selesai: "",
       });
-      console.log(fields.waktu_pengerjaan_mulai, fields.waktu_pengerjaan_selesai);
       navigation.reset({
         index: 0,
         routes: [{ name: "MainAdmin" }],
@@ -286,7 +286,7 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
                     {fields.waktu_pengerjaan_mulai.toLocaleDateString()}{" "}
                     {fields.waktu_pengerjaan_mulai.toLocaleTimeString()}
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> 
                 {showStartDatePicker && (
                   <DateTimePicker
                     value={fields.waktu_pengerjaan_mulai}

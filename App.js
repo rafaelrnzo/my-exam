@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginPage from "./pages/LoginPage";
 import HomePageUser from "./pages/user/HomePageUser";
 import HomePageAdmin from "./pages/admin/HomePageAdmin";
-import VerifyPage from "./pages/VerifyPage";
+// import VerifyPage from "./pages/VerifyPage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef } from "react";
 import UjianPageUser from "./pages/user/UjianPageUser";
@@ -45,7 +45,11 @@ export default function App() {
           index: 0,
           routes: [{ name: "MainAdmin" }],
         });
-        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
+        // Check if the device is a tablet
+        const isTablet = await ScreenOrientation.getPlatformOrientationLockAsync();
+        if (!isTablet) {
+          await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+        }
       } else {
         navigationRef.current?.reset({
           index: 0,
@@ -54,9 +58,10 @@ export default function App() {
         await ScreenOrientation.unlockAsync();
       }
     };
-
+  
     checkAuth();
   }, []);
+  
 
   const queryClient = new QueryClient();
 
@@ -75,6 +80,11 @@ export default function App() {
               component={LoginPage}
               options={{ headerShown: false }}
             />
+            {/* <Stack.Screen
+              name="VerivyPage"
+              component={VerifyPage}
+              options={{ headerShown: false }}
+            /> */}
             <Stack.Screen
               name="LoginAsAdmin"
               component={LoginAsAdmin}
