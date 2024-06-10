@@ -149,7 +149,7 @@ const ListUser = ({ navigation, route }) => {
       <View className="flex flex-col p-4 gap-2 mt-2 items-center border-b-[0.5px] border-slate-300 bg-white">
         <View className="flex-row flex w-full items-center">
           <View>
-            <TouchableOpacity onPress={() => navigation.replace("MainAdmin")} className="pr-2 p-2">
+            <TouchableOpacity onPress={() => navigation.pop()} className="pr-2 p-2">
               <FontAwesomeIcon icon={faArrowLeft} color="black" />
             </TouchableOpacity>
           </View>
