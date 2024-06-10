@@ -1,19 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomePageAdmin from "./HomePageAdmin";
-import { ActivityIndicator, Button, SafeAreaView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  SafeAreaView,
+  Text,
+  View,
+} from "react-native";
 import BASE_API_URL from "../../constant/ip";
 import SubsPage from "./SubsPage";
 import ListKelas from "./ListKelas";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faClipboard as faClipboardSolid, faLink as faLinkSolid } from "@fortawesome/free-solid-svg-icons";
+import {
+  faClipboard as faClipboardSolid,
+  faLink as faLinkSolid,
+} from "@fortawesome/free-solid-svg-icons";
 import { faClipboard } from "@fortawesome/free-regular-svg-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const MainAdmin = () => {
   const Tab = createBottomTabNavigator();
-  const [subsData, setSubsData] = useState('none' || null);
+  const [subsData, setSubsData] = useState("none" || null);
 
   const getSubsData = async () => {
     try {
@@ -32,11 +41,15 @@ const MainAdmin = () => {
     getSubsData();
   }, []);
 
-  if (subsData === null || subsData == []) {
-    return <ActivityIndicator />;
+  if (subsData === null || subsData == [] || subsData == 'none') {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
-  if (subsData.token || subsData === "none") {
+  if (subsData.token === "none") {
     return <SubsPage />;
   }
 
@@ -57,7 +70,7 @@ const MainAdmin = () => {
           options={{
             headerShown: false,
             tabBarLabel: () => null, // Hide the tab bar label
-            
+
             // tabBarLabelStyle: { fontSize: 12, marginBottom: 2 },
             // tabBarLabel: ({ focused }) => (
             //   <Text style={{ color: focused ? "blue" : "black" }}>Classroom</Text>

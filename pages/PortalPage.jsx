@@ -8,9 +8,9 @@ import Icon from '../assets/images/icon.png'
 export default function PortalPage({ navigation }) {
   return (
     <SafeAreaView className="h-full w-full flex justify-center bg-blue-500">
-      {/* <View className="w-full h-1/2">
+      <View className="w-full h-1/2">
         <Image source={Thumbnail} className="h-full w-full" />
-      </View> */}
+      </View>
       <View className=" mx-64 p-12 rounded-2xl bg-slate-50 ">
         <View className="w-full pb-8 flex flex-row items-center justify-center gap-x-4">
           <View className="">
