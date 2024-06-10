@@ -19,10 +19,12 @@ import {
 import { faClipboard } from "@fortawesome/free-regular-svg-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { useLogout } from "../../utils/useLogout";
 
 const MainAdmin = () => {
   const Tab = createBottomTabNavigator();
   const [subsData, setSubsData] = useState("none" || null);
+  const { logout } = useLogout();
 
   const getSubsData = async () => {
     try {
@@ -45,6 +47,8 @@ const MainAdmin = () => {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />
+        <Button title="Logout" onPress={logout} />
+
       </View>
     );
   }

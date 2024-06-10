@@ -92,8 +92,8 @@ const SubsPage = () => {
         <TouchableOpacity onPress={logout}>
           <FontAwesomeIcon icon={faRightFromBracket} color="black" />
         </TouchableOpacity>
-      </View> */}
-      <View className="mx-32 bg-slate-50 p-12 rounded-2xl flex justify-between ">
+      </View> */} 
+      <View className="mx-4 md:mx-32 bg-slate-50 p-4 lg:p-12 rounded-2xl flex justify-between ">
         <View className="w-full flex ">
           <View className="flex justify-end w-full items-end">
             <TouchableOpacity onPress={logout}>
@@ -109,8 +109,8 @@ const SubsPage = () => {
             </View>
           </View>
           <View className="w-full flex flex-col items-center justify-center gap-x-4">
-            <Text className={`${textTitle} text-2xl`}>Solution Exam Online</Text>
-            <Text className={`${textBasic} text-xl text-center`}>Security technology, to provide a fair and trustworthy exam environment for teachers and test takers.</Text>
+            <Text className={`${textTitle} lg:text-2xl`}>Solution Exam Online</Text>
+            <Text className={`${textBasic} lg:text-xl text-center`}>Security technology, to provide a fair and trustworthy exam environment for teachers and test takers.</Text>
           </View>
         </View>
         <View className="flex flex-row gap-x-4 pt-4 ">

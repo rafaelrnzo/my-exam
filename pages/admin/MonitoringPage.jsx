@@ -1,17 +1,15 @@
-// MonitoringPage.js
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
   Button,
   ActivityIndicator,
-  SafeAreaView,
   ScrollView,
   RefreshControl,
   TouchableOpacity,
-  StyleSheet,
   TextInput
 } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLogout } from "../../utils/useLogout";
 import { useApi } from "../../utils/useApi";
 import { useUpdate } from "../../utils/updateContext";
@@ -21,6 +19,7 @@ import {
   faArrowLeft,
   faChevronLeft,
   faChevronRight,
+  faCircle,
   faEllipsisVertical,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
@@ -28,6 +27,7 @@ import { textBasic, textTitle } from "../../assets/style/basic";
 import StatusMonitoringModal from "./components/StatusMonitoringModal";
 import io from "socket.io-client";
 import SOCKET_URL from "../../constant/ip_ws";
+import { Circle, Ellipse } from "react-native-svg";
 
 const MonitoringPage = ({ navigation, route }) => {
   const { updateTrigger, triggerUpdate } = useUpdate();
@@ -136,28 +136,27 @@ const MonitoringPage = ({ navigation, route }) => {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex flex-col bg-white h-full w-full ">
-      <View className="bg-white flex items-center w-full  flex-row  py-4 pt-8 ">
-        <View className="w-full flex flex-row  max-w-screen items-center px-4 ">
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="bg-white flex items-center w-full flex-row py-2">
+        <View className="w-full flex flex-row max-w-screen items-center px-4">
           <View className="flex-none">
-            <TouchableOpacity onPress={() => navigation.pop()} className=" p-4">
+            <TouchableOpacity onPress={() => navigation.pop()} className="p-4">
               <FontAwesomeIcon icon={faArrowLeft} color="black" />
             </TouchableOpacity>
           </View>
-          <View className=" flex-grow border border-slate-300  px-5 p-2.5 rounded-lg flex flex-row items-center">
+          <View className="flex-grow border border-slate-300 px-4 p-2 rounded-lg flex flex-row items-center">
             <View className="px-2">
               <FontAwesomeIcon icon={faSearch} color="#cbd5e1" />
             </View>
             <TextInput
-              // style={styles.searchInput}
-              className=" "
+              className=""
               placeholder="Search by name"
               value={searchQuery}
               onChangeText={(text) => setSearchQuery(text)}
@@ -177,33 +176,42 @@ const MonitoringPage = ({ navigation, route }) => {
           filteredUsers.map((user, index) => (
             <View
               key={links[index].id}
-              className="p-3 border border-slate-300 bg-white rounded-lg w-auto flex "
+              className="p-3 border border-slate-300 bg-white rounded-lg w-auto flex"
             >
               <View className="flex-row flex justify-between">
-                <Text className={`${textTitle}`}>{user.name}</Text>
+                <Text className={textTitle}>{user.name}</Text>
                 <TouchableOpacity
-                  onPress={() =>
-                    handleOpenModal(index, data.data.data[index].id)
-                  }
+                  onPress={() => handleOpenModal(index, data.data.data[index].id)}
                 >
                   <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
                 </TouchableOpacity>
               </View>
-              <Text className={`${textBasic}`}>
+              <Text className={textBasic}>
                 Mengerjakan {links[index]?.link_title}
               </Text>
-              <Text
-                className={`${textBasic} ${status[index] === "keluar"
-                  ? "bg-red-400 p-2 mt-2 rounded-lg border text-center"
+              <View className="flex flex-row items-center gap-x-2">
+                <FontAwesomeIcon icon={faCircle} color="black" size={8} className={` ${status[index] === "keluar"
+                  ? "text-red-500 font-medium text-center"
                   : status[index] === "selesai"
                     ? "bg-green-400 p-2 mt-2 rounded-lg border text-center"
                     : status[index] === "dikerjakan"
                       ? "bg-blue-400 p-2 mt-2 rounded-lg border text-center"
                       : "bg-transparent p-2 mt-2 border-slate-300 border text-center rounded text-slate-500"
-                  }`}
-              >
-                {status[index]}
-              </Text>
+                  }`} />
+                <Text
+                  className={`${textBasic} ${status[index] === "keluar"
+                    ? "text-red-500 font-medium text-center"
+                    : status[index] === "selesai"
+                      ? "bg-green-400 p-2 mt-2 rounded-lg border text-center"
+                      : status[index] === "dikerjakan"
+                        ? "bg-blue-400 p-2 mt-2 rounded-lg border text-center"
+                        : "bg-transparent p-2 mt-2 border-slate-300 border text-center rounded text-slate-500"
+                    }`}
+                >
+                  {status[index]}
+                </Text>
+              </View>
+
             </View>
           ))
         )}
@@ -211,56 +219,13 @@ const MonitoringPage = ({ navigation, route }) => {
           <StatusMonitoringModal
             visible={modalVisible}
             onClose={() => setModalVisible(false)}
-            onUpdateStatus={(newStatus) =>
-              handleUpdateStatus(newStatus, currentId)
-            }
+            onUpdateStatus={(newStatus) => handleUpdateStatus(newStatus, currentId)}
             currentStatus={status[currentUser]}
           />
         )}
       </ScrollView>
-      {/* {paginations.length !== 0 && (
-        <View className="flex flex-row justify-center gap-4 pb-10 px-4">
-          {paginations.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              className="bg-blue-500 py-2 px-4 rounded"
-              onPress={() => handleLinkPress(item.url)}
-            >
-              <Text className="text-white font-bold">
-                {item.label === "&laquo; Previous" ? (
-                  <FontAwesomeIcon icon={faChevronLeft} color="white" />
-                ) : item.label === "Next &raquo;" ? (
-                  <FontAwesomeIcon icon={faChevronRight} color="white" />
-                ) : (
-                  item.label
-                )}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )} */}
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  searchBar: {
-    marginHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 6,
-    borderWidth: 1,
-    borderColor: "#cbd5e1",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-  },
-  searchIcon: {
-    marginRight: 10,
-  },
-  searchInput: {
-    flex: 1,
-    paddingVertical: 6,
-  },
-})
 
 export default MonitoringPage;
