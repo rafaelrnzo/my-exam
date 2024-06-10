@@ -181,7 +181,7 @@ const HomePageAdmin = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView className="px-4 bg-slate-50 h-full"
+      <ScrollView className="px-4 pb-4 bg-slate-50 h-full"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -258,9 +258,9 @@ const styles = StyleSheet.create({
   tabButton: {
     flex: 1,
     alignItems: "center",
-    padding: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: "transparent",
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#cbd5e1",
   },
   selectedTab: {
     color: "#3b82f6",

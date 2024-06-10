@@ -20,6 +20,7 @@ import TimerComponent from "../admin/components/TimerComponent";
 import { useWindowDimensions } from "react-native";
 import io from 'socket.io-client';
 import SOCKET_URL from "../../constant/ip_ws";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const UjianPageUser = ({ navigation, route }) => {
   usePreventScreenCapture();
@@ -141,18 +142,18 @@ const UjianPageUser = ({ navigation, route }) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View className="flex flex-row justify-between bg-white p-4 items-center">
         <Text className="text-blue-500 text-lg">{link_title}</Text>
         <View className="flex flex-row items-center">
-          <FontAwesomeIcon icon={faClock} color="blue" size={17} />
+          {/* <FontAwesomeIcon icon={faClock} color="blue" size={16} className="mr-3"/> */}
           <TimerComponent
             waktu_pengerjaan={waktu_pengerjaan}
             onFinish={handleTimerFinish}
           />
         </View>
         <TouchableOpacity
-          className="bg-blue-500 p-2 rounded"
+          className="bg-blue-500 p-2 px-4 rounded"
           onPress={() => updateProgress("selesai")}
         >
           <Text className="text-white">Finish</Text>
@@ -165,7 +166,7 @@ const UjianPageUser = ({ navigation, route }) => {
         injectedJavaScript={disabledSelect}
         style={{ flex: 1 }}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
