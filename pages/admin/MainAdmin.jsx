@@ -13,7 +13,7 @@ import axios from "axios";
 
 const MainAdmin = () => {
   const Tab = createBottomTabNavigator();
-  const [subsData, setSubsData] = useState(null);
+  const [subsData, setSubsData] = useState('none' || null);
 
   const getSubsData = async () => {
     try {
@@ -32,11 +32,11 @@ const MainAdmin = () => {
     getSubsData();
   }, []);
 
-  if (subsData === null) {
+  if (subsData === null || subsData == []) {
     return <ActivityIndicator />;
   }
 
-  if (subsData.token === "none") {
+  if (subsData.token || subsData === "none") {
     return <SubsPage />;
   }
 
