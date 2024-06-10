@@ -7,7 +7,8 @@ import {
   ScrollView,
   RefreshControl,
   TouchableOpacity,
-  TextInput
+  TextInput,
+  StyleSheet
 } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLogout } from "../../utils/useLogout";
@@ -17,9 +18,6 @@ import BASE_API_URL from "../../constant/ip";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faArrowLeft,
-  faChevronLeft,
-  faChevronRight,
-  faCircle,
   faEllipsisVertical,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
@@ -27,7 +25,6 @@ import { textBasic, textTitle } from "../../assets/style/basic";
 import StatusMonitoringModal from "./components/StatusMonitoringModal";
 import io from "socket.io-client";
 import SOCKET_URL from "../../constant/ip_ws";
-import { Circle, Ellipse } from "react-native-svg";
 
 const MonitoringPage = ({ navigation, route }) => {
   const { updateTrigger, triggerUpdate } = useUpdate();
@@ -39,6 +36,7 @@ const MonitoringPage = ({ navigation, route }) => {
     `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTab, setSelectedTab] = useState("all");
 
   const socket = io(SOCKET_URL);
 
@@ -48,16 +46,19 @@ const MonitoringPage = ({ navigation, route }) => {
   const users = data?.data?.data.map((item) => item.user) || [];
   const links = data?.data?.data.map((item) => item.link) || [];
   const status = data?.data?.data.map((item) => item.status_progress) || [];
-  const paginations = data?.data?.links || [];
 
   const filteredUsers = useMemo(() => {
-    if (searchQuery === "") {
-      return users;
+    let filtered = users;
+    if (searchQuery !== "") {
+      filtered = filtered.filter((user) =>
+        user.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
-    return users.filter((user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery, users]);
+    if (selectedTab !== "all") {
+      filtered = filtered.filter((_, index) => status[index] === selectedTab);
+    }
+    return filtered;
+  }, [searchQuery, selectedTab, users, status]);
 
   const handleOpenModal = (userIndex, id) => {
     setCurrentUser(userIndex);
@@ -164,6 +165,93 @@ const MonitoringPage = ({ navigation, route }) => {
           </View>
         </View>
       </View>
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            selectedTab === "all" && styles.selectedTab,
+          ]}
+          onPress={() => setSelectedTab("all")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === "all" && styles.selectedText,
+            ]}
+            className={`${textBasic}`}
+          >
+            All
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            selectedTab === "keluar" && styles.selectedTab,
+          ]}
+          onPress={() => setSelectedTab("keluar")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === "keluar" && styles.selectedText,
+            ]}
+            className={`${textBasic}`}
+          >
+            Keluar
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            selectedTab === "split screen" && styles.selectedTab,
+          ]}
+          onPress={() => setSelectedTab("split screen")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === "split screen" && styles.selectedText,
+            ]}
+            className={`${textBasic}`}
+          >
+            Split Screen
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            selectedTab === "dikerjakan" && styles.selectedTab,
+          ]}
+          onPress={() => setSelectedTab("dikerjakan")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === "dikerjakan" && styles.selectedText,
+            ]}
+            className={`${textBasic}`}
+          >
+            Dikerjakan
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            selectedTab === "selesai" && styles.selectedTab,
+          ]}
+          onPress={() => setSelectedTab("selesai")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === "selesai" && styles.selectedText,
+            ]}
+            className={`${textBasic}`}
+          >
+            Selesai
+          </Text>
+        </TouchableOpacity>
+      </View>
       <ScrollView
         className="flex flex-col gap-3 px-4 mt-2 flex-2 bg-slate-50"
         refreshControl={
@@ -173,47 +261,42 @@ const MonitoringPage = ({ navigation, route }) => {
         {filteredUsers.length === 0 ? (
           <Text>tidak ada user ujian</Text>
         ) : (
-          filteredUsers.map((user, index) => (
-            <View
-              key={links[index].id}
-              className="p-3 border border-slate-300 bg-white rounded-lg w-auto flex"
-            >
-              <View className="flex-row flex justify-between">
-                <Text className={textTitle}>{user.name}</Text>
-                <TouchableOpacity
-                  onPress={() => handleOpenModal(index, data.data.data[index].id)}
-                >
-                  <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
-                </TouchableOpacity>
-              </View>
-              <Text className={textBasic}>
-                Mengerjakan {links[index]?.link_title}
-              </Text>
-              <View className="flex flex-row items-center gap-x-2">
-                <FontAwesomeIcon icon={faCircle} color="black" size={8} className={` ${status[index] === "keluar"
-                  ? "text-red-500 font-medium text-center"
-                  : status[index] === "selesai"
-                    ? "bg-green-400 p-2 mt-2 rounded-lg border text-center"
-                    : status[index] === "dikerjakan"
-                      ? "bg-blue-400 p-2 mt-2 rounded-lg border text-center"
-                      : "bg-transparent p-2 mt-2 border-slate-300 border text-center rounded text-slate-500"
-                  }`} />
-                <Text
-                  className={`${textBasic} ${status[index] === "keluar"
-                    ? "text-red-500 font-medium text-center"
-                    : status[index] === "selesai"
-                      ? "bg-green-400 p-2 mt-2 rounded-lg border text-center"
-                      : status[index] === "dikerjakan"
-                        ? "bg-blue-400 p-2 mt-2 rounded-lg border text-center"
-                        : "bg-transparent p-2 mt-2 border-slate-300 border text-center rounded text-slate-500"
-                    }`}
-                >
-                  {status[index]}
+          filteredUsers.map((user, index) => {
+            const userLink = links[users.indexOf(user)];
+            const userStatus = status[users.indexOf(user)];
+            return (
+              <View
+                key={userLink.id}
+                className="p-3 border border-slate-300 bg-white rounded-lg w-auto flex"
+              >
+                <View className="flex-row flex justify-between">
+                  <Text className={textTitle}>{user.name}</Text>
+                  <TouchableOpacity
+                    onPress={() => handleOpenModal(users.indexOf(user), data.data.data[users.indexOf(user)].id)}
+                  >
+                    <FontAwesomeIcon icon={faEllipsisVertical} color="black" />
+                  </TouchableOpacity>
+                </View>
+                <Text className={textBasic}>
+                  Mengerjakan {userLink?.link_title}
                 </Text>
+                <View className="flex flex-row justify-end gap-x-2">
+                  <Text
+                    className={`${textBasic} ${userStatus === "keluar"
+                      ? "text-red-500 font-medium text-center"
+                      : userStatus === "selesai"
+                        ? "text-green-500 text-center"
+                        : userStatus === "dikerjakan"
+                          ? "text-blue-500 text-center"
+                          : "text-center rounded text-slate-500"
+                      }`}
+                  >
+                    ● {userStatus}
+                  </Text>
+                </View>
               </View>
-
-            </View>
-          ))
+            );
+          })
         )}
         {currentUser !== null && (
           <StatusMonitoringModal
@@ -227,5 +310,49 @@ const MonitoringPage = ({ navigation, route }) => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 4,
+  },
+  searchBar: {
+    marginHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: "#cbd5e1",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 6,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#cbd5e1",
+  },
+  selectedTab: {
+    color: "#3b82f6",
+    borderBottomColor: "#3b82f6",
+  },
+  selectedText: {
+    color: "#3b82f6",
+  },
+  tabText: {
+    fontSize: 16,
+  },
+});
 
 export default MonitoringPage;
