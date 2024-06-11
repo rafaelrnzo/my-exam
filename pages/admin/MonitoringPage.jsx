@@ -32,9 +32,9 @@ const MonitoringPage = ({ navigation, route }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [currentId, setCurrentId] = useState(null);
   const { kelas_jurusan_id, kelas_jurusan } = route.params;
-  const [url, setUrl] = useState(
-    `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`
-  );
+  const [url, setUrl] = useState(`
+    ${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}
+  `);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("all");
 
@@ -67,6 +67,7 @@ const MonitoringPage = ({ navigation, route }) => {
   };
 
   const handleUpdateStatus = async (newStatus, userId) => {
+    console.log(userId, newStatus);
     try {
       await putData({
         url: `${BASE_API_URL}progress/${userId}`,
@@ -76,14 +77,6 @@ const MonitoringPage = ({ navigation, route }) => {
     } catch (error) {
       console.error("Error updating status:", error, newStatus);
     }
-  };
-
-  const handleLinkPress = (newUrl) => {
-    setUrl(
-      newUrl
-        ? newUrl
-        : `${BASE_API_URL}admin-sekolah/monitoring?kelas_jurusan_id=${kelas_jurusan_id}`
-    );
   };
 
   const [refreshing, setRefreshing] = useState(false);
@@ -266,7 +259,7 @@ const MonitoringPage = ({ navigation, route }) => {
             const userStatus = status[users.indexOf(user)];
             return (
               <View
-                key={userLink.id}
+                key={index}
                 className="p-3 border border-slate-300 bg-white rounded-lg w-auto flex"
               >
                 <View className="flex-row flex justify-between">

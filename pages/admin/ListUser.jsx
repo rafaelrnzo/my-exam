@@ -232,27 +232,6 @@ const ListUser = ({ navigation, route }) => {
       >
         <FontAwesomeIcon icon={faPlus} color="white" />
       </TouchableOpacity>
-      {/* {links.length !== 0 && (
-        <View className="flex flex-row justify-center gap-4 pb-10 px-4">
-          {links.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              className="bg-blue-500 py-2 px-4 rounded"
-              onPress={() => handleLinkPress(item.url)}
-            >
-              <Text className="text-white font-bold">
-                {item.label === "&laquo; Previous" ? (
-                  <FontAwesomeIcon icon={faChevronLeft} color="white" />
-                ) : item.label === "Next &raquo;" ? (
-                  <FontAwesomeIcon icon={faChevronRight} color="white" />
-                ) : (
-                  item.label
-                )}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )} */}
       {selectedItem && (
         <BottomSheetModal
           isVisible={isModalVisible}

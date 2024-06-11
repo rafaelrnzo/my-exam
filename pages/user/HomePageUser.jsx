@@ -22,7 +22,7 @@ const HomePageUser = ({ navigation }) => {
     kelas_jurusan: "",
   });
   const socket = io(SOCKET_URL);
-  const { data: userData, error: userError } = useApi(`${BASE_API_URL}get-data-login`);
+  const { data: userData, error: userError, mutate: mutateUser } = useApi(`${BASE_API_URL}get-data-login`);
   const { data: linksData, mutate: mutateLinks } = useApi(`${BASE_API_URL}links`);
   const { data: progressData, mutate: mutateProgress } = useApi(`${BASE_API_URL}progress`);
   const {postData} = useApi()
@@ -34,10 +34,10 @@ const HomePageUser = ({ navigation }) => {
     fetchData().then(() => setRefreshing(false));
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = async() => {
     await mutateLinks();
     await mutateProgress();
-    console.log("Data refreshed from monitoring");
+    await mutateUser()
   };
 
   useEffect(() => {
