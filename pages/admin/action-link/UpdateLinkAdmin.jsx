@@ -1,31 +1,13 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  ActivityIndicator,
-  ScrollView,
-  Platform,
-  KeyboardAvoidingView,
-  ToastAndroid,
-} from "react-native";
+import React, { useState } from 'react';
+import { SafeAreaView, KeyboardAvoidingView, View, Text, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, ToastAndroid, Platform } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { useApi } from '../../../utils/useApi';
+import BASE_API_URL from '../../../constant/ip';
+import { textBasic, textInputStyle, textTitle } from '../../../assets/style/basic';
 import SelectDropdown from "react-native-select-dropdown";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import BASE_API_URL from "../../../constant/ip";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import {
-  buttonStyle,
-  textBasic,
-  textInputStyle,
-  textTitle,
-} from "../../../assets/style/basic";
-import { useApi } from "../../../utils/useApi";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 const UpdateLinkAdmin = ({ navigation, route }) => {
   const {
@@ -283,13 +265,14 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
                   style={styles.datePickerButton}
                 >
                   <Text>
-                    {fields.waktu_pengerjaan_mulai.toLocaleDateString()}{" "}
-                    {fields.waktu_pengerjaan_mulai.toLocaleTimeString()}
+                    {fields.waktu_pengerjaan_mulai instanceof Date
+                      ? `${fields.waktu_pengerjaan_mulai.toLocaleDateString()} ${fields.waktu_pengerjaan_mulai.toLocaleTimeString()}`
+                      : ""}
                   </Text>
                 </TouchableOpacity> 
                 {showStartDatePicker && (
                   <DateTimePicker
-                    value={fields.waktu_pengerjaan_mulai}
+                    value={fields.waktu_pengerjaan_mulai || new Date()}
                     mode="date"
                     display="default"
                     onChange={onStartDateChange}
@@ -297,7 +280,7 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
                 )}
                 {showStartTimePicker && (
                   <DateTimePicker
-                    value={fields.waktu_pengerjaan_mulai}
+                    value={fields.waktu_pengerjaan_mulai || new Date()}
                     mode="time"
                     display="default"
                     onChange={onStartTimeChange}
@@ -311,13 +294,14 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
                   style={styles.datePickerButton}
                 >
                   <Text>
-                    {fields.waktu_pengerjaan_selesai.toLocaleDateString()}{" "}
-                    {fields.waktu_pengerjaan_selesai.toLocaleTimeString()}
+                    {fields.waktu_pengerjaan_selesai instanceof Date
+                      ? `${fields.waktu_pengerjaan_selesai.toLocaleDateString()} ${fields.waktu_pengerjaan_selesai.toLocaleTimeString()}`
+                      : ""}
                   </Text>
                 </TouchableOpacity>
                 {showEndDatePicker && (
                   <DateTimePicker
-                    value={fields.waktu_pengerjaan_selesai}
+                    value={fields.waktu_pengerjaan_selesai || new Date()}
                     mode="date"
                     display="default"
                     onChange={onEndDateChange}
@@ -325,7 +309,7 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
                 )}
                 {showEndTimePicker && (
                   <DateTimePicker
-                    value={fields.waktu_pengerjaan_selesai}
+                    value={fields.waktu_pengerjaan_selesai || new Date()}
                     mode="time"
                     display="default"
                     onChange={onEndTimeChange}
@@ -340,48 +324,55 @@ const UpdateLinkAdmin = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = {
   dropdownButtonStyle: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#f1f5f9",
-    padding: 10,
-    borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
     borderWidth: 1,
-    borderColor: "#cbd5e1",
+    borderColor: '#ddd',
+    borderRadius: 5,
+    backgroundColor: '#fff',
   },
   dropdownButtonTxtStyle: {
     fontSize: 16,
-    color: "#000",
+    color: '#000',
   },
   dropdownButtonArrowStyle: {
-    fontSize: 20,
-    color: "#000",
-  },
-  dropdownMenuStyle: {
-    backgroundColor: "#fff",
-    borderRadius: 5,
-    marginTop: 10,
-    borderColor: "#cbd5e1",
+    fontSize: 18,
+    color: '#000',
   },
   dropdownItemStyle: {
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#cbd5e1",
   },
   dropdownItemTxtStyle: {
     fontSize: 16,
-    color: "#000",
+    color: '#000',
+  },
+  dropdownMenuStyle: {
+    borderRadius: 5,
   },
   datePickerButton: {
-    backgroundColor: "#f1f5f9",
     padding: 10,
-    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#cbd5e1",
-    alignItems: "center",
+    borderColor: '#ddd',
+    borderRadius: 5,
+    backgroundColor: '#fff',
   },
-});
+  textBasic: {
+    fontSize: 16,
+    color: '#000',
+  },
+  textInputStyle: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    backgroundColor: '#fff',
+  },
+};
 
 export default UpdateLinkAdmin;
+

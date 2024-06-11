@@ -52,7 +52,7 @@ const UpdateUser = ({ navigation, route }) => {
       role: role,
       kelas_jurusan: kelas_jurusan,
     });
-  }, [name, token, role, kelas_jurusan, fields.password]);
+  }, [name, token, role, kelas_jurusan]);
 
   const updateUser = async () => {
     try {

@@ -19,7 +19,7 @@ const LoginPage = ({ navigation }) => {
       return;
     }
     try {
-      await login(`${BASE_API_URL}login-siswa`, 'VerifyPage');
+      await login(`${BASE_API_URL}login-siswa`, 'HomePageUser');
     } catch (error) {
       if (error.response && error.response.status === 401) {
         setErrorMessage("Unauthorized. Please check your name, password, or token.");

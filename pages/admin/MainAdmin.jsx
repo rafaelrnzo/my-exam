@@ -1,49 +1,42 @@
-import React, { useEffect, useState } from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomePageAdmin from "./HomePageAdmin";
-import {
-  ActivityIndicator,
-  Button,
-  SafeAreaView,
-  Text,
-  View,
-} from "react-native";
-import BASE_API_URL from "../../constant/ip";
-import SubsPage from "./SubsPage";
-import ListKelas from "./ListKelas";
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { View, SafeAreaView, ActivityIndicator, Button } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faClipboard as faClipboardSolid,
   faLink as faLinkSolid,
 } from "@fortawesome/free-solid-svg-icons";
 import { faClipboard } from "@fortawesome/free-regular-svg-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import { useLogout } from "../../utils/useLogout";
+import BASE_API_URL from '../../constant/ip';
+import { useLogout } from '../../utils/useLogout';
+import SubsPage from './SubsPage';
+import ListKelas from './ListKelas';
+import HomePageAdmin from './HomePageAdmin';
 
-const MainAdmin = () => {
+const MainAdmin = memo(() => {
   const Tab = createBottomTabNavigator();
-  const [subsData, setSubsData] = useState("none" || null);
+  const [subsData, setSubsData] = useState(null);
   const { logout } = useLogout();
 
-  const getSubsData = async () => {
+  const getSubsData = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("token");
       const response = await axios.get(`${BASE_API_URL}admin-sekolah`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(response.data);
       setSubsData(response.data);
     } catch (error) {
       console.error("Error fetching subs data:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     getSubsData();
-  }, []);
+  }, [getSubsData]);
 
-  if (subsData === null || subsData == [] || subsData == 'none') {
+  if (!subsData || subsData.length === 0 || subsData === 'none') {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -60,11 +53,7 @@ const MainAdmin = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <Tab.Navigator
         screenOptions={{
-          tabBarStyle: {
-            // paddingVertical: 8,
-            height: 65,
-            // paddingBottom: 20, // Adjust the paddingBottom here
-          },
+          tabBarStyle: { height: 65 },
         }}
       >
         <Tab.Screen
@@ -72,12 +61,7 @@ const MainAdmin = () => {
           component={ListKelas}
           options={{
             headerShown: false,
-            tabBarLabel: () => null, // Hide the tab bar label
-
-            // tabBarLabelStyle: { fontSize: 12, marginBottom: 2 },
-            // tabBarLabel: ({ focused }) => (
-            //   <Text style={{ color: focused ? "blue" : "black" }}>Classroom</Text>
-            // ),
+            tabBarLabel: () => null,
             tabBarIcon: ({ focused }) => (
               <FontAwesomeIcon
                 icon={focused ? faClipboardSolid : faClipboard}
@@ -93,15 +77,10 @@ const MainAdmin = () => {
           component={HomePageAdmin}
           options={{
             headerShown: false,
-            // tabBarLabelStyle: { fontSize: 12, marginBottom: 2 },
-            // tabBarLabel: ({ focused }) => (
-            //   <Text style={{ color: focused ? "blue" : "black" }}>Link</Text>
-            // ),
-            tabBarLabel: () => null, // Hide the tab bar label
-
+            tabBarLabel: () => null,
             tabBarIcon: ({ focused }) => (
               <FontAwesomeIcon
-                icon={focused ? faLinkSolid : faLinkSolid}
+                icon={faLinkSolid}
                 color={focused ? "blue" : "black"}
                 size={20}
                 style={{ marginBottom: 2 }}
@@ -112,6 +91,6 @@ const MainAdmin = () => {
       </Tab.Navigator>
     </SafeAreaView>
   );
-};
+});
 
 export default MainAdmin;
