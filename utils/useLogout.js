@@ -19,10 +19,11 @@ export const useLogout = () => {
       );
       console.log('logging out');
       await AsyncStorage.multiRemove(['token', 'role', 'name']);
-      navigation.navigate('PortalPage');
+      navigation.replace('PortalPage');
     } catch (error) {
+      console.log(error);
+      navigation.replace('PortalPage');
       await AsyncStorage.multiRemove(['token', 'role', 'name']);
-      navigation.navigate('PortalPage');
     }
   };
 

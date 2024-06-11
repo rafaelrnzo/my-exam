@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginPage from "./pages/LoginPage";
 import HomePageUser from "./pages/user/HomePageUser";
 import HomePageAdmin from "./pages/admin/HomePageAdmin";
-// import VerifyPage from "./pages/VerifyPage";
+import VerifyPage from "./pages/VerifyPage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef } from "react";
 import UjianPageUser from "./pages/user/UjianPageUser";
@@ -34,6 +34,7 @@ export default function App() {
     const checkAuth = async () => {
       const role = await AsyncStorage.getItem("role");
       const token = await AsyncStorage.getItem("token");
+      console.log(role, token);
       if (token && role == "siswa") {
         navigationRef.current?.reset({
           index: 0,
@@ -80,11 +81,11 @@ export default function App() {
               component={LoginPage}
               options={{ headerShown: false }}
             />
-            {/* <Stack.Screen
+            <Stack.Screen
               name="VerifyPage"
               component={VerifyPage}
               options={{ headerShown: false }}
-            /> */}
+            />
             <Stack.Screen
               name="LoginAsAdmin"
               component={LoginAsAdmin}
